@@ -4,7 +4,7 @@ let express = require('express');
 let router = express.Router();
 let controller = require('./controllers/index.js');
 
-let moduleName = 'menu';
+let moduleName = 'menus';
 
 router.route('/menus').get(__acl.isAllow(moduleName, 'index'), controller.index);
 router.get('/menus/sort/:sort/:order', __acl.isAllow(moduleName, 'index'), controller.index);
