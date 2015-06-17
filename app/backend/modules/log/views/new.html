@@ -1,0 +1,189 @@
+{% extends 'layout.html' %}
+
+{% block cssExtends %}
+    <link rel="stylesheet" href="/admin/plugins/select2/select2.css"/>
+    <link href="/admin/plugins/ckeditor/plugins/codemirror/theme/monokai.css" rel="stylesheet">
+    <link rel="stylesheet" type="text/css" href="/admin/plugins/bootstrap-datepicker/css/datepicker3.css"/>
+    <style>
+        .btn-ahref {
+            background: none !important;
+            border: none;
+            padding: 0 !important;
+            color: #069;
+            cursor: pointer;
+        }
+
+        .btn-ahref:focus {
+            outline: 0;
+        }
+    </style>
+{% endblock %}
+
+{% block content %}
+    <div class="alert-zone"></div>
+    <div class="portlet">
+        <form id="edit-form" method="POST">
+            <div class="portlet-title">
+                <div class="caption">
+                    {% include 'toolbar.html' %}
+                </div>
+            </div>
+            <div class="portlet-body">
+                <div class="row">
+                    <!-- BEGIN LEFTSIDE -->
+                    <div class="col-md-12 col-sm-12">
+                        <div class="row">
+                            <div class="form-group">
+                                <div class="col-md-4 col-sm-4">
+                                    <label for="content" class="control-label">Trạng thái:</label>
+                                    <input type="text" class="form-control" readonly
+                                           value="{{ "Success" if(log.type == 1) else "Error" }}"/>
+                                </div>
+                                <div class="col-md-4 col-sm-4">
+                                    <label for="content" class="control-label">Thời điểm:</label>
+                                    <input type="text" class="form-control" readonly
+                                           value="{{ log.created_at | date('d/m/Y h:i:s') }}"/>
+                                </div>
+                                <div class="col-md-4 col-sm-4">
+                                    <label class="control-label">Module:</label>
+                                    <input name="module_name" class="form-control" type="text"
+                                           value="{{ log.module_name }}"/>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label for="title" class="control-label">Tên log: <span class="required">* </span></label>
+                            <input required name="event_name" class="form-control" type="text"
+                                   value="{{ log.event_name }}"/>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="content" class="control-label">Nội dung: <span
+                                        class="required">* </span></label>
+                            <textarea class="form-control" required rows="10" cols="30"
+                                      name="message">{{ log.message }}</textarea>
+                        </div>
+
+
+                        <div class="form-group">
+                            <label class="control-label">Ghi chú:</label>
+                            <textarea class="form-control" rows="5" cols="30" name="note">{{ log.note }}</textarea>
+                        </div>
+
+                    </div>
+                    <!-- END LEFTSIDE -->
+
+                    {#<!-- BEGIN RIGHTSIDE -->#}
+                    {#<div class="col-md-3 col-sm-3">#}
+                        {#<div class="form-group">#}
+
+                            {#<input type="text" class="form-control" readonly#}
+                                   {#value="{{ "Success" if(log.type == 1) else "Error" }}"/>#}
+                        {#</div>#}
+
+                        {#<div class="form-group">#}
+                            {#<label for="content" class="control-label">Thời điểm:</label>#}
+                            {#<input type="text" class="form-control" readonly#}
+                                   {#value="{{ log.created_at | date('d/m/Y h:i:s') }}"/>#}
+                        {#</div>#}
+
+                        {#<div class="form-group">#}
+                            {#<label class="control-label">Module:</label>#}
+                            {#<input name="module_name" class="form-control" type="text" value="{{ log.module_name }}"/>#}
+                        {#</div>#}
+
+                    {#</div>#}
+                    {#<!-- END RIGHTSIDE -->#}
+                </div>
+            </div>
+        </form>
+    </div>
+{% endblock %}
+
+{% block jsExtends %}
+    {% include 'editorScript.html' %}
+    <script type="text/javascript" src="/admin/plugins/bootstrap-datepicker/js/bootstrap-datepicker.js"></script>
+{% endblock %}
+
+{% block jsFooter %}
+    <script>
+        window.onload = function () {
+            CKEDITOR.replace('content', {
+                height: 300
+            });
+            CKEDITOR.replace('requirement', {
+                height: 300
+            });
+            CKEDITOR.replace('desc', {
+                height: 300
+            });
+        };
+
+        $(document).ready(function () {
+            $('.date-picker').datepicker();
+
+            var select2 = $('#pic_job_skill_id');
+
+            $(select2).select2({
+                placeholder: "Chọn danh mục"
+            });
+
+            {% if job.job_skill_id != '' and job.job_skill_id != null %}
+            var job_skill_id = '{{ job.job_skill_id }}';
+            job_skill_id = job_skill_id.split(':');
+            job_skill_id.shift();
+            job_skill_id.pop(job_skill_id[job_skill_id.length - 1]);
+//            console.log(job_skill_id);
+            $(select2).val(job_skill_id).trigger("change");
+            {% endif %}
+
+            $('#pic_job_loc_id').select2({
+                placeholder: 'Chọn địa điểm'
+            });
+
+            $("#frmEditjob").submit(function (e) {
+                var form = $('#frmEditjob');
+                var list_id = $(select2).val();
+                if (list_id && list_id != '') {
+                    list_id = ':' + list_id.join(':') + ':';
+                    var skill_id = $("<input>")
+                            .attr("type", "hidden")
+                            .attr("name", "job_skill_id").val(list_id);
+                    form.append($(skill_id));
+                }
+
+                list_id = $('#pic_job_loc_id').val();
+                if (list_id && list_id != '') {
+                    list_id = ':' + list_id.join(':') + ':';
+                    var loc_id = $("<input>")
+                            .attr("type", "hidden")
+                            .attr("name", "job_loc_id").val(list_id);
+                    form.append($(loc_id));
+                }
+
+                var desc = CKEDITOR.instances.desc.getData();
+                form.append($("<input>")
+                        .attr("type", "hidden")
+                        .attr("name", "desc").val(desc));
+                var content = CKEDITOR.instances.content.getData();
+                form.append($("<input>")
+                        .attr("type", "hidden")
+                        .attr("name", "content").val(content));
+                var requirement = CKEDITOR.instances.requirement.getData();
+                form.append($("<input>")
+                        .attr("type", "hidden")
+                        .attr("name", "requirement").val(requirement));
+                var expires_date = $('.date-picker').find('input').val();
+                form.append($("<input>")
+                        .attr("type", "hidden")
+                        .attr("name", "expires_date").val(expires_date));
+            });
+
+
+            $('#saveForm').click(function () {
+                $('#frmEditjob').submit();
+            });
+        });
+    </script>
+
+{% endblock %}
