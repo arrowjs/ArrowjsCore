@@ -30,7 +30,7 @@ _module.list = function (req, res) {
     }
 
     __models.category.findAndCountAll({
-        where: condition,
+        where: [condition],
         limit: numberItemInPage,
         offset: (currentPage - 1) * numberItemInPage,
         order: 'name asc'
@@ -38,7 +38,7 @@ _module.list = function (req, res) {
         totalItem = Cats.count;
         totalPage = Math.ceil(totalItem / numberItemInPage);
 
-        _module.render(req, res, 'categories/list', {
+        _module.render(req, res, 'category/index', {
             cats: Cats.rows,
             title: 'Danh mục bài viết',
             messages: req.messages || [],
@@ -66,6 +66,7 @@ _module.save = function (req, res) {
                 data.id = new Date().getTime();
                 data.count = 0;
                 data.slug = slug(data.name).toLowerCase();
+
                 __models.category.create(data).then(function (tag) {
                     res.json(tag);
                 });
@@ -112,7 +113,7 @@ _module.delete = function (req, res, next) {
             let listId = req.param('ids').split(',');
             listId.forEach(function (id) {
                 __models.posts.findAll({
-                    where: 'cat_id like \'%:' + id + ':%\''
+                    where: ['cat_id like \'%:' + id + ':%\'']
                 }).then(function (posts) {
                     if (posts.length > 0) {
                         posts.forEach(function (post) {
@@ -123,7 +124,7 @@ _module.delete = function (req, res, next) {
                                 cat_id: newBtag
                             }).on('success', function () {
                                 __models.category.find({
-                                    where: 'name=\'Uncategorized\''
+                                    where: ['name=\'Uncategorized\'']
                                 }).then(function (tag) {
                                     let count = +tag.count + 1;
                                     tag.updateAttributes({
@@ -158,7 +159,7 @@ _module.listAll = function (req, res) {
     query = query.toLowerCase();
 
     __models.category.findAll({
-        where: 'LOWER(name) like \'%' + query + '%\'',
+        where: ['LOWER(name) like \'%' + query + '%\''],
         order: 'name asc'
     }).then(function (tags) {
         let data = [];

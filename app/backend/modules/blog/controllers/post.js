@@ -2,13 +2,13 @@
 
 let util = require('util');
 let config = require(__base + 'config/config');
-let edit_template = 'posts/new';
-let chalk = require('chalk');
 let slug = require('slug-extend');
 let async = require('async'),
     route = 'blog';
 let sequelize = require('sequelize');
 let Promise = require('bluebird');
+
+let edit_view = 'post/new';
 
 function PostsModule() {
     BaseModuleBackend.call(this);
@@ -116,7 +116,7 @@ _module.list = function (req, res) {
         let totalPage = Math.ceil(results.count / config.pagination.number_item);
 
         // Render view
-        _module.render(req, res, '/posts/index.html', {
+        _module.render(req, res, '/post/index', {
             title: "Danh sách bài viết",
             totalPage: totalPage,
             items: results.rows,
@@ -126,7 +126,7 @@ _module.list = function (req, res) {
         req.flash.error('Name: ' + error.name + '<br />' + 'Message: ' + error.message);
 
         // Render view if has error
-        _module.render(req, res, '/posts/index.html', {
+        _module.render(req, res, '/post/index', {
             title: "Danh sách bài viết",
             totalPage: 1,
             items: null,
@@ -178,7 +178,7 @@ _module.view = function (req, res) {
         let data = results[2];
         data.full_text = data.full_text.replace(/&lt/g, "&amp;lt");
         data.full_text = data.full_text.replace(/&gt/g, "&amp;gt");
-        _module.render(req, res, edit_template, {
+        _module.render(req, res, edit_view, {
             title: "Cập nhật bài viết",
             categories: results[0],
             users: results[1],
@@ -208,34 +208,34 @@ _module.update = function (req, res, next) {
             tag.shift();
             tag.pop(tag.length - 1);
         } else tag = [];
+
         let newtag = data.categories;
         if (newtag != null && newtag != '') {
             newtag = newtag.split(':');
             newtag.shift();
             newtag.pop(newtag.length - 1);
         } else newtag = [];
+
         /**
-         * tim xem tag nao bi xoa di va tag nao moi de thay doi gia tri count
+         * Update count for category
          */
         let onlyInA = [],
             onlyInB = [];
 
         if (Array.isArray(tag) && Array.isArray(newtag)) {
-            //cac tag bi xoa di
             onlyInA = tag.filter(function (current) {
                 return newtag.filter(function (current_b) {
                         return current_b == current
                     }).length == 0
             });
-            //cac tag moi them vao
+
             onlyInB = newtag.filter(function (current) {
                 return tag.filter(function (current_a) {
                         return current_a == current
                     }).length == 0
             });
         }
-        //console.log(chalk.green('Only in old tag: ' + onlyInA));
-        //console.log(chalk.green('Only in new tag: ' + onlyInB));
+
         if (data.published != post.published && data.published == 1) data.published_at = __models.sequelize.fn('NOW');
 
         post.updateAttributes(data).on('success', function () {
@@ -250,7 +250,6 @@ _module.update = function (req, res, next) {
                                         count: count
                                     }).on('success', function (data) {
                                         fulfill(data);
-                                        console.log(chalk.green('Update category ' + tag.id + ': count-1 success'));
                                     });
                                 });
                             });
@@ -265,7 +264,7 @@ _module.update = function (req, res, next) {
                                     tag.updateAttributes({
                                         count: count
                                     }).on('success', function () {
-                                        console.log(chalk.green('Update category ' + tag.id + ': count+1 success'));
+                                        //console.log(chalk.green('Update category ' + tag.id + ': count+1 success'));
                                     });
                                 });
                             });
@@ -276,15 +275,14 @@ _module.update = function (req, res, next) {
                 req.flash.success("Cập nhật bài viết thành công");
                 next();
             })
-
         });
     });
-
 };
 
 _module.create = function (req, res) {
     res.locals.backButton = __acl.addButton(req, route, 'post_index', '/admin/blog/posts/page/1')
     res.locals.saveButton = __acl.addButton(req, route, 'post_create');
+
     Promise.all([
         __models.category.findAll({
             order: "id asc"
@@ -293,22 +291,22 @@ _module.create = function (req, res) {
             order: "id asc"
         })
     ]).then(function (results) {
-
-        _module.render(req, res, edit_template, {
+        _module.render(req, res, edit_view, {
             title: "Thêm bài viết",
             categories: results[0],
             users: results[1]
         });
     });
 };
-_module.save = function (req, res) {
 
+_module.save = function (req, res) {
     let data = req.body;
     data.created_by = req.user.id;
     data.alias = slug(data.title).toLowerCase();
     data.type = 'post';
     if (!data.published) data.published = 0;
     if (data.published == 1) data.published_at = __models.sequelize.fn('NOW');
+
     __models.posts.create(data).then(function (post) {
         let tag = post.cat_id;
         if (tag != null && tag != '') {
@@ -323,7 +321,7 @@ _module.save = function (req, res) {
                         cat.updateAttributes({
                             count: count
                         }).on('success', function () {
-                            console.log(chalk.green('Update cat ' + cat.id + ': count+1 success'));
+                            //console.log(chalk.green('Update cat ' + cat.id + ': count+1 success'));
                         });
                     });
                 });
@@ -335,9 +333,8 @@ _module.save = function (req, res) {
         req.flash.error(err.message);
         res.redirect('/admin/blog/posts/create');
     });
-
-
 };
+
 _module.delete = function (req, res) {
     __models.posts.findAll({
         where: {

@@ -115,7 +115,7 @@ _module.list = function (req, res) {
         let totalPage = Math.ceil(results.count / config.pagination.number_item);
 
         // Render view
-        _module.render(req, res, '/pages/index.html', {
+        _module.render(req, res, '/page/index', {
             title: "Danh sách page",
             totalPage: totalPage,
             items: results.rows,
@@ -125,7 +125,7 @@ _module.list = function (req, res) {
         req.flash.error('Name: ' + error.name + '<br />' + 'Message: ' + error.message);
 
         // Render view if has error
-        _module.render(req, res, '/pages/index.html', {
+        _module.render(req, res, '/page/index', {
             title: "Danh sách page",
             totalPage: 1,
             items: null,
@@ -139,7 +139,7 @@ _module.listAll = function (req, res) {
     query = query.toLowerCase();
 
     __models.posts.findAll({
-        where: "type='page' AND LOWER(title) like '%" + query + "%'",
+        where: ["type='page' AND LOWER(title) like '%" + query + "%'"],
         order: 'title asc'
     }).then(function (tags) {
         let data = [];
@@ -183,7 +183,7 @@ _module.view = function (req, res) {
             })
     ]).then(function ( results) {
         res.locals.viewButton = 'trungtam/' + results[1].alias;
-        _module.render(req,res,'pages/new', {
+        _module.render(req,res,'page/new', {
             title: "Cập nhật page",
             users: results[0],
             page: results[1]
@@ -208,7 +208,7 @@ _module.update = function (req, res, next) {
         page.updateAttributes(data).then(function () {
             res.locals.viewButton = 'trungtam/' + page.alias;
             req.messages = req.flash.success("Cập nhật page thành công");
-            _module.render(req,res,'pages/new', {
+            _module.render(req,res,'page/new', {
                 title: "Cập nhật page",
                 page: page
             });
@@ -223,7 +223,7 @@ _module.create = function (req, res) {
     __models.user.findAll({
                 order: "id asc"
             }).then(function (results) {
-        _module.render(req,res,'pages/new', {
+        _module.render(req,res,'page/new', {
             title: "Tạo page",
             users: results
         });
