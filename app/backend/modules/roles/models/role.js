@@ -1,4 +1,5 @@
-"use strict"
+"use strict";
+
 module.exports = function (sequelize, DataTypes) {
     let Role = sequelize.define("role", {
         name: DataTypes.STRING,
@@ -14,14 +15,12 @@ module.exports = function (sequelize, DataTypes) {
         tableName: 'arr_role',
         createdAt: 'created_at',
         updatedAt: 'modified_at',
-        // And deletedAt to be called destroyTime (remember to enable paranoid for this to work)
         deletedAt: false,
         classMethods: {
             associate: function (models) {
                 Role.hasMany(models.user, {foreignKey: 'role_id'});
             }
         }
-
     });
     return Role;
-}
+};

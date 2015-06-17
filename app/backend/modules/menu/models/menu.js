@@ -1,7 +1,5 @@
-'use strict'
-/**
- * Created by thanhnv on 1/19/15.
- */
+'use strict';
+
 module.exports = function (sequelize, DataTypes) {
     let Menu = sequelize.define("menus", {
         name: DataTypes.STRING,
@@ -14,20 +12,16 @@ module.exports = function (sequelize, DataTypes) {
     }, {
         tableName: 'arr_menu',
         timestamps: true,
-        // I don't want createdAt
         createdAt: "created_at",
-
-        // I want updatedAt to actually be called updateTimestamp
         updatedAt: "modified_at",
-        // And deletedAt to be called destroyTime (remember to enable paranoid for this to work)
         deletedAt: false,
         classMethods: {
             associate: function (models) {
                 Menu.hasMany(models.menu_detail, {foreignKey: 'id'});
-                Menu.belongsTo(models.user,{foreignKey:'created_by'});
-                Menu.belongsTo(models.user,{foreignKey:'modified_by'});
+                Menu.belongsTo(models.user, {foreignKey: 'created_by'});
+                Menu.belongsTo(models.user, {foreignKey: 'modified_by'});
             }
         }
     });
     return Menu;
-}
+};

@@ -23,17 +23,6 @@ module.exports = function () {
     menus.sorting.default = [
         //"dashboard",
         "blog"
-        //"chat",
-        //"customer_register",
-        //"courses",
-        //"classes",
-        //"quiz",
-        //"media",
-        //"surveys",
-        //"interviews",
-        //"testimonials",
-        //"jobs",
-        //"books",
         //"logs"
     ];
     menus.sorting.systems = [
