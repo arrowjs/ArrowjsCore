@@ -1,7 +1,5 @@
-'use strict'
-/**
- * Created by thanhnv on 2/17/15.
- */
+'use strict';
+
 let util = require('util'),
     _ = require('lodash');
 let promise = require('bluebird');
@@ -25,7 +23,6 @@ function MenusModule() {
     this.path = "/menus";
 }
 let _module = new MenusModule();
-
 
 _module.index = function (req, res) {
     // Breadcrumb
@@ -64,7 +61,7 @@ _module.index = function (req, res) {
 
     __models.menus.findAll({
         order: column + " " + order,
-        raw : true
+        raw: true
     }).then(function (menus) {
         // Render view
         _module.render(req, res, 'index', {

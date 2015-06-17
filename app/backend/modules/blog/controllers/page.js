@@ -1,7 +1,7 @@
 'use strict';
 
 let promise = require('bluebird');
-let route ='blog';
+let route = 'blog';
 let config = require(__base + 'config/config');
 let util = require('util');
 let slug = require('slug-extend');
@@ -135,7 +135,7 @@ _module.list = function (req, res) {
 };
 
 _module.listAll = function (req, res) {
-    let query = req.param('query')||'';
+    let query = req.param('query') || '';
     query = query.toLowerCase();
 
     __models.post.findAll({
@@ -153,37 +153,37 @@ _module.listAll = function (req, res) {
     });
 };
 
-_module.redirectToView = function(req, res) {
+_module.redirectToView = function (req, res) {
     __models.post.find({
         where: {
             alias: req.params.name
         }
-    }).then(function(page) {
+    }).then(function (page) {
         res.redirect('/admin/blog/pages/' + page.id);
-    }).catch(function(err) {
+    }).catch(function (err) {
         res.redirect('/404.html');
     })
 };
 
 _module.view = function (req, res) {
-    res.locals.backButton = __acl.addButton(req,route,'page_index','/admin/blog/pages/page/1');
+    res.locals.backButton = __acl.addButton(req, route, 'page_index', '/admin/blog/pages/page/1');
     res.locals.saveButton = __acl.addButton(req, route, 'page_edit');
     res.locals.deleteButton = __acl.addButton(req, route, 'page_delete');
 
     promise.all([
         __models.user.findAll({
-                order: "id asc"
-            }),
+            order: "id asc"
+        }),
         __models.post.find({
-                include: [__models.user],
-                where: {
-                    id: req.params.cid,
-                    type: 'page'
-                }
-            })
-    ]).then(function ( results) {
+            include: [__models.user],
+            where: {
+                id: req.params.cid,
+                type: 'page'
+            }
+        })
+    ]).then(function (results) {
         res.locals.viewButton = 'trungtam/' + results[1].alias;
-        _module.render(req,res,'page/new', {
+        _module.render(req, res, 'page/new', {
             title: "Cập nhật page",
             users: results[0],
             page: results[1]
@@ -192,7 +192,7 @@ _module.view = function (req, res) {
 };
 _module.update = function (req, res, next) {
     res.locals.saveButton = __acl.addButton(req, route, 'page_edit');
-    res.locals.backButton = __acl.addButton(req,route,'page_index','/admin/blog/pages/page/1')
+    res.locals.backButton = __acl.addButton(req, route, 'page_index', '/admin/blog/pages/page/1')
     res.locals.deleteButton = __acl.addButton(req, route, 'page_delete');
 
     let data = req.body;
@@ -208,7 +208,7 @@ _module.update = function (req, res, next) {
         page.updateAttributes(data).then(function () {
             res.locals.viewButton = 'trungtam/' + page.alias;
             req.messages = req.flash.success("Cập nhật page thành công");
-            _module.render(req,res,'page/new', {
+            _module.render(req, res, 'page/new', {
                 title: "Cập nhật page",
                 page: page
             });
@@ -218,12 +218,12 @@ _module.update = function (req, res, next) {
 
 _module.create = function (req, res) {
     res.locals.saveButton = __acl.addButton(req, route, 'page_create');
-    res.locals.backButton = __acl.addButton(req,route,'page_index','/admin/blog/pages/page/1')
+    res.locals.backButton = __acl.addButton(req, route, 'page_index', '/admin/blog/pages/page/1')
 
     __models.user.findAll({
-                order: "id asc"
-            }).then(function (results) {
-        _module.render(req,res,'page/new', {
+        order: "id asc"
+    }).then(function (results) {
+        _module.render(req, res, 'page/new', {
             title: "Tạo page",
             users: results
         });
@@ -232,7 +232,7 @@ _module.create = function (req, res) {
 
 _module.save = function (req, res) {
     res.locals.saveButton = __acl.addButton(req, route, 'page_edit');
-    res.locals.backButton = __acl.addButton(req,route,'page_index','/admin/blog/pages/page/1');
+    res.locals.backButton = __acl.addButton(req, route, 'page_index', '/admin/blog/pages/page/1');
     res.locals.deleteButton = __acl.addButton(req, route, 'page_delete');
 
     let data = req.body;

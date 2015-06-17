@@ -10,6 +10,6 @@ module.exports = function (sequelize, DataTypes) {
     }, {
         tableName: 'arr_log',
         createdAt: 'created_at',
-        updateAt: false
+        updatedAt: false
     });
 };
