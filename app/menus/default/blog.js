@@ -20,7 +20,7 @@ module.exports = function (menus) {
             {
                 rule: 'category_index',
                 title: 'Danh mục bài viết',
-                link: '/category/page/1'
+                link: '/categories/page/1'
             }
         ]
     };

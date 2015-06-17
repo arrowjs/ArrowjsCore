@@ -22,7 +22,7 @@ _module.list = function (req, res) {
         numberItemInPage = 15,
         query = req.param('query') || '',
         condition = '',
-        link = '/admin/blog/category/page/{page}';
+        link = '/admin/blog/categories/page/{page}';
 
     if (query != '') {
         query = query.toLowerCase();
@@ -60,7 +60,7 @@ _module.save = function (req, res) {
     if (data.name != '') {
         data.description = '';
         __models.category.findAndCount({
-            where: 'name = \'' + data.name + '\''
+            where: ['name = \'' + data.name + '\'']
         }).then(function (tags) {
             if (tags.count == 0) {
                 data.id = new Date().getTime();
