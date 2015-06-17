@@ -41,15 +41,15 @@ _module.index = function (req, res) {
 };
 _module.update_setting = function (req, res, next) {
     let data = req.body;
-    //site info
+
+    // Site info
     config.app.title = data.title;
     config.app.description = data.description;
     config.app.logo = data.logo;
     config.app.icon = data.icon;
-    //config.media_server = data.media_server;
-    //config.media_server_id = data.media_server_id;
     config.pagination.number_item = data.number_item;
-    //database info
+
+    // Database info
     config.db.host = data.db_host;
     config.db.port = data.db_port;
     config.db.username = data.db_username;
