@@ -3,7 +3,6 @@
  * Module dependencies.
  */
 var debug = require('debug')('ArrowJs');
-require('pmx').init();
 var init = require('./config/init')(),
     config = require('./config/config');
 
@@ -57,7 +56,6 @@ global.__config = require('./config/config');
 require('./config/passport')();
 
 var server = app.listen(config.port);
-global.__socketManager = require('./libs/socket_manager')(server);
 // Start the app by listening on <port>
 
 // Expose app

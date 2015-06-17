@@ -1,7 +1,0 @@
-{% for item in data %}
-<li>
-    <span class="miniAvatar"> <img class="img-circle" src="{{ item._img_url }}" onerror="this.src='/img/users/student.png'"></span>
-    <span> {{ item._title }}</span>
-    <small class="label label-default pull-right"><i> {{ item._modified_at | humanize_date }}</i></small>
-</li>
-{% endfor %}

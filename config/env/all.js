@@ -35,7 +35,7 @@ module.exports = {
     templateEngine: 'nunjucks',
     sessionSecret: 'GREEN',
     sessionCollection: 'sessions',
-    themes: 'tech',
+    themes: 'default',
     assets: {
         lib: {
             css: [
@@ -43,13 +43,6 @@ module.exports = {
                 'public/lib/bootstrap/dist/css/bootstrap-theme.css'
             ]
 
-        }
-    },
-    'const': {
-        class_user_status: {
-            DUP : 0,
-            DANG_HOC: 1,
-            BO_HOC: 2
         }
     }
 };

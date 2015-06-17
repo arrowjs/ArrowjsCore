@@ -25,8 +25,7 @@ let fs = require('fs'),
     nunjucks = require('nunjucks'),
     _ = require('lodash'),
     path = require('path'),
-    Promise = require('bluebird'),
-    pmx = require('pmx');
+    Promise = require('bluebird');
 
 
 module.exports = function () {
@@ -211,14 +210,11 @@ module.exports = function () {
 
     // Globbing routing files
     require(__base + 'app/frontend/modules/routes')(app);
-
     // Globbing menu files
     config.getGlobbedFiles('./app/menus/*/*.js').forEach(function (routePath) {
         console.log(routePath);
         require(path.resolve(routePath))(__menus);
     });
-
-    app.use(pmx.expressErrorHandler());
     // Assume 'not found' in the error msgs is a 404. this is somewhat silly, but valid, you can do whatever you like, set properties, use instanceof etc.
     app.use(function (err, req, res, next) {
         // If the error object doesn't exists
