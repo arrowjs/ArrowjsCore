@@ -1,0 +1,8 @@
+<section class="widget widget_categories"><h3 class="widget-title font-headlines"><span
+                class="wrap">{{ widget.data.title|title }}</span></h3>
+    <ul>
+        {% for item in items %}
+            <li class="cat-item "><a href="/{{ item.alias }}/c{{ item.id }}/">{{ item.name|safe }}</a></li>
+        {% endfor %}
+    </ul>
+</section>

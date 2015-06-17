@@ -1,0 +1,112 @@
+.form-group > div[class*="col-md-"] {
+    margin-bottom: 15px;
+}
+
+/**
+* css button like a link
+*/
+.btn-ahref {
+    background: none !important;
+    border: none;
+    padding: 0 !important;
+    color: #069;
+    cursor: pointer;
+    width: 100%;
+    text-align: left;
+}
+
+.btn-ahref:focus {
+    outline: 0;
+}
+
+.disable-link {
+    pointer-events: none;
+    cursor: not-allowed;
+}
+
+.autocomplete-suggestions {
+    border: 1px solid #999;
+    background: #FFF;
+    cursor: default;
+    overflow: auto;
+    -webkit-box-shadow: 1px 4px 3px rgba(50, 50, 50, 0.64);
+    -moz-box-shadow: 1px 4px 3px rgba(50, 50, 50, 0.64);
+    box-shadow: 1px 4px 3px rgba(50, 50, 50, 0.64);
+}
+
+.autocomplete-suggestion {
+    padding: 5px 5px;
+    white-space: nowrap;
+    overflow: hidden;
+}
+
+.autocomplete-no-suggestion {
+    padding: 5px 5px;
+}
+
+.autocomplete-selected {
+    background: #F0F0F0;
+}
+
+.autocomplete-suggestions strong {
+    font-weight: bold;
+    color: #000;
+}
+
+.autocomplete-group {
+    padding: 5px 5px;
+}
+
+.autocomplete-group strong {
+    font-weight: bold;
+    font-size: 16px;
+    color: #000;
+    display: block;
+    border-bottom: 1px solid #000;
+}
+
+.btn-info {
+    background-color: #45ACFF !important;
+}
+
+.btn-info:hover, .btn-info:focus, .btn-info:active, .btn-info.active {
+    background-color: #3E9AE5 !important;
+}
+
+.caption {
+    width: 100%;
+}
+
+/* ui dialog bar */
+.ui-dialog-titlebar.ui-widget-header.ui-corner-all.ui-helper-clearfix {
+    border: 1px solid #E0DCDC;
+    background: #E2E2E2;
+}
+/* END OF ui dialog bar */
+#feature-list img {
+    margin-left: 10px;
+    height: 100px;
+    width: auto;
+    cursor: pointer;
+}
+
+#feature-list label {
+    margin-right: 10px;
+}
+
+#feature .modal-dialog {
+    width: 80%;
+}
+
+.ft-item {
+    width: 120px;
+    height: 100px;
+    overflow: hidden;
+    margin-bottom: 15px;
+}
+
+#previewSelect {
+    max-height: 300px;
+    float: right;
+}
+

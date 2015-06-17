@@ -1,0 +1,18 @@
+{% extends "_widget_setting.html" %}
+{% block content %}
+    <div class="row">
+        <div class="col-md-12">
+            <div class="form-group">
+                <label for="layout_type">Layout type</label>
+                <select name="layout_type" id="layout_type" class="form-control">
+                    <option value="box_count" {% if widget.data.layout_type == 'box_count' %}selected="selected"{% endif %}>Box Count</option>
+                    <option value="button_count" {% if widget.data.layout_type == 'button_count' %}selected="selected"{% endif %}>Button Count</option>
+                    <option value="button" {% if widget.data.layout_type == 'button' %}selected="selected"{% endif %}>Button</option>
+                    <option value="icon_link" {% if widget.data.layout_type == 'icon_link' %}selected="selected"{% endif %}>Icon Link</option>
+                    <option value="icon" {% if widget.data.layout_type == 'icon' %}selected="selected"{% endif %}>Icon</option>
+                    <option value="link" {% if widget.data.layout_type == 'link' %}selected="selected"{% endif %}>Link</option>
+                </select>
+            </div>
+        </div>
+    </div>
+{% endblock %}

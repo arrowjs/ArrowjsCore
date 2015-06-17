@@ -1,0 +1,17 @@
+{% block content %}
+    <section class="widget widget_archive"><h3 class="widget-title font-headlines"><span
+                    class="wrap">{{ widget.data.title|title }}</span></h3>
+        <ul>
+            {% for item in items %}
+                <li>
+                    <a href="/archives/{{ item.datex|replace('-99','')|replace('-','/') }}/">{{ item.date|date('m/Y') }}</a>
+                    {% if widget.data.show_post_count == '1' %}
+                        <span class="pull-right">({{ item.count }})</span>
+                    {% endif %}
+                </li>
+            {% endfor %}
+
+        </ul>
+    </section>
+{% endblock %}
+

@@ -1,0 +1,145 @@
+header #trigger {
+    right: 30px!important
+}
+header #searchform::after,
+header #searchicon {
+    right: 90px!important
+}
+.marker {
+    background-color: #ff0
+}
+blockquote {
+    font-style: italic;
+    font-family: Georgia, Times, "Times New Roman", serif;
+    padding: 2px 0;
+    border-style: solid;
+    border-color: #ccc;
+    border-width: 0
+}
+em img {
+    margin: 0 15px 10px 0
+}
+.content ol:not([class]) {
+    padding: 15px
+}
+.image figcaption {
+    font-style: italic;
+    margin-bottom: 10px;
+    font-size: 15px;
+}
+figure {
+    margin: 10px 15px;
+}
+blockquote {
+    font-weight: 400;
+    line-height: 22px;
+    margin: 30px auto;
+    position: relative;
+    font-size: 15px;
+    padding: 15px 0 10px;
+    border-top: 2px solid #000;
+    border-bottom: 2px solid #000;
+    min-height: 60px;
+    width: 85%
+}
+blockquote::before {
+    content: "\275d";
+    position: absolute;
+    top: -25px;
+    left: 45%;
+    color: #FFF;
+    border: 5px solid #FFF;
+    background: #000;
+    padding-top: 10px;
+    padding-left: 6px;
+    border-radius: 50%;
+    font-size: 20px;
+    line-height: 15px;
+    width: 40px;
+    height: 40px
+}
+p+blockquote {
+    margin: 30px auto
+}
+@media (min-width: 768px) and (max-width: 992px) {
+    #searchicon {
+        position: absolute;
+        top: 4px;
+    }
+    .wrap-menu {
+        height: 50px;
+    }
+}
+@media(min-width: 992px) {
+    header #searchform::after, header #searchicon {
+        right: 15px !important;
+    }
+}
+/* css for mixitup course */
+.block.courseitem .block_title {
+    height: 65px;
+}
+#Container {
+    display: table;
+}
+#Container .mix{
+    display: none;
+    /*float: left;*/
+}
+.filter {
+    cursor: pointer;
+}
+.filter:hover {
+    font-weight: bold;
+    color: #222;
+}
+@media (min-width: 1200px) {
+    .course-mix {
+        width: 31%;
+        margin: 0 8px;
+    }
+}
+@media (min-width: 993px) and (max-width: 1199px) {
+    .course-mix {
+        width: 30.5%;
+        margin: 0 8px;
+    }
+}
+@media (max-width: 992px) {
+    .course-mix {
+        width: 48%;
+        margin: 0 4px;
+    }
+}
+@media (max-width: 640px) {
+    .course_instructor a {
+        font-size: 12px;
+    }
+}
+@media (max-width: 480px) {
+    .course-mix {
+        width: 96%;
+    }
+}
+/* end course css */
+.content {
+    line-height: 30px;
+}
+.content p img {
+    margin: 10px 15px;
+}
+
+.course_lesson i, .course_lesson h6 {
+    display: inline-block;
+}
+.book-show+.excerpt {
+    margin: 15px 0;
+}
+li.comment-item {
+    margin-bottom: 15px;
+}
+.comment-content span.s-rating.smaller.static.maroon {
+    /*position: absolute;*/
+    /*left: 0;*/
+    display: block;
+}

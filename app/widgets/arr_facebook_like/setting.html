@@ -1,0 +1,62 @@
+{% extends "_widget_setting.html" %}
+{% block content %}
+    <div class="row">
+        <div class="col-md-12">
+            <div class="form-group">
+                <label for="layout_type">Layout type</label>
+                <select name="layout_type" id="layout_type" class="form-control">
+                    <option value="standard" {% if widget.data.layout_type == 'standard' %}selected="selected"{% endif %}>Standard</option>
+                    <option value="box_count" {% if widget.data.layout_type == 'box_count' %}selected="selected"{% endif %}>Box Count</option>
+                    <option value="button_count" {% if widget.data.layout_type == 'button_count' %}selected="selected"{% endif %}>Button Count</option>
+                    <option value="button" {% if widget.data.layout_type == 'button' %}selected="selected"{% endif %}>Button</option>
+                </select>
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-md-12">
+            <div class="form-group">
+                <label for="action_type">Action type</label>
+                <select name="action_type" id="action_type" class="form-control">
+                    <option value="like" {% if widget.data.action_type == 'like' %}selected="selected"{% endif %}>Like</option>
+                    <option value="recommend" {% if widget.data.action_type == 'recommend' %}selected="selected"{% endif %}>Recommend</option>
+                </select>
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-md-12">
+            <div class="form-group">
+                <label for="color_scheme">Color Scheme</label>
+                <select name="color_scheme" id="color_scheme" class="form-control">
+                    <option value="light" {% if widget.data.color_scheme == 'light' %}selected="selected"{% endif %}>Light</option>
+                    <option value="dark" {% if widget.data.color_scheme == 'dark' %}selected="selected"{% endif %}>Dark</option>
+                </select>
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-md-12">
+            <div class="form-group">
+                <label>
+                    <input type="checkbox" name="show_friend_faces" {% if widget.data.show_friend_faces %}checked{% endif %}/>
+                    Show friend faces
+                </label>
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-md-12">
+            <div class="form-group">
+                <label>
+                    <input type="checkbox" name="include_share_button" {% if widget.data.include_share_button %}checked{% endif %}/>
+                    Include share button
+                </label>
+            </div>
+        </div>
+    </div>
+{% endblock %}

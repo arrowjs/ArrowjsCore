@@ -1,0 +1,93 @@
+<style>
+    .pull-right {
+        margin-left: 5px;
+    }
+
+    .toolbar a, button {
+        margin-right: 10px;
+    }
+
+    .toolbar {
+        padding-bottom: 10px;
+        padding-left: 0px;
+        padding-top: 10px;
+        padding-right: 0px;
+    }
+</style>
+<div class="toolbar row">
+    <div class="col-md-12">
+        {% if backButton %}
+            <a href="{{ backButton }}" class="btn btn-default">
+                <i class="fa fa-angle-left"></i> Quay lại
+            </a>
+        {% endif %}
+
+        {% if viewButton %}
+            <a target="_blank" href='/{{ viewButton }}' class="btn btn-info">
+                <i class="fa fa-eye"></i> Xem
+            </a>
+        {% endif %}
+
+        {% if createButton %}
+            <a href="{{ createButton }}" class="btn btn-primary">
+                <i class="fa fa-plus"></i> Thêm mới
+            </a>
+        {% endif %}
+
+        {% if saveButton %}
+            <button type="submit" id="saveForm" class="btn btn-success">
+                <i class="fa fa-check"></i> Lưu
+            </button>
+        {% endif %}
+
+        {% for btn in customButtons %}
+            <a class="btn {{ btn.cls }}" href="{{ btn.link }}" target="{{ btn.target }}">
+                <i class="fa {{ btn.icon }}"></i> {{ btn.name }}
+            </a>
+        {% endfor %}
+        {% if deleteButton %}
+            <a class="btn btn-danger pull-right" data-toggle="modal" href="javascript:void(0)"
+               onclick="openDeleteConfirmModal()">
+                <i class="fa fa-remove"></i> Xóa
+            </a>
+        {% endif %}
+
+        {% if resetFilterButton %}
+            <a class="btn btn-info pull-left" href="{{ resetFilterButton }}">
+                <i class="fa fa-refresh"></i> Làm mới
+            </a>
+        {% endif %}
+
+        {% if searchButton %}
+            <button type="submit" form="search-form" class="btn btn-warning pull-left"
+                    onclick='return document.forms["search-form"].submit();'>
+                <i class="fa fa-search"></i> Tìm kiếm
+            </button>
+        {% endif %}
+
+        {% if customControls %}
+            {% for control in customControls %}
+                {{ control|safe }}
+            {% endfor %}
+        {% endif %}
+
+        {% if toClassButton %}
+            <a class="btn btn-primary pull-right" data-toggle="modal" href="javascript:void(0)"
+               onclick="openToClassModal()">
+                <i class="fa fa-sign-in"></i> Nhập học
+            </a>
+        {% endif %}
+
+        {% if sendMailButton %}
+            <a class="btn btn-primary pull-right" href="javascript:void(0)" id="btnSendMail" onclick="sendVerifyMail()">
+                <i class="fa fa-envelope"></i>  Gửi phiếu thu học phí</a>
+        {% endif %}
+
+        {% if mergeClassButton %}
+            <a class="btn btn-primary pull-right" href="javascript:void(0)" id="btnMergeClass" onclick="openMergeClassModal()">
+                <i class="fa fa-compress"></i>  Ghép lớp</a>
+        {% endif %}
+    </div>
+</div>
+
+{% include 'delete_modal.html' %}

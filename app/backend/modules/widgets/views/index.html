@@ -1,0 +1,85 @@
+{% extends 'layout.html' %}
+{% block cssExtends %}
+    <style>
+        .module-title {
+            font-size: 17px;
+            font-weight: bold;
+            color: cornflowerblue;
+        }
+
+        .label {
+            font-size: 100%;
+        }
+    </style>
+{% endblock %}
+{% block content %}
+    <a class="btn btn-success" style="margin-bottom: 10px;">
+        <i class="fa fa-plus"></i>
+								<span class="hidden-480">
+								Import Widgets </span>
+    </a>
+    <div class="row">
+        <div class="col-md-12">
+            <div class="box box-solid box-primary">
+                <div class="box-body">
+                    <div class="table-container">
+                        <table class="table table-striped table-bordered table-hover" id="datatable_orders">
+                            <thead>
+                            <tr role="row" class="heading">
+                                <th>
+                                    Name
+                                </th>
+                                <th>
+                                    Version
+                                </th>
+                                <th>
+                                    Description
+                                </th>
+                            </tr>
+                            </thead>
+                            <tbody>
+                            {% for widget in widgets %}
+                                <tr>
+                                    <td>
+                                        <div class="module-title">{{ widget.name }}</div>
+                                        <div class="module-info">
+                                            <span class="module-author">{{ widget.author }}</span>
+                                        </div>
+                                    </td>
+                                    <td>
+                                        {{ widget.version }}
+                                    </td>
+                                    <td>{{ widget.description }}</td>
+                                </tr>
+                            {% endfor %}
+
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}
+{% block jsFooter %}
+    <script>
+        function deleteCourses() {
+            var ids = [];
+            $("input:checkbox[name='id[]']:checked").each(function () {
+                ids.push($(this).val());
+            });
+            if (ids.length > 0)
+                $.ajax({
+                    url: '/admin/widgets',
+                    type: 'DELETE',
+                    data: {
+                        ids: ids.join()
+                    },
+                    success: function (result) {
+                        // Do something with the result
+                        window.location.href = "/admin/widgets";
+                    }
+                });
+        }
+    </script>
+{% endblock %}

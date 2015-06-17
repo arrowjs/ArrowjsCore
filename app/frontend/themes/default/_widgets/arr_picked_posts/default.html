@@ -1,0 +1,14 @@
+<section class="widget widget_recent_entries"><h3 class="widget-title font-headlines"><span
+                class="wrap">{{ widget.data.title|title }}</span></h3>
+    <ul>
+        {% for item in items %}
+            <li>
+                <a href="/{{ item.alias }}/p{{ item.id }}/">{{ item.title|title }}
+                    {% if widget.data.display_date == '1' %}
+                        <span class="pull-right"> {{ item.created_at|date('j M') }}</span>
+                    {% endif %}</a>
+            </li>
+        {% endfor %}
+    </ul>
+</section>
+

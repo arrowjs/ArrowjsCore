@@ -1,0 +1,58 @@
+{% extends 'default_layout.html' %}
+
+{% block content %}
+    <main id="content" class="content" role="main" itemprop="mainContentOfPage">
+        <h6>Search : About ({{ totalItems }}) result for keyword "{{ keyword }}"</h6>
+        <hr/>
+
+        {% if posts|length %}
+            {% for item in posts %}
+                <article
+                        class="entry post publish author-admin post-1177 format-standard has-post-thumbnail category-markup post_tag-alignment-2 post_tag-captions-2 post_tag-content-2 post_tag-css post_tag-image post_tag-markup-2"
+                        itemscope="itemscope" itemtype="http://schema.org/BlogPosting" itemprop="blogPost">
+
+                    {#{% if item.image != null %}#}
+                    {#<a href="/{{ item.alias }}/p{{ item.id }}/"#}
+                    {#title="{{ item.title|title }}" class="img-hyperlink"><img#}
+                    {#src="{{ item.image }}"#}
+                    {#alt="{{ item.title|title }}" class="landscape thumbnail stargazer-full"#}
+                    {#width="800"#}
+                    {#height="500" itemprop="image"></a>#}
+                    {#{% endif %}#}
+
+                    <header class="entry-header">
+
+                        <h2 class="entry-title font-headlines" itemprop="headline"><a
+                                    href="/{{ item.alias }}/p{{ item.id }}/"
+                                    rel="bookmark" itemprop="url">{{ item.title|title }}</a></h2>
+
+                        <div class="entry-byline font-secondary">
+                        <span class="entry-author" itemprop="author" itemscope="itemscope"
+                              itemtype="http://schema.org/Person"><a
+                                    href="/author/{{ item.user.display_name }}/"
+                                    title="{{ item.title|title }}" rel="author" class="url fn n" itemprop="url"><span
+                                        itemprop="name">{{ item.user.display_name }}</span></a></span>
+                            <time class="entry-published updated" datetime="2013-01-10T20:15:40+00:00"
+                                  title="Thursday, January 10, 2013, 8:15 pm">January 10, 2013
+                            </time>
+                            <span class="comments-link"></span></div>
+                        <!-- .entry-byline -->
+
+                    </header>
+                    <!-- .entry-header -->
+
+                    <div class="entry-summary" itemprop="description">
+                        <p>{{ item.intro_text|safe }}<a
+                                    href="/{{ item.alias }}/p{{ item.id }}/"
+                                    class="more-link">[…]</a></p>
+                    </div>
+                    <!-- .entry-summary -->
+                </article>
+            {% endfor %}
+        {% else %}
+            <h2>Blog Empty!</h2>
+        {% endif %}
+        {% set basePageURL = '/page-{page}/' %}
+        {{ totalPage|pagination(currentPage, basePageURL)|safe }}
+    </main>
+{% endblock %}

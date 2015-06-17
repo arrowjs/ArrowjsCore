@@ -1,0 +1,60 @@
+{% extends 'tech/user_view.html' %}
+{% block cssExtends %}
+    <link href="/css/user_courses.css" rel="stylesheet">
+
+{% endblock %}
+{% block content %}
+    <section class="content-wrapper">
+        <section class="content">
+            <div class="row">
+            <div class="col-md-8">
+                <div class="box box-solid">
+                    <div class="box-body">
+                        <div class="classContent list" id="Container">
+                            {% if courses %}
+                                {% for course in courses %}
+                                    <div class="course mix cat-{{ course.cat_id }}">
+                                        <div class="course-item">
+                                            {% set course_link = "/khoa-hoc/"+ course.id +"/"+ course.name %}
+                                            {% if course.type == 2 %}
+                                                {% set course_link = "/khoa-hoc-online/"+ course.id +"/"+ course.name %}
+                                            {% endif %}
+                                            <div class="block-media">
+                                                <a href="{{ course_link }}">
+                                                    <img src="{{ course.course_image_url }}" alt="{{ course.title }}"/>
+                                                </a>
+                                            </div>
+
+                                            <div class="block-content">
+                                                <h4 class="block-title">
+                                                    <a href="{{ course_link }}" title="{{ course.title }}">
+                                                        {{ course.title }}
+                                                    </a>
+                                                </h4>
+                                            </div>
+                                        </div>
+                                    </div>
+                                {% endfor %}
+                            {% else %}
+                                <div> Bạn chưa đăng ký khóa học nào!</div>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+            </div>
+                </div>
+        </section>
+    </section>
+{% endblock %}
+        {% block jsExtends %}
+            <script src="/tech/js/jquery.mixitup.min.js" type="text/javascript"></script>
+            <script>
+                $(function () {
+                    $('#Container').mixItUp();
+                });
+            </script>
+        {% endblock %}
+
+<div class="classContent list" id="Container">
+
+</div>

@@ -1,0 +1,25 @@
+<div class="form-group">
+    <label>Tracking Id:</label>
+    <input class="form-control" type="text" name="tracking_id" value="{{ plugin.options.tracking_id }}">
+</div>
+<p class="help-block">
+    Fill in below information to use google analytics APIs (ex: dashboard diagram, trending post widget, ...)
+</p>
+<div class="form-group">
+    <label for="">Client Id</label>
+    <input name="clientID" type="text" class="form-control" value="{{ plugin.options.clientID }}"/>
+</div>
+<div class="form-group">
+    <label for="">Client Secret</label>
+    <input name="clientSecret" type="text" class="form-control" value="{{ plugin.options.clientSecret }}"/>
+</div>
+<div class="form-group">
+    <label for="">Service Account Email</label>
+    <input name="serviceAEmail" type="text" class="form-control" value="{{ plugin.options.serviceAEmail }}"/>
+</div>
+<div class="form-group">
+    <label for="">Service Account Key File</label>
+    <input type="text" readonly value="{{ plugin.options.serviceAKeyFile }}" class="form-control"/>
+    <input name="serviceAKeyFile" type="file" class="form-control"/>
+</div>
+

@@ -1,0 +1,20 @@
+{% macro render_child(mn, cls, menu_data ) %}
+    {% if mn.children %}
+        <li><a href="{{ menu_data.link }}">{{ menu_data.name }}</a>
+            <ul>
+                {% for subMn in mn.children %}
+                    {{ render_child(subMn,'', subMn.id|get_menu_data(_menus_data)) }}
+                {% endfor %}
+            </ul>
+        </li>
+    {% else %}
+        <li>{{ menu_data.name }}</li>
+    {% endif %}
+{% endmacro %}
+<ul>
+    {% for mn in _menus %}
+        {% set menu_data = mn.id|get_menu_data(_menus_data) %}
+        {% set cls = route|active_menu(menu_data.link,'active',1) %}
+        {{ render_child(mn, cls, menu_data) }}
+    {% endfor %}
+</ul>

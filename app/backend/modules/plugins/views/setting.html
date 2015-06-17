@@ -1,0 +1,76 @@
+{% block cssExtends %}
+    <link href="/admin/plugins/select2/select2.css" rel="stylesheet">
+{% endblock %}
+
+{% extends 'layout.html' %}
+{% block content %}
+    <a href="/admin/plugins" class="btn btn-default" style="margin-bottom: 10px;"><i class="fa fa-angle-left"></i> Back</a>
+    {% if setting_form %}
+        <button type="submit" form="setting-form" class="btn btn-success" style="margin-bottom: 10px;">
+            <i class="fa fa-save"></i> Save
+        </button>
+    {% endif %}
+    <div class="row">
+        {% if setting_form %}
+            <div class="col-md-6">
+                <div class="box box-solid box-primary">
+                    <div class="box-header">
+                        <h3 class="box-title">Options</h3>
+                    </div>
+                    <div class="box-body">
+                        <form method="post" id="setting-form" enctype="multipart/form-data">
+                            {{ setting_form|safe }}
+                        </form>
+                    </div>
+                </div>
+            </div>
+        {% endif %}
+        <div class="col-md-6">
+            <div class="box box-solid box-primary">
+                <div class="box-header">
+                    <h3 class="box-title">{{ plugin.name }}</h3>
+                </div>
+                <div class="box-body">
+                    <table class="table table-bordered">
+                        <tbody>
+                        <tr>
+                            <th>Name</th>
+                            <td>{{ plugin.name }}</td>
+                        </tr>
+                        <tr>
+                            <th>alias</th>
+                            <td>{{ plugin.alias }}</td>
+                        </tr>
+                        <tr>
+                            <th>Author</th>
+                            <td>{{ plugin.author }}</td>
+                        </tr>
+                        <tr>
+                            <th>Version</th>
+                            <td>{{ plugin.version }}</td>
+                        </tr>
+                        <tr>
+                            <th>Description</th>
+                            <td>{{ plugin.description }}</td>
+                        </tr>
+                        <tr>
+                            <th>Active</th>
+                            <td>{{ plugin.active }}</td>
+                        </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}
+
+{% block jsExtends %}
+    <script src="/admin/plugins/select2/select2.min.js"></script>
+    <script>
+        $(function(){
+            var select2 = $('.arr-select2');
+            select2.select2();
+        })
+    </script>
+{% endblock %}

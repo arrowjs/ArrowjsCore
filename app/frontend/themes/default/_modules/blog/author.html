@@ -1,0 +1,89 @@
+{% extends 'default_layout.html' %}
+{% block content %}
+    <section id="blog" class="container">
+        <div class="blog">
+            <div class="row">
+                <div class="col-md-8">
+
+                    {% if posts|length %}
+                        {% for item in posts %}
+                            <div class="blog-item">
+                                <div class="row">
+                                    <div class="col-xs-12 col-sm-2 text-center">
+                                        <div class="entry-meta">
+                                            <span id="publish_date"> {{ item.created_at|date('j M') }}</span>
+                                            <span><i class="fa fa-user"></i> <a
+                                                        href="#">{{ item.user.display_name }}</a></span>
+                                        </div>
+                                    </div>
+
+                                    <div class="col-xs-12 col-sm-10 blog-content">
+                                        {% if item.image != null %}
+                                            <a href="/{{ category.alias }}/p{{ item.alias }}/p{{ item.id }}/"><img
+                                                        class="img-responsive img-blog" src="{{ item.image }}"
+                                                        width="100%" alt=""/></a>
+                                        {% endif %}
+
+                                        <h2>
+                                            <a href="/{{ category.alias }}/p{{ item.alias }}/p{{ item.id }}/">{{ item.title|title }}</a>
+                                        </h2>
+
+                                        <h3>{{ item.intro_text|safe }}</h3>
+                                        <a class="btn btn-primary readmore"
+                                           href="/{{ category.alias }}/p{{ item.alias }}/p{{ item.id }}/">Read More
+                                            <i
+                                                    class="fa fa-angle-right"></i></a>
+                                    </div>
+                                </div>
+                            </div>
+                            <!--/.blog-item-->
+                        {% endfor %}
+
+                        {% set basePageURL = '/' +   category.alias + '/c' + category.id + '/page-{page}/' %}
+                        {{ totalPage|pagination(currentPage, basePageURL)|safe }}
+                        <!--/.pagination-->
+                    {% else %}
+                        <h2>Message: Category Empty</h2>
+                    {% endif %}
+                </div>
+                <!--/.col-md-8-->
+
+                <aside class="col-md-4">
+                    <div class="widget search">
+                        <form role="form">
+                            <input type="text" class="form-control search_box" autocomplete="off"
+                                   placeholder="Search Here">
+                        </form>
+                    </div>
+                    <!--/.search-->
+
+                    {% if categories|length %}
+                        <div class="widget categories">
+                            <h3>Categories</h3>
+
+                            <div class="row">
+                                <div class="col-sm-6">
+                                    <ul class="blog_category">
+                                        {% for item in categories %}
+                                            {% if item.parents == 1 %}
+                                                <li>
+                                                    <a href="/{{ item.alias }}/c{{ item.id }}/">{{ item.name|title }}</a>
+                                                </li>
+                                            {% else %}
+                                                <li><span style="padding-left: 20px"></span><a
+                                                            href="/{{ item.alias }}/c{{ item.id }}/">> {{ item.name|title }}</a>
+                                                </li>
+                                            {% endif %}
+                                        {% endfor %}
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+                        <!--/.categories-->
+                    {% endif %}
+                </aside>
+            </div>
+            <!--/.row-->
+        </div>
+    </section><!--/#blog-->
+{% endblock %}

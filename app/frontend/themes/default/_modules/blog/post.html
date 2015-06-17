@@ -1,0 +1,74 @@
+{% extends 'default_layout.html' %}
+{% block content %}
+    <section id="blog" class="container">
+        <div class="blog">
+            <div class="row">
+                <div class="col-md-8">
+                    <div class="blog-item">
+                        <img class="img-responsive img-blog" src="{{ item.image }}" width="100%" alt=""/>
+
+                        <div class="row">
+                            <div class="col-xs-12 col-sm-2 text-center">
+                                <div class="entry-meta">
+                                    <span id="publish_date">07  NOV</span>
+                                    <span><i class="fa fa-user"></i> <a href="#"> John Doe</a></span>
+                                </div>
+                            </div>
+                            <div class="col-xs-12 col-sm-10 blog-content">
+                                <h2>{{ item.title|title }}</h2>
+
+                                <div>
+                                    {{ item.intro_text|safe }}
+                                    <p>&nbsp;</p>
+                                    {{ item.full_text|safe }}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <!--/.blog-item-->
+
+                    {#{% if item.user %}#}
+                    {#<div class="media reply_section">#}
+                    {#<div class="pull-left post_reply text-center">#}
+                    {#<a href="#"><img src="{{ item.user.user_image_url }}" class="img-circle" alt=""/></a>#}
+                    {#</div>#}
+                    {#<div class="media-body post_reply_content">#}
+                    {#<h3>{{ item.user.display_name|title }}</h3>#}
+                    {#</div>#}
+                    {#</div>#}
+                    {#{% endif %}#}
+                </div>
+
+                <aside class="col-md-4">
+                    <div class="widget search">
+                        {{ "right-sidebar"|get_sidebar(route)|safe }}
+                    </div>
+
+                    {% if categories|length %}
+                        <div class="widget categories">
+                            <h3>Categories</h3>
+
+                            <div class="row">
+                                <div class="col-sm-6">
+                                    <ul class="blog_category">
+                                        {% for item in categories %}
+                                            {% if item.parents == 1 %}
+                                                <li>
+                                                    <a href="/{{ item.alias }}/c{{ item.id }}/">{{ item.name|title }}</a>
+                                                </li>
+                                            {% else %}
+                                                <li><span style="padding-left: 20px"></span>
+                                                    <a href="/{{ item.alias }}/c{{ item.id }}/">>{{ item.name|title }}</a>
+                                                </li>
+                                            {% endif %}
+                                        {% endfor %}
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+                    {% endif %}
+                </aside>
+            </div>
+        </div>
+    </section>
+{% endblock %}

@@ -1,0 +1,12 @@
+{% extends "_widget_setting.html" %}
+
+{% block content %}
+    <div class="row">
+        <div class="col-md-12">
+            <div class="form-group">
+                <label for="number_to_show">Number of posts to show</label>
+                <input type="text" class="form-control" name="number_to_show" id="number_to_show" value="{{ widget.data.number_to_show }}">
+            </div>
+        </div>
+    </div>
+{% endblock %}

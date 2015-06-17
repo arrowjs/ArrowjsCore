@@ -1,0 +1,23 @@
+{% extends "_widget_setting.html" %}
+
+{% block content %}
+    <div class="row">
+        <div class="col-md-12">
+            <div class="form-group">
+                <label for="placeholder">Placeholder</label>
+                <input type="text" class="form-control" name="placeholder" id="placeholder"
+                       value="{{ widget.data.placeholder }}">
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-md-12">
+            <div class="form-group">
+                <label for="button_name">Button name</label>
+                <input type="text" class="form-control" name="button_name" id="button_name"
+                       value="{{ widget.data.button_name }}">
+            </div>
+        </div>
+    </div>
+{% endblock %}
