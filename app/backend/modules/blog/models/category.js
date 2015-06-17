@@ -8,6 +8,6 @@ module.exports = function (sequelize, DataTypes) {
     }, {
         tableName: 'arr_category',
         createdAt: false,
-        updateAt: false
+        updatedAt: false
     });
 };

@@ -10,6 +10,7 @@ var debug = require('debug')("BaseModule Front End"),
 function BaseModule() {
     this.render = function (req, res, view, options, fn) {
         let self = this;
+
         // Get messages from session
         res.locals.messages = req.session.messages;
 

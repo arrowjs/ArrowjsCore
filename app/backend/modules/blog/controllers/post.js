@@ -170,14 +170,17 @@ _module.view = function (req, res) {
         __models.post.find({
             include: [__models.user],
             where: {
-                id: req.params.cid
+                id: req.params.cid,
+                type: 'post'
             }
         })
     ]).then(function (results) {
         res.locals.viewButton = 'posts/' + results[2].id + '/' + results[2].alias;
+
         let data = results[2];
         data.full_text = data.full_text.replace(/&lt/g, "&amp;lt");
         data.full_text = data.full_text.replace(/&gt/g, "&amp;gt");
+
         _module.render(req, res, edit_view, {
             title: "Cập nhật bài viết",
             categories: results[0],
@@ -190,18 +193,16 @@ _module.view = function (req, res) {
 };
 
 _module.update = function (req, res, next) {
-    res.locals.backButton = __acl.addButton(req, route, 'post_index', '/admin/blog/posts/page/1')
+    res.locals.backButton = __acl.addButton(req, route, 'post_index', '/admin/blog/posts/page/1');
     res.locals.saveButton = __acl.addButton(req, route, 'post_edit');
     res.locals.deleteButton = __acl.addButton(req, route, 'post_delete');
 
     let data = req.body;
     data.seo_info = decodeURIComponent(data.seo_info);
-
     data.author_visible = (data.author_visible != null);
-
     if (!data.published) data.published = 0;
-    __models.post.find(req.params.cid).then(function (post) {
 
+    __models.post.find(req.params.cid).then(function (post) {
         let tag = post.categories;
         if (tag != null && tag != '') {
             tag = tag.split(':');
@@ -246,6 +247,7 @@ _module.update = function (req, res, next) {
                             onlyInA.forEach(function (id) {
                                 __models.category.find(id).then(function (tag) {
                                     let count = +tag.count - 1;
+
                                     tag.updateAttributes({
                                         count: count
                                     }).on('success', function (data) {
@@ -261,6 +263,7 @@ _module.update = function (req, res, next) {
                             onlyInB.forEach(function (id) {
                                 __models.category.find(id).then(function (tag) {
                                     let count = +tag.count + 1;
+
                                     tag.updateAttributes({
                                         count: count
                                     }).on('success', function () {
@@ -280,7 +283,7 @@ _module.update = function (req, res, next) {
 };
 
 _module.create = function (req, res) {
-    res.locals.backButton = __acl.addButton(req, route, 'post_index', '/admin/blog/posts/page/1')
+    res.locals.backButton = __acl.addButton(req, route, 'post_index', '/admin/blog/posts/page/1');
     res.locals.saveButton = __acl.addButton(req, route, 'post_create');
 
     Promise.all([
