@@ -10,12 +10,12 @@ module.exports = function (menus) {
             {
                 rule: 'post_index',
                 title: 'Bài viết',
-                link: '/posts/page/1'
+                link: '/post/page/1'
             },
             {
                 rule: 'page_index',
                 title: 'Pages',
-                link: '/pages/page/1'
+                link: '/page/page/1'
             },
             {
                 rule: 'category_index',
