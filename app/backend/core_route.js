@@ -14,42 +14,37 @@ let env = __.createNewEnv(__dirname + '/views_layout');
 let render = function (req, res, view, options, fn) {
     res.locals.messages = req.session.messages;
     req.session.messages = [];
+
     if (view.indexOf('.html') == -1) {
         view += '.html';
     }
+
     if (fn) {
         env.render(view, _.assign(res.locals, options), fn);
-    }
-    else {
+    } else {
         env.render(view, _.assign(res.locals, options), function (err, re) {
-            //console.log("Render error: ", err);
             res.send(re);
         });
     }
+};
 
-}
 module.exports = function (app) {
-
     app.route('/admin/login').get(function (req, res) {
         if (req.isAuthenticated()) {
             return res.redirect('/admin');
-        }
-        else {
+        } else {
             render(req, res, 'login.html');
-
         }
     }).post(function (req, res, next) {
         passport.authenticate('local', function (err, user, info) {
             // Remove sensitive data before login
-            if(user)
+            if (user)
                 user.user_pass = undefined;
 
             if (info) {
                 req.flash.error(info.message);
-                //console.log(req.flash, info.message, res.locals);
                 return render(req, res, 'login.html');
-            }
-            else {
+            } else {
                 req.login(user, function (err) {
                     if (err) {
                         res.status(400).send(err);
@@ -211,24 +206,26 @@ module.exports = function (app) {
     });
 
     app.use('/admin/*', function (req, res, next) {
-        //return next();
         if (!req.isAuthenticated()) {
-            //console.log("redirect to admin login");
             return res.redirect('/admin/login');
         }
+
         if (req.user && req.user.role_id === 21) {
             return res.redirect('/');
         }
-//        res.locals.__user = req.user;
+
         next();
     });
-    //Error in backend
+
+    // Error in backend
     app.route('/admin/err/500').get(function (req, res) {
         render(req, res, '500.html');
     });
+
     app.route('/admin/err/404').get(function (req, res) {
         render(req, res, '404.html');
     });
+
     function sendMail(mailOptions) {
         return new Promise(function (fulfill, reject) {
             let transporter = mailer.createTransport(config.mailer_config);
