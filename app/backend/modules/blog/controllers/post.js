@@ -105,7 +105,7 @@ _module.list = function (req, res) {
         include: [
             {
                 model: __models.user, attributes: ['display_name'],
-                where: '1 = 1'
+                where: ['1 = 1']
             }
         ],
         where: filter.values,

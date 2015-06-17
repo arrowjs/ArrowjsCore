@@ -9,6 +9,7 @@ module.exports = function (sequelize, DataTypes) {
         type: DataTypes.INTEGER
     }, {
         tableName: 'arr_log',
-        createdAt: 'created_at'
+        createdAt: 'created_at',
+        updateAt: false
     });
 };

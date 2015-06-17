@@ -1,7 +1,7 @@
 "use strict";
 
 module.exports = function (sequelize, DataTypes) {
-    let Posts = sequelize.define("posts", {
+    let Posts = sequelize.define("post", {
         title: DataTypes.STRING(255),
         alias: DataTypes.STRING(255),
         intro_text: DataTypes.TEXT,
