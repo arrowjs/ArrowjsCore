@@ -10,8 +10,9 @@ module.exports = function (env) {
             where: {
                 sidebar: sidebarName
             },
-            order: ['ordering']
-        }, {raw: true}).then(function (widgets) {
+            order: ['ordering'],
+            raw :true
+        }).then(function (widgets) {
             Promise.map(widgets,function(widget){
                 let w = __.getWidget(widget.widget_type);
                 if (w) {
