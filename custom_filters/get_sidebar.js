@@ -20,8 +20,9 @@ module.exports = function (env) {
                     where: {
                         sidebar: sidebarName
                     },
-                    order: ['ordering']
-                }, {raw: true}).then(function (widgets) {
+                    order: ['ordering'],
+                    raw: true
+                }).then(function (widgets) {
                     for (let i in widgets) {
                         let w = __.getWidget(widgets[i].widget_type);
                         if (w) {
@@ -31,6 +32,7 @@ module.exports = function (env) {
                     Promise.all(promises).then(function (results) {
                         let html = results.join('');
                         redis.setex(config.redis_prefix + key, 1 * 60 * 60, html);//caching i one hour
+
                         cb(null, html);
                     });
                 });
