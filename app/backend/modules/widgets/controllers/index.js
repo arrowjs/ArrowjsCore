@@ -1,7 +1,5 @@
-'use strict'
-/**
- * Created by thanhnv on 2/17/15.
- */
+'use strict';
+
 let util = require('util'),
     _ = require('lodash');
 let redis = require('redis').createClient();
@@ -30,7 +28,7 @@ function WidgetsModule() {
 let _module = new WidgetsModule();
 
 _module.index = function (req, res) {
-    //breadcrumb
+    // Breadcrumb
     res.locals.breadcrumb = __.create_breadcrumb(breadcrumb);
 
     _module.render(req, res, 'index', {
@@ -46,6 +44,7 @@ _module.sidebar = function (req, res, next) {
         cls: "btn btn-danger",
         link: "/admin/widgets/sidebars/clear"
     }];
+
     Promise.promisifyAll(fs);
     fs.readFileAsync(__base + "app/frontend/themes/" + config.themes + "/theme.json", "utf8").then(function (data) {
         _module.render(req, res, 'sidebars', {
@@ -87,7 +86,6 @@ _module.delete = function (req, res) {
 };
 
 _module.sidebar_sort = function (req, res) {
-    //console.log(req.body);
     let ids = req.body.ids.split(',');
     let sidebar = req.body.sidebar;
     let index = 1;
@@ -103,7 +101,6 @@ _module.sidebar_sort = function (req, res) {
     Promise.all(promises).then(function (results) {
         res.sendStatus(200);
     });
-
 };
 
 _module.clear_sidebar_cache = function (req, res) {
@@ -115,7 +112,6 @@ _module.clear_sidebar_cache = function (req, res) {
             });
         }
     });
-
 };
 
 util.inherits(WidgetsModule, BaseModuleBackend);
