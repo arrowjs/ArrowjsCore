@@ -10,17 +10,17 @@ module.exports = function (menus) {
             {
                 rule: 'post_index',
                 title: 'Bài viết',
-                link: '/post/page/1'
+                link: '/posts/page/1'
             },
             {
                 rule: 'page_index',
                 title: 'Pages',
-                link: '/page/page/1'
+                link: '/pages/page/1'
             },
             {
                 rule: 'category_index',
                 title: 'Danh mục bài viết',
-                link: '/category/page/1'
+                link: '/categories/page/1'
             }
         ]
     };
