@@ -1,14 +1,10 @@
-'use strict'
-/**
- * Created by thanhnv on 2/17/15.
- */
+'use strict';
 
 let express = require('express');
 let router = express.Router();
 let index = require('./controllers/index.js');
 let themes = require('./controllers/themes.js');
 
-//configuration Routes
 let moduleName = 'configurations';
 
 router.route('/configurations/site-info').get(__acl.isAllow(moduleName, 'update_info'), index.index);

@@ -100,7 +100,7 @@ _module.list = function (req, res) {
     ], " AND type='page' ");
 
     // List pages
-    __models.posts.findAndCountAll({
+    __models.post.findAndCountAll({
         include: [
             {
                 model: __models.user, attributes: ['display_name'],
@@ -138,7 +138,7 @@ _module.listAll = function (req, res) {
     let query = req.param('query')||'';
     query = query.toLowerCase();
 
-    __models.posts.findAll({
+    __models.post.findAll({
         where: ["type='page' AND LOWER(title) like '%" + query + "%'"],
         order: 'title asc'
     }).then(function (tags) {
@@ -154,7 +154,7 @@ _module.listAll = function (req, res) {
 };
 
 _module.redirectToView = function(req, res) {
-    __models.posts.find({
+    __models.post.find({
         where: {
             alias: req.params.name
         }
@@ -174,7 +174,7 @@ _module.view = function (req, res) {
         __models.user.findAll({
                 order: "id asc"
             }),
-        __models.posts.find({
+        __models.post.find({
                 include: [__models.user],
                 where: {
                     id: req.params.cid,
@@ -199,7 +199,7 @@ _module.update = function (req, res, next) {
     if (!data.published) data.published = 0;
     data.modified_date = data.modified_date_gmt = sequelize.fn('NOW');
 
-    __models.posts.find({
+    __models.post.find({
         include: [__models.user],
         where: {
             id: req.params.cid
@@ -241,14 +241,14 @@ _module.save = function (req, res) {
     data.type = 'page';
     if (!data.published) data.published = 0;
 
-    __models.posts.create(data).then(function (page) {
+    __models.post.create(data).then(function (page) {
         req.flash.success('Thêm page mới thành công');
         res.redirect('/admin/blog/pages/' + page.id);
     });
 };
 
 _module.delete = function (req, res) {
-    __models.posts.destroy({
+    __models.post.destroy({
         where: {
             id: {
                 "in": req.body.ids.split(',')

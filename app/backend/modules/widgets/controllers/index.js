@@ -109,7 +109,7 @@ _module.sidebar_sort = function (req, res) {
 _module.clear_sidebar_cache = function (req, res) {
     redis.keys(config.redis_prefix + "sidebar:*", function (err, keys) {
         if (keys != null) {
-            redis.del(keys,function(err, result){
+            redis.del(keys, function (err, result) {
                 req.flash.success("Đã xóa bộ nhớ đệm thành công");
                 res.redirect('/admin/widgets/sidebars');
             });
