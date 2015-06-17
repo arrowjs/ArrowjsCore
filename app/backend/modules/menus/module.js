@@ -1,12 +1,12 @@
 'use strict';
 
 module.exports = function (modules) {
-    modules.menu = {
+    modules.menus = {
         title: 'Menu',
         author: 'Nguyen Van Thanh',
         version: '0.0.1',
         description: 'Menu management of website frontend',
-        system: true,
+        system : true,
         rules: [
             {
                 name: 'index',

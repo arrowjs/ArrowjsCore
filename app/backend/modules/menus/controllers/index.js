@@ -63,8 +63,9 @@ _module.index = function (req, res) {
     ]);
 
     __models.menus.findAll({
-        order: column + " " + order
-    }, {raw: true}).then(function (menus) {
+        order: column + " " + order,
+        raw : true
+    }).then(function (menus) {
         // Render view
         _module.render(req, res, 'index', {
             title: "All Menus",

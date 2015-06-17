@@ -1,7 +1,7 @@
 'use strict';
 
 module.exports = function (modules) {
-    modules.configuration = {
+    modules.configurations = {
         title: 'Configuration',
         author: 'Nguyen Van Thanh',
         version: '0.0.1',

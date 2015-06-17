@@ -7,6 +7,7 @@ module.exports = function (env) {
     env.addFilter('render_menu', function (route, menus, user) {
         let html = '';
         let sortedMenus = __.sortMenus(menus);
+
         sortedMenus.forEach(function (m) {
             //console.log(m);
             let i = m.menu;
