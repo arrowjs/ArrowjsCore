@@ -35,7 +35,7 @@ module.exports = {
     templateEngine: 'nunjucks',
     sessionSecret: 'GREEN',
     sessionCollection: 'sessions',
-    themes: 'Corlate',
+    themes: 'default',
     assets: {
         lib: {
             css: [
