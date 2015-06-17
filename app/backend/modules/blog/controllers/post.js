@@ -105,7 +105,7 @@ _module.list = function (req, res) {
         include: [
             {
                 model: __models.user, attributes: ['display_name'],
-                where: '1 = 1'
+                where: ['1 = 1']
             }
         ],
         where: filter.values,
@@ -140,7 +140,7 @@ _module.listAll = function (req, res) {
     query = query.toLowerCase();
 
     __models.posts.findAll({
-        where: 'LOWER(title) like \'%' + query + '%\' AND type=\'post\'',
+        where: ['LOWER(title) like \'%' + query + '%\' AND type=\'post\''],
         order: 'title asc'
     }).then(function (tags) {
         let data = [];
