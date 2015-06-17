@@ -101,7 +101,7 @@ _module.list = function (req, res) {
     ], " AND type='post' ");
 
     // Find all posts
-    __models.posts.findAndCountAll({
+    __models.post.findAndCountAll({
         include: [
             {
                 model: __models.user, attributes: ['display_name'],
@@ -139,7 +139,7 @@ _module.listAll = function (req, res) {
     let query = req.param('query') || "";
     query = query.toLowerCase();
 
-    __models.posts.findAll({
+    __models.post.findAll({
         where: ['LOWER(title) like \'%' + query + '%\' AND type=\'post\''],
         order: 'title asc'
     }).then(function (tags) {
@@ -167,7 +167,7 @@ _module.view = function (req, res) {
         __models.user.findAll({
             order: "id asc"
         }),
-        __models.posts.find({
+        __models.post.find({
             include: [__models.user],
             where: {
                 id: req.params.cid
@@ -200,7 +200,7 @@ _module.update = function (req, res, next) {
     data.author_visible = (data.author_visible != null);
 
     if (!data.published) data.published = 0;
-    __models.posts.find(req.params.cid).then(function (post) {
+    __models.post.find(req.params.cid).then(function (post) {
 
         let tag = post.categories;
         if (tag != null && tag != '') {
@@ -307,7 +307,7 @@ _module.save = function (req, res) {
     if (!data.published) data.published = 0;
     if (data.published == 1) data.published_at = __models.sequelize.fn('NOW');
 
-    __models.posts.create(data).then(function (post) {
+    __models.post.create(data).then(function (post) {
         let tag = post.cat_id;
         if (tag != null && tag != '') {
             tag = tag.split(':');
@@ -336,7 +336,7 @@ _module.save = function (req, res) {
 };
 
 _module.delete = function (req, res) {
-    __models.posts.findAll({
+    __models.post.findAll({
         where: {
             id: {
                 in: req.param('ids').split(',')
@@ -363,7 +363,7 @@ _module.delete = function (req, res) {
                     });
                 }
             }
-            __models.posts.destroy({
+            __models.post.destroy({
                 where: 'id=' + post.id
             });
         });
@@ -373,7 +373,7 @@ _module.delete = function (req, res) {
 };
 
 _module.read = function (req, res, next, id) {
-    __models.posts.find({
+    __models.post.find({
         where: {
             id: id
         }

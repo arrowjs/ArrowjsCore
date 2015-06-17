@@ -6,6 +6,8 @@ module.exports = function (sequelize, DataTypes) {
         name: DataTypes.STRING,
         slug: DataTypes.STRING
     }, {
-        tableName: 'arr_category'
+        tableName: 'arr_category',
+        createdAt: false,
+        updateAt: false
     });
 };

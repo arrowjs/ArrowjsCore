@@ -1,12 +1,10 @@
-'use strict'
-/**
- * Created by thanhnv on 2/17/15.
- */
+'use strict';
+
 module.exports = function (modules) {
-    modules.configurations = {
-        title: 'Configurations',
+    modules.configuration = {
+        title: 'Configuration',
         author: 'Nguyen Van Thanh',
-        version: '0.1.0',
+        version: '0.0.1',
         description:'Configuration information of website',
         system:true,
         rules: [

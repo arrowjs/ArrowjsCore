@@ -112,7 +112,7 @@ _module.delete = function (req, res, next) {
         function () {
             let listId = req.param('ids').split(',');
             listId.forEach(function (id) {
-                __models.posts.findAll({
+                __models.post.findAll({
                     where: ['cat_id like \'%:' + id + ':%\'']
                 }).then(function (posts) {
                     if (posts.length > 0) {
