@@ -1,15 +1,16 @@
 'use strict';
-/**
- * Created by thanhnv on 3/13/15.
- */
+
 var config = require(__base + 'config/config'),
     _ = require('lodash'),
     redis = require('redis').createClient(),
     Promise = require('bluebird');
+
 function PluginManager() {
     let self = this;
+
     self.redis_key = 'all_plugins';
     self.plugins = [];
+
     self.loadAllPlugins = function () {
         redis.get(config.redis_prefix + self.redis_key, function (err, results) {
             if (results != null) {
@@ -31,12 +32,14 @@ function PluginManager() {
         });
 
     };
+
     self.reloadAllPlugins = function () {
         self.plugins = [];
         config.getGlobbedFiles(__base + 'app/plugins/*/*.js').forEach(function (filePath) {
             self.plugins.push(require(filePath));
         });
     };
+
     self.getPlugin = function (alias) {
         for (let i in self.plugins) {
             if (self.plugins[i].alias == alias) {
@@ -44,7 +47,6 @@ function PluginManager() {
             }
         }
     };
-
 }
 
 module.exports = new PluginManager();

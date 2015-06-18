@@ -13,7 +13,6 @@ module.exports.loadAllModules = function () {
     // Globbing admin module files
     let module_tmp = {};
     config.getGlobbedFiles(__base + 'app/frontend/*/module.js').forEach(function (routePath) {
-        console.log(path.resolve(routePath));
         require(path.resolve(routePath))(module_tmp);
     });
 

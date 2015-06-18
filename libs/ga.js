@@ -1,7 +1,5 @@
-/**
- * Created by thanhnv on 4/18/15.
- */
 "use strict";
+
 let __pluginManager = require('./plugins_manager');
 
 let google = require('googleapis');
@@ -22,12 +20,14 @@ let expiry_date = 0;
 function GA() {
     let self = this;
 
-    this.init = function() {
+    this.init = function () {
         __pluginManager.loadAllPlugins();
+
         let ggPlg = __pluginManager.getPlugin('google');
-        if(ggPlg) {
+        if (ggPlg) {
             ggPlg = ggPlg.options;
-            if( ggPlg.clientID && ggPlg.clientID != '' &&
+
+            if (ggPlg.clientID && ggPlg.clientID != '' &&
                 ggPlg.clientSecret && ggPlg.clientSecret != '' &&
                 ggPlg.serviceAEmail && ggPlg.serviceAEmail != '' &&
                 ggPlg.serviceAKeyFile && ggPlg.serviceAKeyFile != ''
@@ -49,13 +49,15 @@ function GA() {
         self.init();
 
         jwt.authorize(function (err, result) {
-            if(err) setTimeout(cb(null), 0);
+            if (err) setTimeout(cb(null), 0);
             else {
                 access_token = result.access_token;
                 expiry_date = result.expiry_date;
+
                 oauth2.setCredentials({
                     access_token: result.access_token
                 });
+
                 analytics.data.ga.get({
                     auth: oauth2,
                     "ids": "ga:59684062",
@@ -68,6 +70,7 @@ function GA() {
                         setTimeout(cb(null), 0);
                     } else {
                         var data = [];
+
                         if (body != null) {
                             body.rows.sort(function (a, b) {
                                 if ((a[2] - b[2]) == 0) {
@@ -78,6 +81,7 @@ function GA() {
                                 }
 
                             });
+
                             for (var i in body.rows) {
                                 var day = parseInt(body.rows[i][0]);
                                 var month = parseInt(body.rows[i][1]);
@@ -93,19 +97,21 @@ function GA() {
                 });
             }
         });
-
     };
+
     this.getGooglePopularLinkInformation = function (mark_link, cb) {
         self.init();
 
         jwt.authorize(function (err, result) {
-            if(err) setTimeout(cb(null), 0);
+            if (err) setTimeout(cb(null), 0);
             else {
                 access_token = result.access_token;
                 expiry_date = result.expiry_date;
+
                 oauth2.setCredentials({
                     access_token: result.access_token
                 });
+
                 analytics.data.ga.get({
                     auth: oauth2,
                     "ids": "ga:59684062",
@@ -119,8 +125,7 @@ function GA() {
                 }, function (err, body) {
                     if (err) {
                         setTimeout(cb(null), 0);
-                    }
-                    else {
+                    } else {
                         setTimeout(cb(body), 0);
                     }
 
@@ -129,4 +134,5 @@ function GA() {
         });
     };
 }
+
 module.exports = GA;

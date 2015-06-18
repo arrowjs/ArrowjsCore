@@ -6,7 +6,6 @@
 module.exports = function (env) {
     env.addFilter('render_sidebar', function (route, user) {
         var html = '';
-        //console.log(__menus, user);
         sortGroups = __.sortMenus(__menus);
         for (var i in sortGroups) {
             var group = __menus[sortGroups[i].menu];

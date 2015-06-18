@@ -1,25 +1,11 @@
-'use strict'
-/**
- * Created by thanhnv on 1/26/15.
- */
+'use strict';
+
 let util = require('util'),
     _ = require('lodash');
 let fs = require('fs');
 let path = require('path');
 
 let route = 'roles';
-let breadcrumb =
-    [
-        {
-            title: 'Home',
-            icon: 'fa fa-dashboard',
-            href: '/admin'
-        },
-        {
-            title: 'Roles',
-            href: '/admin/roles'
-        }
-    ];
 
 function RolesModule() {
     BaseModuleBackend.call(this);
@@ -31,9 +17,6 @@ _module.list = function (req, res) {
     // Add button
     res.locals.createButton = __acl.addButton(req, route, 'create', '/admin/roles/create');
     res.locals.deleteButton = __acl.addButton(req, route, 'delete');
-
-    // Breadcrumb
-    res.locals.breadcrumb = __.create_breadcrumb(breadcrumb);
 
     //Config ordering
     let column = req.params.sort || 'id';
@@ -110,9 +93,6 @@ _module.view = function (req, res) {
     res.locals.saveButton = __acl.addButton(req, route, 'update');
     res.locals.backButton = __acl.addButton(req, route, 'index', '/admin/roles');
 
-    // Breadcrumb
-    res.locals.breadcrumb = __.create_breadcrumb(breadcrumb, {title: 'Update Role'});
-
     // Get role by id
     __models.role.find({
         where: {
@@ -179,9 +159,6 @@ _module.create = function (req, res) {
     // Add button
     res.locals.saveButton = __acl.addButton(req, route, 'create');
     res.locals.backButton = __acl.addButton(req, route, 'index', '/admin/roles');
-
-    // Breadcrumb
-    res.locals.breadcrumb = __.create_breadcrumb(breadcrumb, {title: 'Add New'});
 
     _module.render(req, res, 'new', {
         title: "New Role",

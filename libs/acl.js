@@ -6,7 +6,7 @@
  * @param {string} action - Action which user access.
  * @param {string} orAction - Alternative action to check.
  * @param {boolean} hasAuthorize - Authorize of user.
- * @return Redirect to error page with flash message.
+ * @return  Redirect to error page with flash message.
  */
 exports.isAllow = function (route, action, orAction, hasAuthorize) {
     return function (req, res, next) {
@@ -16,7 +16,7 @@ exports.isAllow = function (route, action, orAction, hasAuthorize) {
             if (req.user != undefined && req.user.acl[route] != undefined) {
                 let rules = req.user.acl[route].split(':');
                 for (let i in rules) {
-                    if(rules.hasOwnProperty(i)){
+                    if (rules.hasOwnProperty(i)) {
                         if (action == rules[i]) {
                             next();
                             return;
@@ -44,7 +44,7 @@ exports.isAllow = function (route, action, orAction, hasAuthorize) {
 };
 
 /**
- * Add a button
+ * Add a button.
  * @param {object} req - Request of users.
  * @param {string} route - Route which user access.
  * @param {string} action - Action which user access.
@@ -56,7 +56,7 @@ exports.addButton = function (req, route, action, url) {
         let rules = req.user.acl[route].split(':');
 
         for (let i in rules) {
-            if(rules.hasOwnProperty(i)){
+            if (rules.hasOwnProperty(i)) {
                 if (action == rules[i]) {
                     if (url === undefined) {
                         return route.replace('_', '-');
@@ -71,7 +71,7 @@ exports.addButton = function (req, route, action, url) {
 };
 
 /**
- * Add custom button
+ * Add custom button.
  * @param {string} url - URL which button will be linked to.
  * @returns {string}
  */
@@ -80,7 +80,7 @@ exports.customButton = function (url) {
 };
 
 /**
- * Check module active
+ * Check module active.
  * @param {object} req - Request of users.
  * @param {string} route - Route which user access.
  * @param {string} action - Action which user access.
@@ -91,13 +91,12 @@ exports.allow = function (req, route, action) {
     if (__modules[route] != undefined && (__modules[route].system || __modules[route].active)) {
         if (req.user != undefined && req.user.acl[route] != undefined) {
             let rules = req.user.acl[route].split(':');
+
             for (let i in rules) {
-                if(rules.hasOwnProperty(i)){
+                if (rules.hasOwnProperty(i)) {
                     if (action == rules[i]) {
                         return true;
                     }
-                }else{
-                    return false;
                 }
             }
             return false;

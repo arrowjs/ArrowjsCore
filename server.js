@@ -15,14 +15,14 @@ global.__base = __dirname + '/';
 global.__ = require('./libs/global_function');
 global.__modules = require('./libs/modules_backend_manager.js')();
 global.__f_modules = require('./libs/modules_frontend_manager.js')();
-global.__menus = require('./app/menus/menus_manager')();
-global.__widgets = require('./app/widgets/widgets_manager')();
 global.__models = require('./libs/models_manager');
 global.__acl = require('./libs/acl');
+global.__menus = require('./app/menus/menus_manager')();
+global.__setting_menu_module = [];
+global.__widgets = require('./app/widgets/widgets_manager')();
+global.__pluginManager = require('./libs/plugins_manager');
 global.__messages = [];
 global.__current_theme = {};
-global.__pluginManager = require('./libs/plugins_manager');
-global.__setting_menu_module = [];
 global.__cache = require('./libs/arr_caching')();
 global.__config = require('./config/config');
 global.BaseModuleBackend = require('./app/backend/base_module');
@@ -55,8 +55,8 @@ let app = require('./config/app')();
 /** Bootstrap passport config */
 require('./config/passport')();
 
-let server = app.listen(config.port);
 /** Start the app by listening on <port> */
+let server = app.listen(config.port);
 
 /** Expose app */
 module.exports = app;
