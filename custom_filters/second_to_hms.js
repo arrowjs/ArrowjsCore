@@ -1,7 +1,4 @@
-"use strict"
-/**
- * Created by thanhnv on 2/28/15.
- */
+"use strict";
 
 module.exports = function (env) {
     env.addFilter('second_to_hms', function (d) {
@@ -12,4 +9,4 @@ module.exports = function (env) {
         var s = Math.floor(d % 3600 % 60);
         return ((h > 0 ? h + ":" + (m < 10 ? "0" : "") : "") + m + ":" + (s < 10 ? "0" : "") + s);
     });
-}
+};

@@ -1,7 +1,7 @@
-/**
- * Created by vhchung on 3/16/15.
- */
-    'use strict';
+
+'use strict';
+
+
 let utils = require(__base + 'libs/utils');
 let config = require(__base + 'config/config');
 module.exports = function (env) {

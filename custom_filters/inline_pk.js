@@ -1,7 +1,4 @@
 "use strict";
-/**
- * Created by thanhnv on 2/28/15.
- */
 
 module.exports = function (env) {
     env.addFilter('inline_pk', function (pk, item) {

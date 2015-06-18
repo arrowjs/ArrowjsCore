@@ -1,7 +1,10 @@
-"use strict"
+
+"use strict";
+
 /**
- * Created by thanhnv on 2/28/15.
+ * Hàm mục đích kiểm tra một đối tượng được truyền vào có phải là null hay không
  */
+
 var slug = require('slug');
 module.exports = function (env) {
     env.addFilter('slug', function (input) {
@@ -10,4 +13,4 @@ module.exports = function (env) {
         else
             return '';
     });
-}
+};

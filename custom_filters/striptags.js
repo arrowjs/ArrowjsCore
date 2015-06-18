@@ -1,3 +1,8 @@
+/**
+ *
+ * @param env
+ */
+
 module.exports = function (env) {
     env.addFilter('strip_tags', function (input, allowed) {
         allowed = (((allowed || '') + '')

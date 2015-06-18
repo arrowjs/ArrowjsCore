@@ -1,7 +1,4 @@
 
-/**
- * Created by thanhnv on 2/28/15.
- */
 
 module.exports = function (env) {
     env.addFilter('render_sidebar', function (route, user) {
@@ -59,4 +56,4 @@ module.exports = function (env) {
         }
         return html;
     });
-}
+};

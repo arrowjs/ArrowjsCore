@@ -1,5 +1,6 @@
 /**
- * Created by vhchung on 3/19/15.
+ * Hàm nhận vào một đường dẫn và cắt nó theo kí tự / và tùy biến nó thành một đường dẫn search
+ * @param env
  */
 module.exports = function (env) {
     env.addFilter('standard_route_search', function (route) {

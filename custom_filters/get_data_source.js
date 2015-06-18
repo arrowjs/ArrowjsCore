@@ -1,7 +1,4 @@
-"use strict"
-/**
- * Created by thanhnv on 2/28/15.
- */
+"use strict";
 
 module.exports = function (env) {
     env.addFilter('get_data_source', function (source, filter, cb) {
@@ -30,4 +27,4 @@ module.exports = function (env) {
         }
 
     }, true);
-}
+};

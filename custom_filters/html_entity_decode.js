@@ -1,4 +1,5 @@
 'use strict';
+
 let utils = require(__base + 'libs/utils');
 module.exports = function (env) {
     env.addFilter('html_entity_decode', function (string, quote_style) {
