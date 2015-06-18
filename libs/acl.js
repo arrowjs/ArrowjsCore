@@ -56,11 +56,13 @@ exports.addButton = function (req, route, action, url) {
         let rules = req.user.acl[route].split(':');
 
         for (let i in rules) {
-            if (action == rules[i]) {
-                if (url === undefined) {
-                    return route.replace('_', '-');
-                } else {
-                    return url.replace('_', '-');
+            if(rules.hasOwnProperty(i)){
+                if (action == rules[i]) {
+                    if (url === undefined) {
+                        return route.replace('_', '-');
+                    } else {
+                        return url.replace('_', '-');
+                    }
                 }
             }
         }
@@ -89,14 +91,15 @@ exports.allow = function (req, route, action) {
     if (__modules[route] != undefined && (__modules[route].system || __modules[route].active)) {
         if (req.user != undefined && req.user.acl[route] != undefined) {
             let rules = req.user.acl[route].split(':');
-
-           if (rules.length > 0){
-               for (let i in rules) {
-                   if (action == rules[i]) {
-                       return true;
-                   }
-               }
-           }
+            for (let i in rules) {
+                if(rules.hasOwnProperty(i)){
+                    if (action == rules[i]) {
+                        return true;
+                    }
+                }else{
+                    return false;
+                }
+            }
             return false;
         } else {
             return false;
