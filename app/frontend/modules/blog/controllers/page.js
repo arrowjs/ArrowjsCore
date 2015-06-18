@@ -10,7 +10,7 @@ function BlogModule() {
 var _module = new BlogModule();
 
 _module.index = function (req, res) {
-    __models.posts.find({
+    __models.post.find({
         include: [
             {
                 model: __models.user,

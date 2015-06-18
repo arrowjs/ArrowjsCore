@@ -207,14 +207,14 @@ _module.update = function (req, res) {
 };
 
 _module.menuById = function (req, res, next, id) {
-    __models.menus.find(id).then(function (menu) {
+    __models.menus.findById(id).then(function (menu) {
         res.locals.menu = menu;
-
         return __models.menu_detail.findAll({
             where: {
                 menu_id: id
-            }
-        }, {raw: true});
+            },
+            raw: true
+        });
     }).then(function (menu_details) {
         res.locals.menu_details = JSON.stringify(menu_details);
         next();

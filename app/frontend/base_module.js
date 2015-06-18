@@ -57,7 +57,8 @@ function BaseModule() {
         }
 
         env.loaders[0].searchPaths = [__dirname + '/themes', __dirname + '/themes/' + config.themes];
-        env.render(view, _.assign(res.locals, options), function (err, re) {
+        //env.render(view, _.assign(res.locals, options), function (err, re) {
+        env.render(view, function (err, re) {
             res.send(re);
         });
     };
