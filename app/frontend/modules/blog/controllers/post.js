@@ -13,7 +13,7 @@ _module.index = function (req, res) {
     promise.all(
         [
             // Find post by id
-            __models.posts.find({
+            __models.post.find({
                 include: [
                     {
                         model: __models.user,
@@ -26,10 +26,8 @@ _module.index = function (req, res) {
                     published: 1
                 }
             }),
-
             // Find all categories
-            __models.categories.findAndCountAll({
-                where: "published = 1 AND id <> 1",
+            __models.category.findAndCountAll({
                 order: "id,parent ASC"
             })
         ]
@@ -37,8 +35,9 @@ _module.index = function (req, res) {
             if (results[0]) {
                 // Get SEO info
                 let seo_info = null;
-
-                if (results[0].seo_info && results[0].seo_info != '') seo_info = JSON.parse(decodeURIComponent(results[0].seo_info));
+                 console.log(results[0].seo_info);
+                if (results[0].seo_info && results[0].seo_info.length > 0 )
+                    seo_info = JSON.parse(decodeURIComponent(results[0].seo_info));
 
                 // Render view
                 _module.render(req, res, 'post.html', {
@@ -56,6 +55,8 @@ _module.index = function (req, res) {
                 // Redirect to 404 if post not exist
                 _module.render404(req, res);
             }
+        }).catch(function (err) {
+            console.log(err.stack)
         });
 };
 

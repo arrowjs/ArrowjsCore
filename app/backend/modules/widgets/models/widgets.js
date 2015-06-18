@@ -2,7 +2,10 @@
 
 module.exports = function (sequelize, DataTypes) {
     return sequelize.define("widgets", {
-        id: DataTypes.BIGINT,
+        id: {
+            type : DataTypes.INTEGER,
+            autoIncrement : true
+        },
         sidebar: DataTypes.STRING,
         data: DataTypes.STRING,
         created_at: DataTypes.DATE,

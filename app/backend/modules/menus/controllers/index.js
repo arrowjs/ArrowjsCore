@@ -188,7 +188,6 @@ _module.update = function (req, res) {
 _module.menuById = function (req, res, next, id) {
     __models.menus.findById(id).then(function (menu) {
         res.locals.menu = menu;
-
         return __models.menu_detail.findAll({
             where: {
                 menu_id: id

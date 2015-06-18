@@ -47,8 +47,7 @@ BaseWidget.prototype.save = function (data) {
         delete json_data.id;
         json_data = JSON.stringify(json_data);
         if (data.id != '') {
-
-            __models.widgets.find(data.id).then(function (widget) {
+            __models.widgets.findById(data.id).then(function (widget) {
                 widget.updateAttributes({
                     sidebar: data.sidebar,
                     data: json_data
@@ -59,7 +58,6 @@ BaseWidget.prototype.save = function (data) {
 
         } else {
             __models.widgets.create({
-                id: new Date().getTime(),
                 widget_type: data.widget,
                 sidebar: data.sidebar,
                 data: json_data,
