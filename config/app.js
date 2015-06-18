@@ -96,7 +96,9 @@ module.exports = function () {
     let middleSession = session({
         store: new RedisStore({host: config.redis.host, port: config.redis.port, client: redis}),
         secret: secret,
-        key: 'sid'
+        key: 'sid',
+        resave: true,
+        saveUninitialized: true
     });
     app.use(middleSession);
 

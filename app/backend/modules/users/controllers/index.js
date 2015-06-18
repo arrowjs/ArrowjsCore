@@ -422,7 +422,7 @@ _module.profile = function (req, res) {
  */
 _module.changePass = function (req, res) {
     res.locals.breadcrumb = __.create_breadcrumb(breadcrumb, {title: 'Change password'});
-    _module.render(req, res, 'users/change-pass', {
+    _module.render(req, res, 'change-pass', {
         user: req.user
     });
 };
@@ -442,12 +442,12 @@ _module.updatePass = function (req, res) {
             }).catch(function (error) {
                 req.flash.error('Name: ' + error.name + '<br />' + 'Message: ' + error.message);
             }).finally(function () {
-                _module.render(req, res, 'users/change-pass');
+                _module.render(req, res, 'change-pass');
             });
         }
         else {
             req.flash.warning("Password invalid");
-            _module.render(req, res, 'users/change-pass');
+            _module.render(req, res, 'change-pass');
         }
     });
 };
