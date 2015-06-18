@@ -5,18 +5,6 @@ let util = require('util'),
 let promise = require('bluebird');
 
 let route = 'menus';
-let breadcrumb =
-    [
-        {
-            title: 'Home',
-            icon: 'fa fa-dashboard',
-            href: '/admin'
-        },
-        {
-            title: 'Menus',
-            href: '/admin/menus'
-        }
-    ];
 
 function MenusModule() {
     BaseModuleBackend.call(this);
@@ -25,9 +13,6 @@ function MenusModule() {
 let _module = new MenusModule();
 
 _module.index = function (req, res) {
-    // Breadcrumb
-    res.locals.breadcrumb = __.create_breadcrumb(breadcrumb);
-
     // Add button
     res.locals.createButton = __acl.addButton(req, route, 'create', '/admin/menus/create');
     res.locals.deleteButton = __acl.addButton(req, route, 'delete');
@@ -79,9 +64,6 @@ _module.index = function (req, res) {
 };
 
 _module.create = function (req, res) {
-    // Breadcrumb
-    res.locals.breadcrumb = __.create_breadcrumb(breadcrumb, {title: 'New Menu'});
-
     // Add buttons
     res.locals.saveButton = __acl.addButton(req, route, 'create');
     res.locals.backButton = __acl.addButton(req, route, 'index', '/admin/menus');
@@ -144,9 +126,6 @@ _module.save = function (req, res) {
 };
 
 _module.read = function (req, res) {
-    // Breadcrumb
-    res.locals.breadcrumb = __.create_breadcrumb(breadcrumb, {title: 'Update Menu'});
-
     // Add buttons
     res.locals.backButton = __acl.addButton(req, route, 'index', '/admin/menus');
 
@@ -207,14 +186,15 @@ _module.update = function (req, res) {
 };
 
 _module.menuById = function (req, res, next, id) {
-    __models.menus.find(id).then(function (menu) {
+    __models.menus.findById(id).then(function (menu) {
         res.locals.menu = menu;
 
         return __models.menu_detail.findAll({
             where: {
                 menu_id: id
-            }
-        }, {raw: true});
+            },
+            raw: true
+        });
     }).then(function (menu_details) {
         res.locals.menu_details = JSON.stringify(menu_details);
         next();

@@ -9,7 +9,6 @@ module.exports = function (env) {
         let sortedMenus = __.sortMenus(menus);
 
         sortedMenus.forEach(function (m) {
-            //console.log(m);
             let i = m.menu;
             if (menus[i] != undefined) {
                 if (user.acl[i] != undefined) {
