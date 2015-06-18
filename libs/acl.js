@@ -90,11 +90,13 @@ exports.allow = function (req, route, action) {
         if (req.user != undefined && req.user.acl[route] != undefined) {
             let rules = req.user.acl[route].split(':');
 
-            for (let i in rules) {
-                if (action == rules[i]) {
-                    return true;
-                }
-            }
+           if (rules.length > 0){
+               for (let i in rules) {
+                   if (action == rules[i]) {
+                       return true;
+                   }
+               }
+           }
             return false;
         } else {
             return false;
