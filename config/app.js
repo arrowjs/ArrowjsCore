@@ -90,13 +90,14 @@ module.exports = function () {
     // CookieParser should be above session
     app.use(cookieParser());
 
-
     // Express session storage
     let secret = "hjjhdsu465aklsdjfhasdasdf342ehsf09kljlasdf";
     let middleSession = session({
         store: new RedisStore({host: config.redis.host, port: config.redis.port, client: redis}),
         secret: secret,
-        key: 'sid'
+        key: 'sid',
+        resave: true,
+        saveUninitialized: true
     });
     app.use(middleSession);
 
@@ -160,14 +161,8 @@ module.exports = function () {
         __setting_menu_module.push(require(path.resolve(routePath))(app, config));
     });
 
-    // Globbing routing admin files
-    config.getGlobbedFiles('./app/frontend/modules/*/settings/*.js').forEach(function (routePath) {
-        require(path.resolve(routePath))(app, config);
-    });
-
     app.use('/admin/*', function (req, res, next) {
         if (!req.isAuthenticated()) {
-            console.log("redirect to admin login");
             return res.redirect('/admin/login');
         }
         next();

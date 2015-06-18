@@ -66,8 +66,8 @@ _module.saveWidget = function (req, res) {
     let widget_type = req.body.widget;
     var widget = __.getWidget(widget_type);
     widget.save(req.body).then(function (id) {
-        res.send(id);
-    });
+        res.send(id.toString());
+    })
 };
 
 _module.read = function (req, res) {
@@ -80,8 +80,11 @@ _module.read = function (req, res) {
 };
 
 _module.delete = function (req, res) {
+
     __models.widgets.destroy({where: {id: req.params.cid}}).then(function () {
         res.sendStatus(200);
+    }).catch(function (err) {
+        console.log(err.stack);
     });
 };
 

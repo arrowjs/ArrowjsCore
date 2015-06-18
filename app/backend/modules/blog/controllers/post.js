@@ -201,7 +201,7 @@ _module.update = function (req, res, next) {
     data.author_visible = (data.author_visible != null);
     if (!data.published) data.published = 0;
 
-    __models.post.find(req.params.cid).then(function (post) {
+    __models.post.findById(req.params.cid).then(function (post) {
         let tag = post.categories;
         if (tag != null && tag != '') {
             tag = tag.split(':');

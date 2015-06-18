@@ -31,8 +31,9 @@ Menus.prototype.render_setting = function (widget_type, widget) {
             where: {
                 status: 'publish'
             },
-            order: ["id"]
-        }, {raw: true}).then(function (menus) {
+            order: ["id"],
+            raw : true
+        }).then(function (menus) {
             _this.env.render(widget_type + '/setting.html', {
                     widget_type: widget_type,
                     widget: widget,
@@ -50,12 +51,13 @@ Menus.prototype.render = function (widget, route) {
     let _this = this;
     //Processing here
     return new Promise(function (resolve, reject) {
-        __models.menus.find(widget.data.menu_id, {raw: true}).then(function (menu) {
+        __models.menus.findById(widget.data.menu_id).then(function (menu) {
             __models.menu_detail.findAll({
                 where: {
                     menu_id: menu.id
-                }
-            }, {raw: true}).then(function (menu_details) {
+                },
+                raw : true
+            }).then(function (menu_details) {
                 //get menu order
                 let menu_order = JSON.parse(menu.menu_order);
                 resolve(BaseWidget.prototype.render.call(_this, widget, {

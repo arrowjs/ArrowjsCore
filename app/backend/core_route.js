@@ -117,7 +117,7 @@ module.exports = function (app) {
                         html: emailHTML
                     };
 
-                    return sendMail(mailOptions).then(function (info) {
+                    return __.sendMail(mailOptions).then(function (info) {
                         req.flash.success('An email has been sent to ' + user.user_email + ' with further instructions. Please follow the guide in email to reset password');
                         return render(req, res, 'reset-password');
                     });
@@ -194,7 +194,7 @@ module.exports = function (app) {
                     html: emailHTML
                 };
 
-                return sendMail(mailOptions).then(function (info) {
+                return __.sendMail(mailOptions).then(function (info) {
                     req.flash.success('Reset password successfully');
                     return render(req, res, 'reset-password.html');
                 });
@@ -225,17 +225,4 @@ module.exports = function (app) {
     app.route('/admin/err/404').get(function (req, res) {
         render(req, res, '404.html');
     });
-
-    function sendMail(mailOptions) {
-        return new Promise(function (fulfill, reject) {
-            let transporter = mailer.createTransport(config.mailer_config);
-            transporter.sendMail(mailOptions, function (err, info) {
-                if (err !== null) {
-                    reject(err);
-                } else {
-                    fulfill(info);
-                }
-            });
-        });
-    }
 };
