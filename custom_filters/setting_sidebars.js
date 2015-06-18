@@ -1,7 +1,5 @@
-"use strict"
-/**
- * Created by thanhnv on 2/28/15.
- */
+"use strict";
+
 let Promise = require('bluebird');
 
 module.exports = function (env) {
@@ -36,4 +34,4 @@ module.exports = function (env) {
             })
         });
     }, true);
-}
+};

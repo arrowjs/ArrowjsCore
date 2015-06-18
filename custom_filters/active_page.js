@@ -1,7 +1,4 @@
-"use strict"
-/**
- * Created by thanhnv on 2/28/15.
- */
+"use strict";
 
 module.exports = function (env) {
     env.addFilter('active_page', function (value, string_to_compare, cls) {
@@ -12,4 +9,4 @@ module.exports = function (env) {
         }
         return arr[1] == string_to_compare ? st : "";
     });
-}
+};

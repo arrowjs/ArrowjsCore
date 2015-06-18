@@ -1,7 +1,5 @@
-/**
- * Created by vhchung on 3/19/15.
- */
 'use strict';
+
 let chalk = require('chalk');
 
 module.exports = function (env) {

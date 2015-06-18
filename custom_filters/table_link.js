@@ -1,6 +1,9 @@
-"use strict"
+"use strict";
+
 /**
- * Created by thanhnv on 2/28/15.
+ * hàm này em chưa hiểu
+ *
+ * @param env
  */
 
 module.exports = function (env) {
@@ -14,7 +17,7 @@ module.exports = function (env) {
                     let arr = x.split('.');
                     let value = '';
                     for (let i in arr) {
-                        item = (item[arr[i]] != null) ? item[arr[i]] : '';
+                        item = (item[arr[i]] != null) ? item[arr[i] ] : '';
                         value = item;
                     }
                     return value;
@@ -28,4 +31,4 @@ module.exports = function (env) {
         }
         return link;
     });
-}
+};

@@ -1,7 +1,5 @@
-"use strict"
-/**
- * Created by thanhnv on 2/28/15.
- */
+"use strict";
+
 let config = require(__base + 'config/config.js');
 let fs = require('fs');
 module.exports = function (env) {
@@ -15,4 +13,4 @@ module.exports = function (env) {
         }
 
     });
-}
+};

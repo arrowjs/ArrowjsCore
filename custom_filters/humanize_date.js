@@ -1,7 +1,5 @@
-"use strict"
-/**
- * Created by thanhnv on 2/28/15.
- */
+"use strict";
+
 let moment = require('moment');
 moment.locale('vn');
 moment.locale('en', {
@@ -25,4 +23,4 @@ module.exports = function (env) {
     env.addFilter('humanize_date', function (input) {
         return moment(input).fromNow();
     });
-}
+};

@@ -1,7 +1,5 @@
-"use strict"
-/**
- * Created by thanhnv on 2/28/15.
- */
+"use strict";
+
 let utils = require(__base+'libs/utils'),
     dateFormatter = require(__base+'libs/dateformatter');
 module.exports = function (env) {
@@ -15,7 +13,7 @@ module.exports = function (env) {
         if (offset) {
             date.setTimezoneOffset(offset, abbr);
         }
-
+;
         for (i; i < l; i += 1) {
             cur = format.charAt(i);
             if (dateFormatter.hasOwnProperty(cur)) {
