@@ -43,13 +43,7 @@ _module.index = function (req, res) {
                 _module.render(req, res, 'post.html', {
                     item: results[0],
                     seo_info: seo_info,
-                    categories: results[1].rows,
-                    _breadcrumb: [
-                        {
-                            title: results[0].title,
-                            link: '/' + results[0].id + '/' + results[0].alias + '/'
-                        }
-                    ]
+                    categories: results[1].rows
                 });
             } else {
                 // Redirect to 404 if post not exist

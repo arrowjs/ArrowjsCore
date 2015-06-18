@@ -1,28 +1,9 @@
 "use strict";
-/**
- * Created by thanhnv on 2/17/15.
- */
 
 let   util = require('util'),
     _ = require('lodash');
 let config = require(__base + 'config/config');
 let redis = require('redis').createClient();
-let breadcrumb =
-    [
-        {
-            title: 'Home',
-            icon: 'fa fa-dashboard',
-            href: '/admin'
-        },
-        {
-            title: 'Configurations',
-            href: '#'
-        },
-        {
-            title: 'Site info',
-            href: '#'
-        }
-    ];
 
 function ConfigurationsModule() {
     BaseModuleBackend.call(this);
@@ -31,7 +12,6 @@ function ConfigurationsModule() {
 let _module = new ConfigurationsModule();
 
 _module.index = function (req, res) {
-    res.locals.breadcrumb = __.create_breadcrumb(breadcrumb);
     let seo_enable = __seo_enable;
     _module.render(req, res, 'sites/index', {
         config: config,

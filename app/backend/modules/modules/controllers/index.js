@@ -8,18 +8,7 @@ var
 let config = require(__base + 'config/config');
 let redis = require('redis').createClient();
 let route = 'modules';
-let breadcrumb =
-    [
-        {
-            title: 'Home',
-            icon: 'fa fa-dashboard',
-            href: '/admin'
-        },
-        {
-            title: 'Modules',
-            href: '/admin/modules'
-        }
-    ];
+
 function ModulesModule() {
     BaseModuleBackend.call(this);
     this.path = "/modules";
@@ -27,8 +16,6 @@ function ModulesModule() {
 let _module = new ModulesModule();
 
 _module.index = function (req, res) {
-    // Breadcrumb
-    res.locals.breadcrumb = __.create_breadcrumb(breadcrumb);
     _module.render(req, res, 'index', {
         title: "All Modules",
         modules: __modules

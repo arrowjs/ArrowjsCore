@@ -14,18 +14,6 @@ let formidable = require('formidable');
 Promise.promisifyAll(formidable);
 let renameAsync = Promise.promisify(require('fs').rename);
 
-let breadcrumb =
-    [
-        {
-            title: 'Home',
-            icon: 'fa fa-dashboard',
-            href: '/admin'
-        },
-        {
-            title: 'Plugins',
-            href: '/admin/plugins'
-        }
-    ];
 function PluginsModule() {
     BaseModuleBackend.call(this);
     this.path = "/plugins";
@@ -33,16 +21,12 @@ function PluginsModule() {
 let _module = new PluginsModule();
 
 _module.index = function (req, res) {
-    // Breadcrumb
-    res.locals.breadcrumb = __.create_breadcrumb(breadcrumb);
     _module.render(req, res, 'index', {
         title: "All Plugins",
         plugins: __pluginManager.plugins
     });
 };
 _module.setting = function (req, res) {
-    // Breadcrumb
-    res.locals.breadcrumb = __.create_breadcrumb(breadcrumb, {title: req.params.alias});
     let plg = __pluginManager.getPlugin(req.params.alias);
     if (fs.existsSync(__base + 'app/plugins/' + req.params.alias + '/setting.html')) {
         let env = __.createNewEnv([__base + 'app/plugins/' + req.params.alias]);

@@ -28,9 +28,6 @@ function WidgetsModule() {
 let _module = new WidgetsModule();
 
 _module.index = function (req, res) {
-    // Breadcrumb
-    res.locals.breadcrumb = __.create_breadcrumb(breadcrumb);
-
     _module.render(req, res, 'index', {
         title: "All Widgets",
         widgets: __widgets
@@ -38,7 +35,6 @@ _module.index = function (req, res) {
 };
 
 _module.sidebar = function (req, res, next) {
-    res.locals.breadcrumb = __.create_breadcrumb(breadcrumb, {title: 'Sidebars'});
     res.locals.customButtons = [{
         name: "Xóa bộ nhớ đệm",
         cls: "btn btn-danger",

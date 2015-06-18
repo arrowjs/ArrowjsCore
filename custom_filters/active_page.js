@@ -1,5 +1,6 @@
 "use strict";
 
+//todo: hoi anh thanh
 module.exports = function (env) {
     env.addFilter('active_page', function (value, string_to_compare, cls) {
         let arr = value.split('/');

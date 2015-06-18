@@ -45,7 +45,7 @@ _module.list = function (req, res) {
     res.locals.createButton = __acl.addButton(req, route, 'create', '/admin/users/create');
 
     // Breadcrumb
-    res.locals.breadcrumb = __.create_breadcrumb(breadcrumb);
+    res.locals.breadcrumb = __.createBreadcrumb(breadcrumb);
 
     let page = req.params.page || 1;
     let column = req.params.sort || 'id';
@@ -181,7 +181,7 @@ _module.view = function (req, res) {
     res.locals.backButton = __acl.addButton(req, route, 'index', '/admin/users');
 
     // Breadcrumb
-    res.locals.breadcrumb = __.create_breadcrumb(breadcrumb, {title: 'Update User'});
+    res.locals.breadcrumb = __.createBreadcrumb(breadcrumb, {title: 'Update User'});
     // Get user by session and list roles
     __models.role.findAll().then(function (roles) {
         _module.render(req, res, edit_template, {
@@ -285,7 +285,7 @@ _module.create = function (req, res) {
     res.locals.backButton = __acl.addButton(req, route, 'index', '/admin/users');
 
     // Breadcrumb
-    res.locals.breadcrumb = __.create_breadcrumb(breadcrumb, {title: 'New User'});
+    res.locals.breadcrumb = __.createBreadcrumb(breadcrumb, {title: 'New User'});
 
     // Get list roles
     __models.role.findAll({
@@ -398,7 +398,7 @@ _module.profile = function (req, res) {
     // Add button
     res.locals.saveButton = __acl.addButton(req, route, 'update_profile');
     //breadcrumb
-    res.locals.breadcrumb = __.create_breadcrumb(breadcrumb, {title: 'Profile'});
+    res.locals.breadcrumb = __.createBreadcrumb(breadcrumb, {title: 'Profile'});
 
     //console.log(req.user, '##################', req._user);
     __models.role.findAll({
@@ -421,7 +421,7 @@ _module.profile = function (req, res) {
  * Change pass view
  */
 _module.changePass = function (req, res) {
-    res.locals.breadcrumb = __.create_breadcrumb(breadcrumb, {title: 'Change password'});
+    res.locals.breadcrumb = __.createBreadcrumb(breadcrumb, {title: 'Change password'});
     _module.render(req, res, 'change-pass', {
         user: req.user
     });

@@ -9,24 +9,6 @@ var config = require(__base + 'config/config');
 var redis = require("redis").createClient(),
     route = 'configurations';
 
-var breadcrumb =
-    [
-        {
-            title: 'Home',
-            icon: 'fa fa-dashboard',
-            href: '/admin'
-        },
-        {
-            title: 'Configurations',
-            href: '/admin/configurations'
-        },
-        {
-            title: 'Themes',
-            href: '/admin/configurations/themes'
-        }
-    ];
-
-
 function ConfigurationsThemesModule() {
     BaseModuleBackend.call(this);
     this.path = "/configurations";
@@ -35,9 +17,6 @@ let _module = new ConfigurationsThemesModule();
 
 
 _module.index = function (req, res) {
-    // Breadcrumb
-    res.locals.breadcrumb = __.create_breadcrumb(breadcrumb);
-
     let themes = [];
 
     config.getGlobbedFiles(__base + 'app/frontend/themes/*/theme.json').forEach(function (filePath) {
