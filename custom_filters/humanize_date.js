@@ -1,21 +1,21 @@
 "use strict";
 
 let moment = require('moment');
-moment.locale('vn');
+
 moment.locale('en', {
-    relativeTime : {
+    relativeTime: {
         future: "trong %s",
-        past:   "%s trước",
-        s:  "giây",
-        m:  "1 phút",
+        past: "%s trước",
+        s: "%d giây",
+        m: "1 phút",
         mm: "%d phút",
-        h:  "1 tiếng",
+        h: "1 tiếng",
         hh: "%d tiếng",
-        d:  "1 ngày",
+        d: "1 ngày",
         dd: "%d ngày",
-        M:  "1 tháng",
+        M: "1 tháng",
         MM: "%d tháng",
-        y:  "1 năm",
+        y: "1 năm",
         yy: "%d năm"
     }
 });

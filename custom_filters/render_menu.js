@@ -1,5 +1,6 @@
 "use strict";
 
+/** Render menu */
 module.exports = function (env) {
     env.addFilter('render_menu', function (route, menus, user) {
         let html = '';
@@ -7,22 +8,26 @@ module.exports = function (env) {
 
         sortedMenus.forEach(function (m) {
             let i = m.menu;
+
             if (menus[i] != undefined) {
                 if (user.acl[i] != undefined) {
                     let cls = __.active_menu(route, i.replace('_', '-'));
                     html += '<li class="' + cls + '">';
+
                     if (menus[i].menus.length == 1)
                         html += '<a href="/admin/' + (i.replace('_', '-') + menus[i].menus[0].link) + '">';
                     else
                         html += '<a href="javascript:;">';
+
                     html += '<i class="icon-arrow-right"></i>';
                     html += '<span class="title">' + menus[i].title + '</span>';
                     html += '<span class="arrow "></span>';
                     html += '</a>';
 
                     if (menus[i].menus.length > 1) {
-                        //check submenu
+                        // Check submenu
                         html += '<ul class="sub-menu">';
+
                         for (let y in menus[i].menus) {
                             if (user.acl[i].indexOf(menus[i].menus[y].name) > -1) {
                                 html += '<li>';

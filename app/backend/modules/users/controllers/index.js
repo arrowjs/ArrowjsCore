@@ -20,18 +20,6 @@ let slug = require('slug');
 let edit_template = 'new.html';
 let folder_upload = '/img/users/';
 let route = 'users';
-let breadcrumb =
-    [
-        {
-            title: 'Home',
-            icon: 'fa fa-dashboard',
-            href: '/admin'
-        },
-        {
-            title: 'Users',
-            href: '/admin/users'
-        }
-    ];
 
 function UsersModule() {
     BaseModuleBackend.call(this);
@@ -42,9 +30,6 @@ let _module = new UsersModule();
 _module.list = function (req, res) {
     // Add button
     res.locals.createButton = __acl.addButton(req, route, 'create', '/admin/users/create');
-
-    // Breadcrumb
-    res.locals.breadcrumb = __.createBreadcrumb(breadcrumb);
 
     let page = req.params.page || 1;
     let column = req.params.sort || 'id';
@@ -179,8 +164,6 @@ _module.view = function (req, res) {
     res.locals.saveButton = __acl.addButton(req, route, 'create');
     res.locals.backButton = __acl.addButton(req, route, 'index', '/admin/users');
 
-    // Breadcrumb
-    res.locals.breadcrumb = __.createBreadcrumb(breadcrumb, {title: 'Update User'});
     // Get user by session and list roles
     __models.role.findAll().then(function (roles) {
         _module.render(req, res, edit_template, {
@@ -282,9 +265,6 @@ _module.create = function (req, res) {
     // Add button
     res.locals.saveButton = __acl.addButton(req, route, 'create');
     res.locals.backButton = __acl.addButton(req, route, 'index', '/admin/users');
-
-    // Breadcrumb
-    res.locals.breadcrumb = __.createBreadcrumb(breadcrumb, {title: 'New User'});
 
     // Get list roles
     __models.role.findAll({
@@ -396,10 +376,7 @@ _module.signout = function (req, res) {
 _module.profile = function (req, res) {
     // Add button
     res.locals.saveButton = __acl.addButton(req, route, 'update_profile');
-    //breadcrumb
-    res.locals.breadcrumb = __.createBreadcrumb(breadcrumb, {title: 'Profile'});
 
-    //console.log(req.user, '##################', req._user);
     __models.role.findAll({
         order: "id asc"
     }).then(function (roles) {
@@ -420,7 +397,6 @@ _module.profile = function (req, res) {
  * Change pass view
  */
 _module.changePass = function (req, res) {
-    res.locals.breadcrumb = __.createBreadcrumb(breadcrumb, {title: 'Change password'});
     _module.render(req, res, 'change-pass', {
         user: req.user
     });

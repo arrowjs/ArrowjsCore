@@ -9,14 +9,14 @@ module.exports = function (env) {
                 sidebar: sidebarName
             },
             order: ['ordering'],
-            raw :true
+            raw: true
         }).then(function (widgets) {
-            Promise.map(widgets,function(widget){
+            Promise.map(widgets, function (widget) {
                 let w = __.getWidget(widget.widget_type);
                 if (w) {
                     return w.render_setting(widget.widget_type, widget)
                 }
-            }).then(function(results){
+            }).then(function (results) {
                 let html = "";
                 if (results.length > 0) {
                     for (let i in results) {
