@@ -1,10 +1,5 @@
 'use strict';
-/**
- * Created by thanhnv on 3/13/15.
- */
-/**
- * Created by thanhnv on 3/13/15.
- */
+
 var Promise = require('bluebird'),
     _ = require('lodash');
 var _base_config = {
@@ -38,5 +33,6 @@ function GooglePlugin() {
         });
     }
 }
+
 module.exports = new GooglePlugin();
 

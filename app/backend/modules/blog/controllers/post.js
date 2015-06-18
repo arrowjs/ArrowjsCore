@@ -2,12 +2,11 @@
 
 let util = require('util');
 let config = require(__base + 'config/config');
-let slug = require('slug-extend');
-let async = require('async'),
-    route = 'blog';
+let slug = require('slug');
 let sequelize = require('sequelize');
 let Promise = require('bluebird');
 
+let route = 'blog';
 let edit_view = 'post/new';
 
 function PostsModule() {

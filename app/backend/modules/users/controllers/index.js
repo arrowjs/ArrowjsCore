@@ -1,17 +1,12 @@
 'use strict';
-/**
- * Created by thanhnv on 1/26/15.
- */
+
 let util = require('util'),
     _ = require('lodash');
 
-let gm = require('gm');
-//let imagic = gm.subClass({imageMagick: true});
 let fs = require('fs');
 
 let promise = require('bluebird');
 
-let renameAsync = promise.promisify(require('fs').rename);
 let writeFileAsync = promise.promisify(require('fs').writeFile);
 
 let formidable = require('formidable');
@@ -20,7 +15,7 @@ promise.promisifyAll(formidable);
 let redis = require('redis').createClient();
 
 let path = require('path');
-let slug = require('slug-extend');
+let slug = require('slug');
 let config = require(__base + 'config/config.js');
 
 let edit_template = 'new.html';

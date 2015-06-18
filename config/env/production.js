@@ -6,7 +6,7 @@ module.exports = {
         port: '5432',
         database: 'arr_techmaster',
         username: 'postgres',
-        password: 'vanthanh123-',
+        password: 'secret',
         dialect: 'postgres',
         logging: true
     },

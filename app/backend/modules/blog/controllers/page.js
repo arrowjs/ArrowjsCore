@@ -4,7 +4,7 @@ let promise = require('bluebird');
 let route = 'blog';
 let config = require(__base + 'config/config');
 let util = require('util');
-let slug = require('slug-extend');
+let slug = require('slug');
 let formidable = require('formidable');
 let sequelize = require('sequelize');
 promise.promisifyAll(formidable);
