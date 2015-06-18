@@ -6,7 +6,6 @@
 let _ = require('lodash'),
     path = require('path'),
     util = require('util');
-let config = require(__base + 'config/config');
 let route = 'logs';
 
 /**
@@ -179,10 +178,10 @@ _module.list = function (req, res) {
     __models.logs.findAndCountAll({
         where: filter.values,
         order: column + " " + order,
-        limit: config.pagination.number_item,
-        offset: (page - 1) * config.pagination.number_item
+        limit: __config.pagination.number_item,
+        offset: (page - 1) * __config.pagination.number_item
     }).then(function (logs) {
-        let totalPage = Math.ceil(logs.count / config.pagination.number_item);
+        let totalPage = Math.ceil(logs.count / __config.pagination.number_item);
         _module.render(req, res, 'index', {
             title: "Logs hệ thống",
             items: logs.rows,

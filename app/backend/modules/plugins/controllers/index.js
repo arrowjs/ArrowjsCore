@@ -4,7 +4,6 @@
  */
 let util = require('util'),
     _ = require('lodash');
-let config = require(__base + 'config/config');
 let redis = require('redis').createClient();
 let fs = require('fs');
 let route = 'modules';
@@ -73,7 +72,7 @@ _module.setting = function (req, res) {
 
 };
 _module.save_setting = function (req, res, next) {
-    let folder_to_upload = __base + 'config/env/';
+    let folder_to_upload = __base + '__config/env/';
     let plg = __pluginManager.getPlugin(req.params.alias);
     let form = new formidable.IncomingForm();
     form.parseAsync(req).then(function (result) {
@@ -93,7 +92,7 @@ _module.save_setting = function (req, res, next) {
         });
     }).then(function (data) {
         plg.options = data;
-        redis.set(config.redis_prefix + 'all_plugins', JSON.stringify(__pluginManager.plugins), redis.print);
+        redis.set(__config.redis_prefix + 'all_plugins', JSON.stringify(__pluginManager.plugins), redis.print);
         req.flash.success("Saved success");
         next();
     }).catch(function (err) {
@@ -105,7 +104,7 @@ _module.save_setting = function (req, res, next) {
 _module.active = function (req, res, next) {
     let plg = __pluginManager.getPlugin(req.params.alias);
     plg.active = !plg.active;
-    redis.set(config.redis_prefix + 'all_plugins', JSON.stringify(__pluginManager.plugins), redis.print);
+    redis.set(__config.redis_prefix + 'all_plugins', JSON.stringify(__pluginManager.plugins), redis.print);
     next();
 };
 

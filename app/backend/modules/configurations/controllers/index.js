@@ -5,7 +5,6 @@
 
 let   util = require('util'),
     _ = require('lodash');
-let config = require(__base + 'config/config');
 let redis = require('redis').createClient();
 let breadcrumb =
     [
@@ -34,7 +33,7 @@ _module.index = function (req, res) {
     res.locals.breadcrumb = __.create_breadcrumb(breadcrumb);
     let seo_enable = __seo_enable;
     _module.render(req, res, 'sites/index', {
-        config: config,
+        __config: __config,
         seo_enable: seo_enable,
         title: 'Cấu hình hệ thống'
     });
@@ -43,25 +42,25 @@ _module.update_setting = function (req, res, next) {
     let data = req.body;
 
     // Site info
-    config.app.title = data.title;
-    config.app.description = data.description;
-    config.app.logo = data.logo;
-    config.app.icon = data.icon;
-    config.pagination.number_item = data.number_item;
+    __config.app.title = data.title;
+    __config.app.description = data.description;
+    __config.app.logo = data.logo;
+    __config.app.icon = data.icon;
+    __config.pagination.number_item = data.number_item;
 
     // Database info
-    config.db.host = data.db_host;
-    config.db.port = data.db_port;
-    config.db.username = data.db_username;
+    __config.db.host = data.db_host;
+    __config.db.port = data.db_port;
+    __config.db.username = data.db_username;
     if (data.db_password != '') {
-        config.db.password = data.db_password;
+        __config.db.password = data.db_password;
     }
-    config.db.dialect = data.db_dialect;
+    __config.db.dialect = data.db_dialect;
     if (data.logging) {
-        config.db.logging = true;
+        __config.db.logging = true;
     }
     if(data.seo_enable == 'false') {
-        redis.set(config.redis_prefix +"seo_enable", false, function (err, res) {
+        redis.set(__config.redis_prefix +"seo_enable", false, function (err, res) {
             if (err) {
                 console.log(" Redis reply error: " + err);
             } else {
@@ -70,7 +69,7 @@ _module.update_setting = function (req, res, next) {
         });
         __seo_enable = false;
     } else {
-        redis.set(config.redis_prefix +"seo_enable", true, function (err, res) {
+        redis.set(__config.redis_prefix +"seo_enable", true, function (err, res) {
             if (err) {
                 console.log(" Redis reply error: " + err);
             } else {
@@ -81,10 +80,10 @@ _module.update_setting = function (req, res, next) {
     }
 
     //redis info
-    config.redis.host = data.redis_host;
-    config.redis.port = data.redis_port;
+    __config.redis.host = data.redis_host;
+    __config.redis.port = data.redis_port;
 
-    redis.set(config.redis_prefix +config.key, JSON.stringify(config), redis.print);
+    redis.set(__config.redis_prefix +__config.key, JSON.stringify(__config), redis.print);
     req.flash.success('Saved success');
     next();
 

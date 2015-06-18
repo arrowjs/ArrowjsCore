@@ -1,7 +1,6 @@
 'use strict';
 
 let util = require('util'),
-    config = require(__base + 'config/config.js'),
     _ = require('lodash');
 
 function IndexModule() {

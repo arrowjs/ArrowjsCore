@@ -16,7 +16,6 @@ let redis = require('redis').createClient();
 
 let path = require('path');
 let slug = require('slug');
-let config = require(__base + 'config/config.js');
 
 let edit_template = 'new.html';
 let folder_upload = '/img/users/';
@@ -50,7 +49,7 @@ _module.list = function (req, res) {
     let page = req.params.page || 1;
     let column = req.params.sort || 'id';
     let order = req.params.order || 'asc';
-    //Config columns
+    //config columns
     res.locals.root_link = '/admin/users/page/' + page + '/sort';
     let filter = __.createFilter(req, res, route, '/admin/users', column, order, [
         {
@@ -151,11 +150,11 @@ _module.list = function (req, res) {
             }
         ],
         order: filter.sort,
-        limit: config.pagination.number_item,
-        offset: (page - 1) * config.pagination.number_item,
+        limit: __config.pagination.number_item,
+        offset: (page - 1) * __config.pagination.number_item,
         where: filter.values
     }).then(function (results) {
-        let totalPage = Math.ceil(results.count / config.pagination.number_item);
+        let totalPage = Math.ceil(results.count / __config.pagination.number_item);
         _module.render(req, res, 'index.html', {
             title: "Danh sách thành viên",
             totalPage: totalPage,

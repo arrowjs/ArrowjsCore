@@ -5,7 +5,6 @@
 
 var util = require('util'),
     _ = require('lodash');
-var config = require(__base + 'config/config');
 var redis = require("redis").createClient(),
     route = 'configurations';
 
@@ -40,12 +39,12 @@ _module.index = function (req, res) {
 
     let themes = [];
 
-    config.getGlobbedFiles(__base + 'app/frontend/themes/*/theme.json').forEach(function (filePath) {
+    __config.getGlobbedFiles(__base + 'app/frontend/themes/*/theme.json').forEach(function (filePath) {
         themes.push(require(filePath));
     });
     let current_theme;
     for (let i in themes) {
-        if (themes[i].alias.toLowerCase() == config.themes.toLowerCase()) {
+        if (themes[i].alias.toLowerCase() == __config.themes.toLowerCase()) {
             current_theme = __current_theme = themes[i];
         }
     }
@@ -62,7 +61,7 @@ _module.detail = function (req, res) {
 
     let themes = [];
 
-    config.getGlobbedFiles(__base + 'app/frontend/themes/*/theme.json').forEach(function (filePath) {
+    __config.getGlobbedFiles(__base + 'app/frontend/themes/*/theme.json').forEach(function (filePath) {
         themes.push(require(filePath));
     });
     let current_theme;
@@ -79,8 +78,8 @@ _module.detail = function (req, res) {
 };
 
 _module.change_themes = function (req, res) {
-    config.themes = req.params.themeName;
-    redis.set(config.redis_prefix +config.key, JSON.stringify(config), redis.print);
+    __config.themes = req.params.themeName;
+    redis.set(__config.redis_prefix +__config.key, JSON.stringify(__config), redis.print);
     res.send("OK");
 };
 

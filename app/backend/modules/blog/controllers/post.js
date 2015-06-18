@@ -1,7 +1,6 @@
 'use strict';
 
 let util = require('util');
-let config = require(__base + 'config/config');
 let slug = require('slug');
 let sequelize = require('sequelize');
 let Promise = require('bluebird');
@@ -109,10 +108,10 @@ _module.list = function (req, res) {
         ],
         where: filter.values,
         order: filter.sort,
-        limit: config.pagination.number_item,
-        offset: (page - 1) * config.pagination.number_item
+        limit: __config.pagination.number_item,
+        offset: (page - 1) * __config.pagination.number_item
     }).then(function (results) {
-        let totalPage = Math.ceil(results.count / config.pagination.number_item);
+        let totalPage = Math.ceil(results.count / __config.pagination.number_item);
 
         // Render view
         _module.render(req, res, '/post/index', {
