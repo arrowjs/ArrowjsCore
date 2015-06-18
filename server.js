@@ -1,9 +1,10 @@
 'use strict';
+
 /**
  * Module dependencies.
  */
-var debug = require('debug')('ArrowJs');
-var init = require('./config/init')(),
+let debug = require('debug')('ArrowJs');
+let init = require('./config/init')(),
     config = require('./config/config');
 
 /**
@@ -21,21 +22,22 @@ global.__acl = require('./libs/acl');
 global.__messages = [];
 global.__current_theme = {};
 global.__pluginManager = require('./libs/plugins_manager');
+global.__setting_menu_module = [];
+global.__cache = require('./libs/arr_caching')();
+global.__config = require('./config/config');
 global.BaseModuleBackend = require('./app/backend/base_module');
 global.BaseModuleFrontend = require('./app/frontend/base_module');
-global.__setting_menu_module = [];
 global.ArrModule = require('./libs/ArrModule');
-global.__cache = require('./libs/arr_caching')();
+
 __pluginManager.loadAllPlugins();
 
 let redis = require('redis').createClient();
 
-// Init SEO
+/** Init SEO */
 redis.get(config.redis_prefix + 'seo_enable', function (err, result) {
     if (result != null) {
         global.__seo_enable = result;
-    }
-    else {
+    } else {
         redis.set(config.redis_prefix + 'seo_enable', true, function (err, res) {
             if (err) {
                 console.log("Init app Redis reply error: " + err);
@@ -47,19 +49,18 @@ redis.get(config.redis_prefix + 'seo_enable', function (err, result) {
     }
 });
 
-// Init the express application
-var app = require('./config/app')();
+/** Init the express application */
+let app = require('./config/app')();
 
-global.__config = require('./config/config');
-
-// Bootstrap passport config
+/** Bootstrap passport config */
 require('./config/passport')();
 
-var server = app.listen(config.port);
-// Start the app by listening on <port>
+let server = app.listen(config.port);
+/** Start the app by listening on <port> */
 
-// Expose app
+/** Expose app */
 module.exports = app;
 
-// Logging initialization
+/** Logging initialization */
 console.log('Application started on port ' + config.port);
+

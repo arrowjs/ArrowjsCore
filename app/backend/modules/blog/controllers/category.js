@@ -2,7 +2,7 @@
 
 let route = 'blog';
 let util = require('util');
-let slug = require('slug-extend');
+let slug = require('slug');
 
 function CategoriesModule() {
     BaseModuleBackend.call(this);

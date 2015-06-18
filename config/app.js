@@ -1,7 +1,3 @@
-/**
- * Created by thanhnv on 2/18/15.
- */
-
 'use strict';
 
 /**
@@ -27,14 +23,12 @@ let fs = require('fs'),
     path = require('path'),
     Promise = require('bluebird');
 
-
 module.exports = function () {
     // Initialize express app
     let app = express();
-    // Setting the app router and static folder
 
-    // Should be placed before express.static
-    /*    app.use(compress({
+    // Setting the app router and static folder. Should be placed before express.static
+    /*app.use(compress({
      filter: function (req, res) {
      return (/json|text|javascript|css/).test(res.getHeader('Content-Type'));
      },
@@ -43,23 +37,16 @@ module.exports = function () {
 
     app.use(express.static(path.resolve('./public'), {maxAge: 3600}));
 
-    // Setting application local variables
-    /*app.locals.title = config.app.title;
-     app.locals.description = config.app.description;
-     app.locals.keywords = config.app.keywords;
-     app.locals.facebookAppId = config.facebook.clientID;*/
-//    app.locals.jsFiles = config.getJavaScriptAssets();
-//    app.locals.cssFiles = config.getCSSAssets();
-
     redis.get(config.redis_prefix + config.key, function (err, result) {
         if (result != null) {
             let tmp = JSON.parse(result);
             _.assign(config, tmp);
 
-        }
-        else {
+        } else {
             redis.set(config.redis_prefix + config.key, JSON.stringify(config), redis.print);
         }
+
+        // Set local variable
         app.locals.title = config.app.title;
         app.locals.description = config.app.description;
         app.locals.keywords = config.app.keywords;
@@ -70,17 +57,16 @@ module.exports = function () {
     app.set('showStackError', true);
 
     // Set nunjucks as the template engine
-    //app.engine('html', nunjucks);
     let e = nunjucks.configure(__base + 'app/themes', {
         autoescape: true,
         express: app
     });
+
     //Initials custom filter
     __.getAllCustomFilter(e);
 
     // Set views path and view engine
     app.set('view engine', 'html');
-    //app.set('views', ['./app/themes', './app/widgets']);
 
     // Environment dependent middleware
     if (process.env.NODE_ENV === 'development') {
@@ -94,8 +80,6 @@ module.exports = function () {
     }
 
     // Request body parsing middleware should be above methodOverride
-
-
     app.use(bodyParser.urlencoded({
         extended: true,
         limit: '5mb'
@@ -107,17 +91,14 @@ module.exports = function () {
     app.use(cookieParser());
 
 
-    // Express MongoDB session storage
+    // Express session storage
     let secret = "hjjhdsu465aklsdjfhasdasdf342ehsf09kljlasdf";
-
     let middleSession = session({
         store: new RedisStore({host: config.redis.host, port: config.redis.port, client: redis}),
         secret: secret,
         key: 'sid'
     });
-
     app.use(middleSession);
-
 
     app.use(function (req, res, next) {
         if (!req.session) {
@@ -125,11 +106,12 @@ module.exports = function () {
         }
         next(); // otherwise continue
     });
-    // use passport session
+
+    // Use passport session
     app.use(passport.initialize());
     app.use(passport.session());
 
-    //flash messages
+    // Flash messages
     app.use(require(__base + 'app/middleware/flash-plugin.js'));
 
     // Use helmet to secure Express headers
@@ -139,41 +121,35 @@ module.exports = function () {
     app.use(helmet.ienoopen());
     app.disable('x-powered-by');
 
-
-    //app.use(setStaticResourceFolder);
     // Passing the request url to environment locals
     app.use(function (req, res, next) {
         res.locals.url = req.protocol + '://' + req.headers.host + req.url;
         res.locals.route = req.url;
         res.locals.path = req.protocol + '://' + req.headers.host;
 
-        //HTTP headers for caching static resources
-        //res.setHeader('Cache-Control', 'public, max-age=600');
+        // HTTP headers for caching static resources
         if (req.user) {
             res.locals.__user = req.user;
         }
         next();
     });
 
-    //app.use(require('../app/middleware/theme-plugin.js'));
-
     // Globbing admin module files
     redis.get(config.redis_prefix + 'all_modules', function (err, results) {
         if (results != null) {
             global.__modules = JSON.parse(results);
-        }
-        else {
+        } else {
             config.getGlobbedFiles('./app/backend/modules/*/module.js').forEach(function (routePath) {
-                console.log(path.resolve(routePath));
                 require(path.resolve(routePath))(__modules);
             });
             redis.set(config.redis_prefix + 'all_modules', JSON.stringify(__modules), redis.print);
         }
     });
 
-    //module manager backend
+    // Module manager backend
     require(__base + 'app/backend/core_route')(app);
     app.use('/admin/*', require('../app/middleware/modules-plugin.js'));
+
     // Globbing routing admin files
     config.getGlobbedFiles('./app/backend/modules/*/route.js').forEach(function (routePath) {
         app.use('/' + config.admin_prefix, require(path.resolve(routePath)));
@@ -190,17 +166,14 @@ module.exports = function () {
     });
 
     app.use('/admin/*', function (req, res, next) {
-        //return next();
         if (!req.isAuthenticated()) {
             console.log("redirect to admin login");
             return res.redirect('/admin/login');
         }
-//        res.locals.__user = req.user;
         next();
     });
 
-    //module manager frontend
-    //app.use('/^((?!admin))/*', require('../app/middleware/modules-f-plugin.js'));
+    // Module manager frontend
     app.use('/*', require('../app/middleware/modules-f-plugin.js'));
 
     // Globbing frontend module files
@@ -210,11 +183,13 @@ module.exports = function () {
 
     // Globbing routing files
     require(__base + 'app/frontend/modules/routes')(app);
+
     // Globbing menu files
     config.getGlobbedFiles('./app/menus/*/*.js').forEach(function (routePath) {
         console.log(routePath);
         require(path.resolve(routePath))(__menus);
     });
+
     // Assume 'not found' in the error msgs is a 404. this is somewhat silly, but valid, you can do whatever you like, set properties, use instanceof etc.
     app.use(function (err, req, res, next) {
         // If the error object doesn't exists
@@ -222,6 +197,7 @@ module.exports = function () {
 
         // Log it
         console.error(err.stack);
+
         // Log error into database
         __models.logs.create({
             event_name: err.name,
@@ -230,7 +206,6 @@ module.exports = function () {
         });
 
         // Error page
-
         res.status(500).render('500', {
             error: err.stack
         });
@@ -239,19 +214,15 @@ module.exports = function () {
     // Assume 404 since no middleware responded
     app.use(function (req, res) {
         let h = req.header("Accept");
-        try{
+        try {
             if (h.indexOf('text/html') > -1) {
                 res.redirect('/404.html');
-            }
-            else {
+            } else {
                 res.sendStatus(404);
             }
-        }
-        catch(err){
+        } catch (err) {
             res.sendStatus(404);
         }
-
-
     });
 
     if (process.env.NODE_ENV === 'secure') {
@@ -271,6 +242,7 @@ module.exports = function () {
         // Return HTTPS server instance
         return httpsServer;
     }
+
     // Return Express server instance
     return app;
 };
