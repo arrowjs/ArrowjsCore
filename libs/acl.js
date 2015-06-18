@@ -45,10 +45,10 @@ exports.isAllow = function (route, action, orAction, hasAuthorize) {
 
 /**
  * Add a button.
- * @param  {object} req - Request of users.
- * @param  {string} route - Route which user access.
- * @param  {string} action - Action which user access.
- * @param  {string} url - URL which button will be linked to.
+ * @param {object} req - Request of users.
+ * @param {string} route - Route which user access.
+ * @param {string} action - Action which user access.
+ * @param {string} url - URL which button will be linked to.
  * @return {string}
  */
 exports.addButton = function (req, route, action, url) {
@@ -72,7 +72,7 @@ exports.addButton = function (req, route, action, url) {
 
 /**
  * Add custom button.
- * @param   {string} url - URL which button will be linked to.
+ * @param {string} url - URL which button will be linked to.
  * @returns {string}
  */
 exports.customButton = function (url) {
@@ -81,9 +81,9 @@ exports.customButton = function (url) {
 
 /**
  * Check module active.
- * @param   {object} req - Request of users.
- * @param   {string} route - Route which user access.
- * @param   {string} action - Action which user access.
+ * @param {object} req - Request of users.
+ * @param {string} route - Route which user access.
+ * @param {string} action - Action which user access.
  * @returns {boolean}
  */
 //todo: rename function

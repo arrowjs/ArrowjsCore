@@ -5,7 +5,7 @@ let mailer = require('nodemailer');
 
 /**
  * Create breadcrumb
- * @param   {array} root - Existing breadcrumb
+ * @param {array} root - Base breadcrumb
  * @returns {array} - Return new breadcrumb
  */
 exports.createBreadcrumb = function (root) {
@@ -19,10 +19,10 @@ exports.createBreadcrumb = function (root) {
 
 /**
  * Add active class to current menu
- * @param   {string} value - Menu link
- * @param   {string} string_to_compare - String to compare with menu link
- * @param   {string} css_class - CSS class when not use class "active"
- * @param   {integer} index
+ * @param {string} value - Menu link
+ * @param {string} string_to_compare - String to compare with menu link
+ * @param {string} css_class - CSS class when not use class "active"
+ * @param {integer} index
  * @returns {string}
  */
 //todo: hoi anh thanh
@@ -61,12 +61,14 @@ exports.active_menu = function (value, string_to_compare, css_class, index) {
 exports.sortMenus = function (menus) {
     let sortable = [];
 
+    // Add menus to array
     for (let m in menus) {
         if (menus.hasOwnProperty(m)) {
             sortable.push({menu: m, sort: menus[m].sort});
         }
     }
 
+    // Sort menu array
     sortable.sort(function (a, b) {
         if (a.sort < b.sort)
             return -1;
@@ -81,7 +83,7 @@ exports.sortMenus = function (menus) {
 /**
  * Get widget by alias
  * @param {string} alias
- * @returns {*}
+ * @returns {object}
  */
 exports.getWidget = function (alias) {
     for (let i in __widgets) {
@@ -135,12 +137,16 @@ exports.getAllGlobalVariable = function (env) {
     env.addGlobal('create_link', function (module_name, link) {
         return module_name + '/' + link;
     });
-    env.addGlobal('media_server', config.media_server);
-    env.addGlobal('media_server_id', config.media_server_id);
     return env;
 };
 
-
+/**
+ * Parse query conditions with column type
+ * @param {string} column_name
+ * @param {string} value
+ * @param {string} col
+ * @returns {string}
+ */
 exports.parseCondition = function (column_name, value, col) {
     if (col.filter.filter_key) {
         column_name = col.filter.filter_key;
@@ -176,12 +182,18 @@ exports.parseCondition = function (column_name, value, col) {
     }
 };
 
+/**
+ * Parse value with data type
+ * @param {string} value
+ * @param {object} col
+ * @returns {string}
+ */
 exports.parseValue = function (value, col) {
     if (col.filter.data_type == 'array') {
         return '{' + value + '}';
     }
 
-    if (col.filter.type == 'datetime') {
+    if (col.filter.data_type == 'datetime') {
         return value.split(/\s+-\s+/);
     } else if (col.filter.data_type == 'string') {
         value = "%" + value + "%";
@@ -216,7 +228,19 @@ exports.parseValue = function (value, col) {
     }
 };
 
-exports.createFilter = function (req, res, route, reset_link, current_column, order, columns, customCondition, type) {
+/**
+ * Create filter column for standard table
+ * @param {object} req - Request
+ * @param {object} res - Response
+ * @param {route} route - Module name
+ * @param {string} reset_link - Link to create button reset filter
+ * @param {string} current_column - Current column used to sorting
+ * @param {string} current_order - Current "order by" used to sorting
+ * @param {string} columns - List of columns which display in table
+ * @param {string} customCondition - Custom conditions
+ * @returns {object}
+ */
+exports.createFilter = function (req, res, route, reset_link, current_column, current_order, columns, customCondition) {
     // Add button Search
     if (route != '') {
         res.locals.searchButton = __acl.customButton(route);
@@ -226,19 +250,21 @@ exports.createFilter = function (req, res, route, reset_link, current_column, or
     let conditions = [];
     let values = [];
     let attributes = [];
-    values.push('command');
+    values.push('');
 
+    // Get column by name
     let getColumn = function (name) {
         for (let i in columns) {
-            if (columns[i].column == name) {
+            if (columns.hasOwnProperty(i) && columns[i].column == name) {
                 return columns[i];
             }
         }
         return {filter: {}};
     };
 
+    // Get values
     for (let i in req.query) {
-        if (req.query[i] != '') {
+        if (req.query.hasOwnProperty(i) && req.query[i] != '') {
             let col = getColumn(i);
             if (!col) continue;
 
@@ -260,35 +286,49 @@ exports.createFilter = function (req, res, route, reset_link, current_column, or
         }
     }
 
+    // Get attributes
     for (let i in columns) {
-        if (columns[i].column != '')
+        if (columns.hasOwnProperty(i) && columns[i].column != '')
             attributes.push(columns[i].column);
     }
 
     let tmp = conditions.length > 0 ? "(" + conditions.join(" AND ") + ")" : " 1=1 ";
-    let stCondition = tmp + (customCondition ? customCondition : '');
-    values[0] = stCondition;
+    values[0] = tmp + (customCondition ? customCondition : '');
 
+    // Set local variables
     res.locals.table_columns = columns;
     res.locals.currentColumn = current_column;
-    res.locals.currentOrder = order;
+    res.locals.currentOrder = current_order;
     res.locals.filters = req.query;
 
+    // Wrap column name by double quotes to prevent error when query
     if (current_column.indexOf('.') > -1)
         current_column = current_column.replace(/(.*)\.(.*)/, '"$1"."$2"');
+
     return {
         values: values,
         attributes: attributes,
-        sort: current_column + " " + order
+        sort: current_column + " " + current_order
     };
 };
 
+/**
+ *
+ * @param {array} filterValues
+ * @returns {string}
+ */
+//todo: hoi anh thanh
 exports.toRawFilter = function (filterValues) {
     let conditions = filterValues[0].split('?');
     for (let i = 0; i < conditions.length - 1; i++) conditions[i] += "'" + filterValues[i + 1] + "'";
     return conditions.join('');
 };
 
+/**
+ * Generate random string from possible string
+ * @param {integer} length - Length of random string
+ * @returns {string}
+ */
 exports.randomSalt = function (length) {
     let text = "";
     let possible = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
@@ -299,6 +339,11 @@ exports.randomSalt = function (length) {
     return text;
 };
 
+/**
+ * Send mail with provided options
+ * @param {object} mailOptions
+ * @returns {Promise}
+ */
 exports.sendMail = function (mailOptions) {
     return new Promise(function (fulfill, reject) {
         let transporter = mailer.createTransport(config.mailer_config);

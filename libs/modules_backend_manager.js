@@ -5,9 +5,11 @@ let redis = require('redis').createClient();
 let path = require('path');
 let _ = require('lodash');
 let modules = {};
+
 module.exports = function () {
     return modules;
 };
+
 module.exports.loadAllModules = function () {
     // Globbing admin module files
     let module_tmp = {};
