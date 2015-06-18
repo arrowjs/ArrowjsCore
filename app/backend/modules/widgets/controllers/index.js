@@ -5,7 +5,6 @@ let util = require('util'),
 let redis = require('redis').createClient();
 let fs = require("fs");
 let Promise = require("bluebird");
-let config = require(__base + 'config/config');
 let route = 'modules';
 
 let breadcrumb =
@@ -42,7 +41,7 @@ _module.sidebar = function (req, res, next) {
     }];
 
     Promise.promisifyAll(fs);
-    fs.readFileAsync(__base + "app/frontend/themes/" + config.themes + "/theme.json", "utf8").then(function (data) {
+    fs.readFileAsync(__base + "app/frontend/themes/" + __config.themes + "/theme.json", "utf8").then(function (data) {
         _module.render(req, res, 'sidebars', {
             title: "Sidebars",
             sidebars: JSON.parse(data).sidebars,
@@ -103,7 +102,7 @@ _module.sidebar_sort = function (req, res) {
 };
 
 _module.clear_sidebar_cache = function (req, res) {
-    redis.keys(config.redis_prefix + "sidebar:*", function (err, keys) {
+    redis.keys(__config.redis_prefix + "sidebar:*", function (err, keys) {
         if (keys != null) {
             redis.del(keys, function (err, result) {
                 req.flash.success("Đã xóa bộ nhớ đệm thành công");

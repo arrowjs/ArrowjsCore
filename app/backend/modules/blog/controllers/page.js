@@ -2,7 +2,6 @@
 
 let promise = require('bluebird');
 let route = 'blog';
-let config = require(__base + 'config/config');
 let util = require('util');
 let slug = require('slug');
 let formidable = require('formidable');
@@ -109,10 +108,10 @@ _module.list = function (req, res) {
         ],
         where: filter.values,
         order: filter.sort,
-        limit: config.pagination.number_item,
-        offset: (page - 1) * config.pagination.number_item
+        limit: __config.pagination.number_item,
+        offset: (page - 1) * __config.pagination.number_item
     }).then(function (results) {
-        let totalPage = Math.ceil(results.count / config.pagination.number_item);
+        let totalPage = Math.ceil(results.count / __config.pagination.number_item);
 
         // Render view
         _module.render(req, res, '/page/index', {

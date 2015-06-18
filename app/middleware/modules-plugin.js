@@ -1,12 +1,11 @@
 'use strict';
 
-let config = require(__base + 'config/config.js');
 
 module.exports = function (req, res, next) {
     // Check if is using admin view
     let pre_fix = '';
     let module = res.locals.route.split('/')[1];
-    if (module == config.admin_prefix) {
+    if (module == __config.admin_prefix) {
         pre_fix = module = res.locals.route.split('/')[2];
     }
 

@@ -3,7 +3,6 @@
 var debug = require('debug')("BaseModule Front End"),
     nunjucks = require('nunjucks'),
     fs = require('fs'),
-    config = require(__base + 'config/config'),
     _ = require('lodash'),
     env = __.createNewEnv([__dirname + '/themes', __dirname + '']);
 
@@ -20,10 +19,10 @@ function BaseModule() {
             view += '.html';
         }
 
-        let tmp = config.themes + '/_modules/' + self.path + '/' + view;
+        let tmp = __config.themes + '/_modules/' + self.path + '/' + view;
         if (fs.existsSync(__base + 'app/frontend/themes/' + tmp)) {
             env.loaders[0].searchPaths = [__dirname + '/themes'];
-            view = config.themes + '/_modules' + self.path + '/' + view;
+            view = __config.themes + '/_modules' + self.path + '/' + view;
         } else {
             env.loaders[0].searchPaths = [__dirname + '/themes', __dirname + '/modules'];
             if (self.path.indexOf('/') == 0) {
@@ -56,7 +55,7 @@ function BaseModule() {
             view += '.html';
         }
 
-        env.loaders[0].searchPaths = [__dirname + '/themes', __dirname + '/themes/' + config.themes];
+        env.loaders[0].searchPaths = [__dirname + '/themes', __dirname + '/themes/' + __config.themes];
         //env.render(view, _.assign(res.locals, options), function (err, re) {
         env.render(view, function (err, re) {
             res.send(re);

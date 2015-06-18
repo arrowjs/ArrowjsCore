@@ -1,7 +1,6 @@
 'use strict';
 
 let passport = require('passport');
-let config = require(__base + 'config/config.js');
 
 module.exports = function (app) {
     // Passport Router
@@ -22,7 +21,7 @@ module.exports = function (app) {
     });
 
     app.get('/404.html', function(req, res, next) {
-        let env = __.createNewEnv([__base + 'app/frontend/themes', __base + 'app/frontend/themes/' + config.themes]);
+        let env = __.createNewEnv([__base + 'app/frontend/themes', __base + 'app/frontend/themes/' + __config.themes]);
         env.render('404.html', res.locals, function (err, re) {
             res.send(re);
         });

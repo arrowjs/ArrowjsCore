@@ -2,7 +2,6 @@
 
 var BaseWidget = require('../base_widget'),
     util = require('util'),
-    config = require(__base + 'config/config'),
     _ = require('lodash');
 
 function FacebookLike() {

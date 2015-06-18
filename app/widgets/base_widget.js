@@ -4,8 +4,7 @@
  */
 var Promise = require('bluebird'),
     fs = require('fs'),
-    _ = require('lodash'),
-    config = require(__base + 'config/config');
+    _ = require('lodash');
 
 var _base_config = {
     alias: "Base",
@@ -28,12 +27,12 @@ function BaseWidget() {
 }
 BaseWidget.prototype.getAllLayouts = function (alias) {
     let files = [];
-    config.getGlobbedFiles(__base + "app/frontend/themes/" + config.themes + '/_widgets/' + alias + '/*.html').forEach(function (path) {
+    __config.getGlobbedFiles(__base + "app/frontend/themes/" + __config.themes + '/_widgets/' + alias + '/*.html').forEach(function (path) {
         let s = path.split('/');
         files.push(s[s.length - 1]);
     });
     if (files.length == 0) {
-        config.getGlobbedFiles(__base + "app/frontend/themes/default/_widgets/" + alias + "/*.html").forEach(function (path) {
+        __config.getGlobbedFiles(__base + "app/frontend/themes/default/_widgets/" + alias + "/*.html").forEach(function (path) {
             let s = path.split('/');
             files.push(s[s.length - 1]);
         });
@@ -87,13 +86,13 @@ BaseWidget.prototype.render = function (widget, data) {
     return new Promise(function (resolve, reject) {
         let renderWidget = Promise.promisify(_this.env.render, _this.env);
         let widgetFile = widget.widget_type + '/' + widget.data.file;
-        let widgetFilePath = __base + 'app/frontend/themes/' + config.themes + '/_widgets/' + widgetFile;
+        let widgetFilePath = __base + 'app/frontend/themes/' + __config.themes + '/_widgets/' + widgetFile;
 
         if (!fs.existsSync(widgetFilePath)) {
             widgetFilePath = 'default/_widgets/' + widgetFile;
         }
         else {
-            widgetFilePath = config.themes + '/_widgets/' + widgetFile;
+            widgetFilePath = __config.themes + '/_widgets/' + widgetFile;
         }
         if (widgetFilePath.indexOf('.html') == -1) {
             widgetFilePath += '.html';

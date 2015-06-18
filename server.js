@@ -12,6 +12,7 @@ let init = require('./config/init')(),
  * Please note that the order of loading is important.
  */
 global.__base = __dirname + '/';
+global.__config = require('./config/config');
 global.__ = require('./libs/global_function');
 global.__modules = require('./libs/modules_backend_manager.js')();
 global.__f_modules = require('./libs/modules_frontend_manager.js')();
@@ -24,7 +25,6 @@ global.__pluginManager = require('./libs/plugins_manager');
 global.__messages = [];
 global.__current_theme = {};
 global.__cache = require('./libs/arr_caching')();
-global.__config = require('./config/config');
 global.BaseModuleBackend = require('./app/backend/base_module');
 global.BaseModuleFrontend = require('./app/frontend/base_module');
 global.ArrModule = require('./libs/ArrModule');

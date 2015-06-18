@@ -5,7 +5,6 @@
 var
     util = require('util'),
     _ = require('lodash');
-let config = require(__base + 'config/config');
 let redis = require('redis').createClient();
 let route = 'modules';
 
@@ -32,7 +31,7 @@ _module.active = function (req, res) {
         __modules[req.params.route].active = false;
     }
 
-    redis.set(config.redis_prefix +'all_modules', JSON.stringify(__modules), redis.print);
+    redis.set(__config.redis_prefix +'all_modules', JSON.stringify(__modules), redis.print);
     return res.redirect('/admin/modules');
 };
 

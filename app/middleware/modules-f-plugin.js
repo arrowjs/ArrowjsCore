@@ -2,7 +2,6 @@
 /**
  * Created by thanhnv on 2/23/15.
  */
-let config = require(__base + 'config/config.js');
 module.exports = function (req, res, next) {
     let module = res.locals.route.split('/')[1];
     let moduleName = module.replace('-', '_');
