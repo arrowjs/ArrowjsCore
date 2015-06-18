@@ -52,14 +52,15 @@ redis.get(config.redis_prefix + 'seo_enable', function (err, result) {
 /** Init the express application */
 let app = require('./config/app')();
 
-// Bootstrap passport config
+/** Bootstrap passport config */
 require('./config/passport')();
 
 let server = app.listen(config.port);
-// Start the app by listening on <port>
+/** Start the app by listening on <port> */
 
-// Expose app
+/** Expose app */
 module.exports = app;
 
-// Logging initialization
+/** Logging initialization */
 console.log('Application started on port ' + config.port);
+
