@@ -14,39 +14,56 @@ let _module = new CategoriesModule;
  * List of categories
  */
 _module.list = function (req, res) {
+
+    // Add buttons
     res.locals.deleteButton = __acl.addButton(req, route, 'category_delete');
 
-    let totalItem,
-        totalPage,
-        currentPage = req.param('page') || 1,
-        numberItemInPage = 15,
-        query = req.param('query') || '',
-        condition = '',
-        link = '/admin/blog/categories/page/{page}';
+    // Get current page and default sorting
+    let page = req.params.page || 1;
+    let column = req.params.sort || 'id';
+    let order = req.params.order || '';
+    res.locals.root_link = '/admin/blog/category/page/' + page + '/sort';
 
-    if (query != '') {
-        query = query.toLowerCase();
-        condition = 'LOWER(name) like \'%' + query + '%\'';
-    }
-
+    // Create filter
+    let filter = __.createFilter(req, res, route, '/admin/blog/category/page', column, order, [
+        {
+            column: "id",
+            width: '1%',
+            header: "",
+            type: 'checkbox'
+        },
+        {
+            column: "name",
+            header: "Tên",
+            link: '/admin/blog/categories/{id}',
+            acl: 'update',
+            type: 'inline',
+            pk: '{id}',
+            filter: {
+                data_type: 'string'
+            }
+        }
+    ]);
+    // Find all categories
     __models.category.findAndCountAll({
-        where: [condition],
-        limit: numberItemInPage,
-        offset: (currentPage - 1) * numberItemInPage,
-        order: 'name asc'
-    }).then(function (Cats) {
-        totalItem = Cats.count;
-        totalPage = Math.ceil(totalItem / numberItemInPage);
-
+        attributes: ['id', 'name'],
+        where: filter.values,
+        order: column + " " + order,
+        limit: __config.pagination.number_item,
+        offset: (page - 1) * __config.pagination.number_item
+    }).then(function (results) {
+        let totalPage = Math.ceil(results.count / __config.pagination.number_item);
+        console.log('asgdjsadghjasgdjgsadjhagsdj');
+        // Render view
         _module.render(req, res, 'category/index', {
-            cats: Cats.rows,
-            title: 'Danh mục bài viết',
-            messages: req.messages || [],
-            currentPage: currentPage,
+            title: "Danh mục bài viết",
             totalPage: totalPage,
-            link: link,
-            query: req.param('query') || ''
+            items: results.rows,
+            currentPage: page
         });
+    }).catch(function (error) {
+        req.flash.error('Name: ' + error.name + '<br />' + 'Message: ' + error.stack);
+        res.redirect('/admin/err/500');
     });
 };
 
@@ -55,7 +72,6 @@ _module.list = function (req, res) {
  */
 _module.save = function (req, res) {
     res.locals.deleteButton = __acl.addButton(req, route, 'category_delete');
-
     let data = req.body;
     if (data.name != '') {
         data.description = '';
@@ -63,7 +79,6 @@ _module.save = function (req, res) {
             where: ['name = \'' + data.name + '\'']
         }).then(function (tags) {
             if (tags.count == 0) {
-                data.id = new Date().getTime();
                 data.count = 0;
                 data.slug = slug(data.name).toLowerCase();
 
@@ -91,14 +106,12 @@ _module.update = function (req, res) {
         data.slug = data.value;
     }
 
-    __models.category.find({
-        where: {
-            id: req.params.catId
-        }
-    }).then(function (bookTag) {
-        bookTag.updateAttributes(data).then(function () {
-            res.sendStatus(200);
-        });
+    __models.category.findById(req.params.catId).then(function (cat) {
+        return cat.updateAttributes(data)
+    }).then(function () {
+        res.sendStatus(200);
+    }).catch(function (err) {
+        res.sendStatus(500)
     });
 };
 

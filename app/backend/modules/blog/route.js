@@ -14,7 +14,7 @@ router.route('/blog/categories').get(__acl.isAllow(moduleName, 'category_index')
     .delete(__acl.isAllow(moduleName, 'category_delete'), category.delete);
 router.route('/blog/categories/page/:page').get(__acl.isAllow(moduleName, 'category_index'), category.list);
 router.route('/blog/categories/create').post(__acl.isAllow(moduleName, 'category_create'), category.save);
-router.route('/blog/categories/:catId').put(__acl.isAllow(moduleName, 'category_edit'), category.update);
+router.route('/blog/categories/:catId').post(__acl.isAllow(moduleName, 'category_edit'), category.update);
 
 router.get('/blog/posts/page/:page', __acl.isAllow(moduleName, 'post_index'), post.list);
 router.route('/blog/posts/page/:page/sort/:sort/(:order)?').get(__acl.isAllow(moduleName, 'post_index'), post.list);

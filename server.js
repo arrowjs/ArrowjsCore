@@ -13,6 +13,7 @@ let init = require('./config/init')(),
  */
 global.__base = __dirname + '/';
 global.__config = require('./config/config');
+global.__utils = require('./libs/utils');
 global.__ = require('./libs/global_function');
 global.__modules = require('./libs/modules_backend_manager.js')();
 global.__f_modules = require('./libs/modules_frontend_manager.js')();
