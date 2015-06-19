@@ -12,43 +12,24 @@ let init = require('./config/init')(),
  * Please note that the order of loading is important.
  */
 global.__base = __dirname + '/';
-global.__config = require('./config/config');
-global.__utils = require('./libs/utils');
-global.__ = require('./libs/global_function');
-global.__modules = require('./libs/modules_backend_manager.js')();
-global.__f_modules = require('./libs/modules_frontend_manager.js')();
-global.__models = require('./libs/models_manager');
-global.__acl = require('./libs/acl');
-global.__menus = require('./app/menus/menus_manager')();
+global.__config = config;
+global.__utils = require(__base + 'core/libs/utils');
+global.__ = require(__base + 'core/libs/global_function');
+global.__modules = require(__base + 'core/libs/modules_backend_manager.js')();
+global.__f_modules = require(__base + 'core/libs/modules_frontend_manager.js')();
+global.__models = require(__base + 'core/libs/models_manager');
+global.__acl = require(__base + 'core/libs/acl');
+global.__menus = require(__base + 'menus/menus_manager')();
 global.__setting_menu_module = [];
-global.__widgets = require('./app/widgets/widgets_manager')();
-global.__pluginManager = require('./libs/plugins_manager');
+global.__widgets = require(__base + 'core/libs/widgets_manager')();
+global.__pluginManager = require(__base + 'core/libs/plugins_manager');
 global.__messages = [];
 global.__current_theme = {};
-global.__cache = require('./libs/arr_caching')();
-global.BaseModuleBackend = require('./app/backend/base_module');
-global.BaseModuleFrontend = require('./app/frontend/base_module');
-global.ArrModule = require('./libs/ArrModule');
-
+global.__cache = require(__base + 'core/libs/arr_caching')();
+global.BaseModuleBackend = require(__base + 'core/libs/base_module');
+global.BaseModuleFrontend = require(__base + 'core/libs/base_module_f');
+global.ArrModule = require(__base + 'core/libs/ArrModule');
 __pluginManager.loadAllPlugins();
-
-let redis = require('redis').createClient();
-
-/** Init SEO */
-redis.get(config.redis_prefix + 'seo_enable', function (err, result) {
-    if (result != null) {
-        global.__seo_enable = result;
-    } else {
-        redis.set(config.redis_prefix + 'seo_enable', true, function (err, res) {
-            if (err) {
-                console.log("Init app Redis reply error: " + err);
-            } else {
-                console.log("Init app Redis reply: " + res);
-            }
-        });
-        global.__seo_enable = true;
-    }
-});
 
 /** Init the express application */
 let app = require('./config/app')();

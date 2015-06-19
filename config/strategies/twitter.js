@@ -7,7 +7,8 @@ let passport = require('passport'),
 	url = require('url'),
 	TwitterStrategy = require('passport-twitter').Strategy,
 	config = require('../config'),
-    users = require(__base + 'app/backend/modules/users/controllers/index');
+	users = require(__base + 'core/modules/users/backend/controllers/index');
+
 
 module.exports = function() {
 	// Use twitter strategy

@@ -1,6 +1,6 @@
 'use strict';
 
-let utils = require(__base + 'libs/utils');
+let utils = require(__base + 'core/libs/utils');
 let config = require(__base + 'config/config');
 
 module.exports = function (env) {

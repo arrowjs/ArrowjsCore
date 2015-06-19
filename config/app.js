@@ -113,7 +113,7 @@ module.exports = function () {
     app.use(passport.session());
 
     // Flash messages
-    app.use(require(__base + 'app/middleware/flash-plugin.js'));
+    app.use(require(__base + 'core/middleware/flash-plugin.js'));
 
     // Use helmet to secure Express headers
     app.use(helmet.xframe());
@@ -134,13 +134,12 @@ module.exports = function () {
         }
         next();
     });
-
     // Globbing admin module files
     redis.get(config.redis_prefix + 'all_modules', function (err, results) {
         if (results != null) {
             global.__modules = JSON.parse(results);
         } else {
-            config.getGlobbedFiles('./app/backend/modules/*/module.js').forEach(function (routePath) {
+            config.getGlobbedFiles(__base + 'core/modules/*/module.js').forEach(function (routePath) {
                 require(path.resolve(routePath))(__modules);
             });
             redis.set(config.redis_prefix + 'all_modules', JSON.stringify(__modules), redis.print);
@@ -148,58 +147,49 @@ module.exports = function () {
     });
 
     // Module manager backend
-    require(__base + 'app/backend/core_route')(app);
-    app.use('/admin/*', require('../app/middleware/modules-plugin.js'));
+    require(__base + 'core_route')(app);
+    app.use('/' + config.admin_prefix + '/*', require('../core/middleware/modules-plugin.js'));
 
     // Globbing routing admin files
-    config.getGlobbedFiles('./app/backend/modules/*/route.js').forEach(function (routePath) {
+    config.getGlobbedFiles(__base + 'core/modules/*/backend/route.js').forEach(function (routePath) {
+        app.use('/' + config.admin_prefix, require(path.resolve(routePath)));
+    });
+    config.getGlobbedFiles(__base + 'modules/*/backend/route.js').forEach(function (routePath) {
         app.use('/' + config.admin_prefix, require(path.resolve(routePath)));
     });
 
     // Globbing routing admin files
-    config.getGlobbedFiles('./app/frontend/modules/*/settings/*.js').forEach(function (routePath) {
+    config.getGlobbedFiles('./core/modules/*/frontend/settings/*.js').forEach(function (routePath) {
         __setting_menu_module.push(require(path.resolve(routePath))(app, config));
     });
 
-    app.use('/admin/*', function (req, res, next) {
+    config.getGlobbedFiles('./modules/*/frontend/settings/*.js').forEach(function (routePath) {
+        __setting_menu_module.push(require(path.resolve(routePath))(app, config));
+    });
+
+    app.use('/' + config.admin_prefix + '/*', function (req, res, next) {
         if (!req.isAuthenticated()) {
-            return res.redirect('/admin/login');
+            return res.redirect('/' + config.admin_prefix + '/login');
         }
         next();
     });
 
-    // Module manager frontend
-    app.use('/*', require('../app/middleware/modules-f-plugin.js'));
-
-    // Globbing frontend module files
-    config.getGlobbedFiles('./app/frontend/modules/*/module.js').forEach(function (routePath) {
-        require(path.resolve(routePath))(__f_modules);
-    });
 
     // Globbing routing files
-    require(__base + 'app/frontend/modules/routes')(app);
+    config.getGlobbedFiles(__base + 'core/modules/*/frontend/route.js').forEach(function (routePath) {
+       require(path.resolve(routePath))(app);
+    });
 
     // Globbing menu files
-    config.getGlobbedFiles('./app/menus/*/*.js').forEach(function (routePath) {
-        console.log(routePath);
+    config.getGlobbedFiles('./menus/*/*.js').forEach(function (routePath) {
         require(path.resolve(routePath))(__menus);
     });
 
     // Assume 'not found' in the error msgs is a 404. this is somewhat silly, but valid, you can do whatever you like, set properties, use instanceof etc.
     app.use(function (err, req, res, next) {
+        console.log(req.url);
         // If the error object doesn't exists
         if (!err) return next();
-
-        // Log it
-        console.error(err.stack);
-
-        // Log error into database
-        __models.logs.create({
-            event_name: err.name,
-            message: err.stack,
-            type: 0 // warning or error
-        });
-
         // Error page
         res.status(500).render('500', {
             error: err.stack

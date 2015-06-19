@@ -1,7 +1,7 @@
 "use strict";
 
-let utils = require(__base + 'libs/utils'),
-    dateFormatter = require(__base + 'libs/dateformatter');
+let utils = require(__base + 'core/libs/utils'),
+    dateFormatter = require(__base + 'core/libs/dateformatter');
 
 module.exports = function (env) {
     env.addFilter('date', function (input, format, offset, abbr) {
