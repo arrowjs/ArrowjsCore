@@ -4,7 +4,7 @@ module.exports = {
     db: {
         host: 'localhost',
         port: '5432',
-        database: 'arr_techmaster',
+        database: 'coretechmaster',
         username: 'postgres',
         password: 'secret',
         dialect: 'postgres',

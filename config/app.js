@@ -15,7 +15,6 @@ let fs = require('fs'),
     cookieParser = require('cookie-parser'),
     helmet = require('helmet'),
     passport = require('passport'),
-    config = require('./config'),
     redis = require("redis").createClient(),
     RedisStore = require('connect-redis')(session),
     nunjucks = require('nunjucks'),
@@ -24,62 +23,80 @@ let fs = require('fs'),
     Promise = require('bluebird');
 
 module.exports = function () {
-    // Initialize express app
+    /** Initialize express app */
     let app = express();
 
-    // Setting the app router and static folder. Should be placed before express.static
-    /*app.use(compress({
-     filter: function (req, res) {
-     return (/json|text|javascript|css/).test(res.getHeader('Content-Type'));
-     },
-     level: 9
-     }));*/
+    /** Uncomment to setting the app router and static folder. Should be placed before express.static */
+    //app.use(compress({
+    //    filter: function (req, res) {
+    //        return (/json|text|javascript|css/).test(res.getHeader('Content-Type'));
+    //    },
+    //    level: 9
+    //}));
 
+    /** Set static resources path */
     app.use(express.static(path.resolve('./public'), {maxAge: 3600}));
 
-    redis.get(config.redis_prefix + config.key, function (err, result) {
+    //todo: hoi anh thanh
+    redis.get(__config.redis_prefix + __config.key, function (err, result) {
         if (result != null) {
             let tmp = JSON.parse(result);
-            _.assign(config, tmp);
-
+            _.assign(__config, tmp);
         } else {
-            redis.set(config.redis_prefix + config.key, JSON.stringify(config), redis.print);
+            redis.set(__config.redis_prefix + __config.key, JSON.stringify(__config), redis.print);
         }
 
         // Set local variable
-        app.locals.title = config.app.title;
-        app.locals.description = config.app.description;
-        app.locals.keywords = config.app.keywords;
-        app.locals.facebookAppId = config.facebook.clientID;
+        app.locals.title = __config.app.title;
+        app.locals.description = __config.app.description;
+        app.locals.keywords = __config.app.keywords;
+        app.locals.facebookAppId = __config.facebook.clientID;
     });
 
-    // Showing stack errors
+    /** Showing stack errors */
     app.set('showStackError', true);
 
-    // Set nunjucks as the template engine
+    /** Set nunjucks as the template engine */
     let e = nunjucks.configure(__base + 'app/themes', {
         autoescape: true,
         express: app
     });
 
-    //Initials custom filter
-    __.getAllCustomFilter(e);
-
-    // Set views path and view engine
+    /** Set views path and view engine */
     app.set('view engine', 'html');
 
-    // Environment dependent middleware
+    // Initials custom filter
+    //todo: create env moi lai phai add lai custom filter?
+    __.getAllCustomFilter(e);
+
+    /** Environment dependent middleware */
     if (process.env.NODE_ENV === 'development') {
-        // Enable logger (morgan)
+        /** Uncomment to enable logger (morgan) */
         //app.use(morgan('dev'));
 
-        // Disable views cache
+        /** Disable views cache */
         app.set('view cache', false);
     } else if (process.env.NODE_ENV === 'production') {
         app.locals.cache = 'memory';
+    } else if (process.env.NODE_ENV === 'secure') {
+        /** Log SSL usage */
+        console.log('Securely using https protocol');
+
+        /** Load SSL key and certificate */
+        let privateKey = fs.readFileSync('./config/sslcerts/key.pem', 'utf8');
+        let certificate = fs.readFileSync('./config/sslcerts/cert.pem', 'utf8');
+
+        /** Create HTTPS Server */
+        let httpsServer = https.createServer({
+            key: privateKey,
+            cert: certificate
+        }, app);
+
+        /** Return HTTPS server instance */
+        return httpsServer;
     }
 
-    // Request body parsing middleware should be above methodOverride
+    /** Request body parsing middleware should be above methodOverride */
     app.use(bodyParser.urlencoded({
         extended: true,
         limit: '5mb'
@@ -87,20 +104,19 @@ module.exports = function () {
     app.use(bodyParser.json({limit: '5mb'}));
     app.use(methodOverride());
 
-    // CookieParser should be above session
+    /** CookieParser should be above session */
     app.use(cookieParser());
 
-    // Express session storage
+    /** Express session storage */
     let secret = "hjjhdsu465aklsdjfhasdasdf342ehsf09kljlasdf";
     let middleSession = session({
-        store: new RedisStore({host: config.redis.host, port: config.redis.port, client: redis}),
+        store: new RedisStore({host: __config.redis.host, port: __config.redis.port, client: redis}),
         secret: secret,
         key: 'sid',
         resave: true,
         saveUninitialized: true
     });
     app.use(middleSession);
-
     app.use(function (req, res, next) {
         if (!req.session) {
             return next(new Error('Session destroy')); // handle error
@@ -108,95 +124,128 @@ module.exports = function () {
         next(); // otherwise continue
     });
 
-    // Use passport session
+    /** Use passport session */
     app.use(passport.initialize());
     app.use(passport.session());
 
-    // Flash messages
+    /** Flash messages */
     app.use(require(__base + 'core/middleware/flash-plugin.js'));
 
-    // Use helmet to secure Express headers
+    /** Use helmet to secure Express headers */
     app.use(helmet.xframe());
     app.use(helmet.xssFilter());
     app.use(helmet.nosniff());
     app.use(helmet.ienoopen());
     app.disable('x-powered-by');
 
-    // Passing the request url to environment locals
+    /** Passing the request url to environment locals */
     app.use(function (req, res, next) {
         res.locals.url = req.protocol + '://' + req.headers.host + req.url;
-        res.locals.route = req.url;
         res.locals.path = req.protocol + '://' + req.headers.host;
+        res.locals.route = req.url;
 
-        // HTTP headers for caching static resources
         if (req.user) {
             res.locals.__user = req.user;
         }
+
         next();
     });
-    // Globbing admin module files
-    redis.get(config.redis_prefix + 'all_modules', function (err, results) {
-        if (results != null) {
-            global.__modules = JSON.parse(results);
-        } else {
-            config.getGlobbedFiles(__base + 'core/modules/*/module.js').forEach(function (routePath) {
-                require(path.resolve(routePath))(__modules);
-            });
-            redis.set(config.redis_prefix + 'all_modules', JSON.stringify(__modules), redis.print);
+
+    //redis.get(__config.redis_prefix + 'all_modules', function (err, results) {
+    //    if (results != null) {
+    //        global.__modules = JSON.parse(results);
+    //    } else {
+    //
+    //        redis.set(__config.redis_prefix + 'all_modules', JSON.stringify(__modules), redis.print);
+    //    }
+    //});
+
+    app.use('/' + __config.admin_prefix + '/*', function (req, res, next) {
+        if (!req.isAuthenticated()) {
+            return res.redirect('/' + __config.admin_prefix + '/login');
         }
+        next();
     });
 
     // Module manager backend
     require(__base + 'core_route')(app);
-    app.use('/' + config.admin_prefix + '/*', require('../core/middleware/modules-plugin.js'));
+    app.use('/' + __config.admin_prefix + '/*', require('../core/middleware/modules-plugin.js'));
 
-    // Globbing routing admin files
-    config.getGlobbedFiles(__base + 'core/modules/*/backend/route.js').forEach(function (routePath) {
-        app.use('/' + config.admin_prefix, require(path.resolve(routePath)));
+    // Globbing admin module files
+    let adminModules = [];
+    __config.getGlobbedFiles(__base + 'core/modules/*/module.js').forEach(function (routePath) {
+        adminModules = __config.getOverrideGlobbedFiles(adminModules, routePath, 2);
     });
-    config.getGlobbedFiles(__base + 'modules/*/backend/route.js').forEach(function (routePath) {
-        app.use('/' + config.admin_prefix, require(path.resolve(routePath)));
+    __config.getGlobbedFiles(__base + 'modules/*/module.js').forEach(function (routePath) {
+        adminModules = __config.getOverrideGlobbedFiles(adminModules, routePath, 2);
     });
-
-    // Globbing routing admin files
-    config.getGlobbedFiles('./core/modules/*/frontend/settings/*.js').forEach(function (routePath) {
-        __setting_menu_module.push(require(path.resolve(routePath))(app, config));
-    });
-
-    config.getGlobbedFiles('./modules/*/frontend/settings/*.js').forEach(function (routePath) {
-        __setting_menu_module.push(require(path.resolve(routePath))(app, config));
-    });
-
-    app.use('/' + config.admin_prefix + '/*', function (req, res, next) {
-        if (!req.isAuthenticated()) {
-            return res.redirect('/' + config.admin_prefix + '/login');
+    for(let index in adminModules){
+        if (adminModules.hasOwnProperty(index)){
+            require(path.resolve(adminModules[index]))(__modules);
         }
-        next();
+    }
+
+    // Globbing routing admin files
+    let adminRoute = [];
+    __config.getGlobbedFiles(__base + 'core/modules/*/backend/route.js').forEach(function (routePath) {
+        adminRoute = __config.getOverrideGlobbedFiles(adminModules, routePath, 3);
+        //app.use('/' + __config.admin_prefix, require(path.resolve(routePath)));
+    });
+    __config.getGlobbedFiles(__base + 'modules/*/backend/route.js').forEach(function (routePath) {
+        adminRoute = __config.getOverrideGlobbedFiles(adminModules, routePath, 3);
+        //app.use('/' + __config.admin_prefix, require(path.resolve(routePath)));
+    });
+    for(let index in adminRoute){
+        if (adminRoute.hasOwnProperty(index)){
+            app.use('/' + __config.admin_prefix, require(path.resolve(adminRoute[index])));
+        }
+    }
+
+    // Globbing routing admin files
+    __config.getGlobbedFiles('./core/modules/*/frontend/settings/*.js').forEach(function (routePath) {
+        __setting_menu_module.push(require(path.resolve(routePath))(app, __config));
+    });
+    __config.getGlobbedFiles('./modules/*/frontend/settings/*.js').forEach(function (routePath) {
+        __setting_menu_module.push(require(path.resolve(routePath))(app, __config));
     });
 
-
-    // Globbing routing files
-    config.getGlobbedFiles(__base + 'core/modules/*/frontend/route.js').forEach(function (routePath) {
-       require(path.resolve(routePath))(app);
+    // Globbing route frontend files
+    __config.getGlobbedFiles(__base + 'core/modules/*/frontend/route.js').forEach(function (routePath) {
+        require(path.resolve(routePath))(app);
+    });
+    __config.getGlobbedFiles(__base + 'modules/*/frontend/route.js').forEach(function (routePath) {
+        require(path.resolve(routePath))(app);
     });
 
     // Globbing menu files
-    config.getGlobbedFiles('./menus/*/*.js').forEach(function (routePath) {
+    __config.getGlobbedFiles('./menus/*/*.js').forEach(function (routePath) {
         require(path.resolve(routePath))(__menus);
     });
 
-    // Assume 'not found' in the error msgs is a 404. this is somewhat silly, but valid, you can do whatever you like, set properties, use instanceof etc.
+    /** Assume 'not found' in the error msgs is a 404.
+     * This is somewhat silly, but valid, you can do whatever you like, set properties, use instanceof etc.
+     */
     app.use(function (err, req, res, next) {
-        console.log(req.url);
         // If the error object doesn't exists
         if (!err) return next();
+
+        // Log it
+        console.error(err.stack);
+
+        // Log error into database
+        __models.logs.create({
+            event_name: err.name,
+            message: err.stack,
+            type: 0 // warning or error
+        });
+
         // Error page
         res.status(500).render('500', {
             error: err.stack
         });
     });
 
-    // Assume 404 since no middleware responded
+    /** Assume 404 since no middleware responded */
     app.use(function (req, res) {
         let h = req.header("Accept");
         try {
@@ -210,24 +259,6 @@ module.exports = function () {
         }
     });
 
-    if (process.env.NODE_ENV === 'secure') {
-        // Log SSL usage
-        console.log('Securely using https protocol');
-
-        // Load SSL key and certificate
-        let privateKey = fs.readFileSync('./config/sslcerts/key.pem', 'utf8');
-        let certificate = fs.readFileSync('./config/sslcerts/cert.pem', 'utf8');
-
-        // Create HTTPS Server
-        let httpsServer = https.createServer({
-            key: privateKey,
-            cert: certificate
-        }, app);
-
-        // Return HTTPS server instance
-        return httpsServer;
-    }
-
-    // Return Express server instance
+    /** Return Express server instance */
     return app;
 };

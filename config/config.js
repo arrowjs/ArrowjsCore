@@ -54,6 +54,18 @@ module.exports.getGlobbedFiles = function(globPatterns, removeRoot) {
 };
 
 /**
+ * Huy viet
+ */
+module.exports.getOverrideGlobbedFiles = function(modules, routePath, index){
+    let p = routePath.split('/');
+    let module_name = p[p.length - index];
+    let check_obj = {};
+    check_obj[module_name] = routePath;
+    modules = _.assign(modules, check_obj);
+    return modules;
+};
+
+/**
  * Get the modules JavaScript files
  */
 module.exports.getJavaScriptAssets = function(includeTests) {
