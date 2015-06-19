@@ -313,11 +313,10 @@ exports.createFilter = function (req, res, route, reset_link, current_column, cu
 };
 
 /**
- *
- * @param {array} filterValues
+ * Convert filter values to String (use in raw query)
+ * @param {array} filterValues - Values of filter which created by createFilter
  * @returns {string}
  */
-//todo: hoi anh thanh
 exports.toRawFilter = function (filterValues) {
     let conditions = filterValues[0].split('?');
     for (let i = 0; i < conditions.length - 1; i++) conditions[i] += "'" + filterValues[i + 1] + "'";

@@ -14,16 +14,18 @@ function ConfigurationsThemesModule() {
 }
 let _module = new ConfigurationsThemesModule();
 
-
+//todo: co loi chua sua duoc
 _module.index = function (req, res) {
     let themes = [];
 
     __config.getGlobbedFiles(__base + 'app/frontend/themes/*/theme.json').forEach(function (filePath) {
         themes.push(require(filePath));
     });
+
     let current_theme;
     for (let i in themes) {
-        if (themes[i].alias.toLowerCase() == __config.themes.toLowerCase()) {
+        if (themes.hasOwnProperty(i) && themes[i].alias.toLowerCase() == __config.themes.toLowerCase()) {
+            console.log(__current_theme, 'cho nay khong co log se bao loi tren IDE');
             current_theme = __current_theme = themes[i];
         }
     }

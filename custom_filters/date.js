@@ -1,9 +1,10 @@
 "use strict";
 
-let utils = require(__base+'libs/utils'),
-    dateFormatter = require(__base+'libs/dateformatter');
+let utils = require(__base + 'libs/utils'),
+    dateFormatter = require(__base + 'libs/dateformatter');
+
 module.exports = function (env) {
-    env.addFilter('date', function(input, format, offset, abbr){
+    env.addFilter('date', function (input, format, offset, abbr) {
         let l = format.length,
             date = new dateFormatter.DateZ(input),
             cur,
@@ -13,7 +14,7 @@ module.exports = function (env) {
         if (offset) {
             date.setTimezoneOffset(offset, abbr);
         }
-;
+
         for (i; i < l; i += 1) {
             cur = format.charAt(i);
             if (dateFormatter.hasOwnProperty(cur)) {
@@ -24,4 +25,4 @@ module.exports = function (env) {
         }
         return out;
     });
-}
+};

@@ -7,19 +7,6 @@ let fs = require("fs");
 let Promise = require("bluebird");
 let route = 'modules';
 
-let breadcrumb =
-    [
-        {
-            title: 'Home',
-            icon: 'fa fa-dashboard',
-            href: '/admin'
-        },
-        {
-            title: 'Widgets',
-            href: '/admin/widgets'
-        }
-    ];
-
 function WidgetsModule() {
     BaseModuleBackend.call(this);
     this.path = "/widgets";

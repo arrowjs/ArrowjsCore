@@ -1,9 +1,11 @@
 'use strict';
 
+//todo: hoi anh thanh
 module.exports = function (env) {
     env.addFilter('apply_admin_route', function (route) {
             var st = route.split('/');
             let link = '';
+
             if (st.length > 0) {
                 let module = st[1];
                 let pre = '<li class=" menu-item "><a href="';

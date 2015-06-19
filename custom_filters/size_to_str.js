@@ -1,7 +1,5 @@
 "use strict";
 
-
-
 module.exports = function (env) {
     env.addFilter('size_to_str', function (bytes) {
         if (bytes != '') {
@@ -10,8 +8,7 @@ module.exports = function (env) {
             var sizes = ['Bytes', 'KB', 'MB', 'GB', 'TB', 'PB', 'EB', 'ZB', 'YB'];
             var i = Math.floor(Math.log(bytes) / Math.log(k));
             return (bytes / Math.pow(k, i)).toPrecision(3) + ' ' + sizes[i];
-        }
-        else {
+        } else {
             return 0;
         }
     });
