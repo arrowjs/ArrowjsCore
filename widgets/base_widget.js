@@ -23,7 +23,7 @@ var _base_config = {
 //Base constructor
 function BaseWidget() {
     _.assign(this, _base_config);
-    this.env = __.createNewEnv([__base + 'widgets/']);
+    this.env = __.createNewEnv([__base + 'widgets/',__base + "themes/frontend/"+ __config.themes +"/_widgets/"]);
 }
 BaseWidget.prototype.getAllLayouts = function (alias) {
     let files = [];
@@ -93,7 +93,7 @@ BaseWidget.prototype.render = function (widget, data) {
             widgetFilePath = 'default/_widgets/' + widgetFile;
         }
         else {
-            widgetFilePath = __config.themes + '/_widgets/' + widgetFile;
+            widgetFilePath = __base + 'themes/frontend/' + __config.themes + '/_widgets/' + widgetFile;
         }
         if (widgetFilePath.indexOf('.html') == -1) {
             widgetFilePath += '.html';
