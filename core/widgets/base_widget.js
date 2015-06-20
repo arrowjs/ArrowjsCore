@@ -1,7 +1,5 @@
-'use strict'
-/**
- * Created by thanhnv on 3/9/15.
- */
+'use strict';
+
 var Promise = require('bluebird'),
     fs = require('fs'),
     _ = require('lodash');
@@ -20,13 +18,14 @@ var _base_config = {
     }
 };
 
-//Base constructor
+// Base constructor
 function BaseWidget() {
     _.assign(this, _base_config);
-    this.env = __.createNewEnv([__base + 'widgets/',__base + "themes/frontend/"+ __config.themes +"/_widgets/"]);
+    this.env = __.createNewEnv([__base + 'core/widgets/', __base + "themes/frontend/" + __config.themes + "/_widgets/"]);
 }
 BaseWidget.prototype.getAllLayouts = function (alias) {
     let files = [];
+
     __config.getGlobbedFiles(__base + "themes/frontend/" + __config.themes + '/_widgets/' + alias + '/*.html').forEach(function (path) {
         let s = path.split('/');
         files.push(s[s.length - 1]);
@@ -39,7 +38,8 @@ BaseWidget.prototype.getAllLayouts = function (alias) {
     }
 
     return files;
-}
+};
+
 BaseWidget.prototype.save = function (data) {
     return new Promise(function (done, reject) {
         let json_data = _.clone(data);
@@ -68,7 +68,8 @@ BaseWidget.prototype.save = function (data) {
         }
 
     });
-}
+};
+
 BaseWidget.prototype.render_setting = function (widget_type, widget) {
     let _this = this;
     return new Promise(function (done, reject) {
@@ -80,10 +81,12 @@ BaseWidget.prototype.render_setting = function (widget_type, widget) {
             });
     });
 
-}
+};
+
 //Render v
 BaseWidget.prototype.render = function (widget, data) {
     let _this = this;
+
     return new Promise(function (resolve, reject) {
         let renderWidget = Promise.promisify(_this.env.render, _this.env);
         let widgetFile = widget.widget_type + '/' + widget.data.file;
@@ -91,18 +94,19 @@ BaseWidget.prototype.render = function (widget, data) {
 
         if (!fs.existsSync(widgetFilePath)) {
             widgetFilePath = 'default/_widgets/' + widgetFile;
-        }
-        else {
+        } else {
             widgetFilePath = __base + 'themes/frontend/' + __config.themes + '/_widgets/' + widgetFile;
         }
+
         if (widgetFilePath.indexOf('.html') == -1) {
             widgetFilePath += '.html';
         }
+
         let context = _.assign({widget: widget}, data);
         resolve(renderWidget(widgetFilePath, context).catch(function (err) {
             return "<p>" + err.cause;
         }));
     });
-}
+};
 
 module.exports = BaseWidget;

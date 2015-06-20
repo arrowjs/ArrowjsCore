@@ -1,6 +1,5 @@
 'use strict';
 
-let config = require(__base + 'config/config');
 let mailer = require('nodemailer');
 
 /**
@@ -122,9 +121,14 @@ exports.createNewEnv = function (views) {
  * @returns {object}
  */
 exports.getAllCustomFilter = function (env) {
-    config.getGlobbedFiles(__base + 'custom_filters/*.js').forEach(function (routePath) {
-        require(routePath)(env);
-    });
+    let custom_filters = __config.getOverrideCorePath(__base + 'core/custom_filters/*.js', __base + 'app/custom_filters/*.js', 1);
+
+    for (let index in custom_filters) {
+        if (custom_filters.hasOwnProperty(index)) {
+            require(custom_filters[index])(env);
+        }
+    }
+
     return env;
 };
 
@@ -133,6 +137,7 @@ exports.getAllCustomFilter = function (env) {
  * @param {object} env - Environment to add global variable
  * @returns {object}
  */
+//todo: hoi anh thanh
 exports.getAllGlobalVariable = function (env) {
     env.addGlobal('create_link', function (module_name, link) {
         return module_name + '/' + link;
@@ -345,7 +350,7 @@ exports.randomSalt = function (length) {
  */
 exports.sendMail = function (mailOptions) {
     return new Promise(function (fulfill, reject) {
-        let transporter = mailer.createTransport(config.mailer_config);
+        let transporter = mailer.createTransport(__config.mailer_config);
         transporter.sendMail(mailOptions, function (err, info) {
             if (err !== null) {
                 reject(err);

@@ -54,15 +54,34 @@ module.exports.getGlobbedFiles = function(globPatterns, removeRoot) {
 };
 
 /**
- * Huy viet
+ * Replace paths with same name in "checkIndex" position (calculate from end string when split with "/")
  */
-module.exports.getOverrideGlobbedFiles = function(modules, routePath, index){
-    let p = routePath.split('/');
-    let module_name = p[p.length - index];
+module.exports.overrideCorePath = function(paths, routePath, checkIndex){
+    let arr_path = routePath.split('/');
+    let checkName = arr_path[arr_path.length - checkIndex];
+
     let check_obj = {};
-    check_obj[module_name] = routePath;
-    modules = _.assign(modules, check_obj);
-    return modules;
+    check_obj[checkName] = routePath;
+
+    paths = _.assign(paths, check_obj);
+    return paths;
+};
+
+/**
+ * Replace core paths with app paths if they have same name in "checkIndex" position using overrideCorePath
+ */
+module.exports.getOverrideCorePath = function(corePath, appPath, checkIndex){
+    let paths = [];
+
+    __config.getGlobbedFiles(corePath).forEach(function (routePath) {
+        paths = __config.overrideCorePath(paths, routePath, checkIndex);
+    });
+
+    __config.getGlobbedFiles(appPath).forEach(function (routePath) {
+        paths = __config.overrideCorePath(paths, routePath, checkIndex);
+    });
+
+    return paths
 };
 
 /**

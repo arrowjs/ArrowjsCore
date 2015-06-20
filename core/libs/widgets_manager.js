@@ -2,10 +2,15 @@
 
 module.exports = function () {
     let w = [];
-    __config.getGlobbedFiles(__base + "widgets/*/*.js").forEach(function (routePath) {
-        let Widget = require(routePath);
-        w.push(new Widget());
-    });
+
+    let widgets = __config.getOverrideCorePath(__base + "core/widgets/*/*.js", __base + "app/widgets/*/*.js", 2);
+
+    for (let index in widgets) {
+        if (widgets.hasOwnProperty(index)) {
+            let Widget = require(widgets[index]);
+            w.push(new Widget());
+        }
+    }
 
     return w;
 };

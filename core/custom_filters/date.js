@@ -3,6 +3,7 @@
 let utils = require(__base + 'core/libs/utils'),
     dateFormatter = require(__base + 'core/libs/dateformatter');
 
+//todo: hoi anh thanh
 module.exports = function (env) {
     env.addFilter('date', function (input, format, offset, abbr) {
         let l = format.length,

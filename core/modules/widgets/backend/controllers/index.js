@@ -62,7 +62,6 @@ _module.read = function (req, res) {
 };
 
 _module.delete = function (req, res) {
-
     __models.widgets.destroy({where: {id: req.params.cid}}).then(function () {
         res.sendStatus(200);
     }).catch(function (err) {
@@ -75,14 +74,19 @@ _module.sidebar_sort = function (req, res) {
     let sidebar = req.body.sidebar;
     let index = 1;
     let promises = [];
+
     for (let i in ids) {
         if (ids[i] == '') {
             index++;
             continue;
         }
+
         promises.push(__models.sequelize.query("Update " + __models.widgets.getTableName() + " set ordering=?, sidebar=? where id=?",
-            {replacements: [index++, sidebar, ids[i]]}));
+            {
+                replacements: [index++, sidebar, ids[i]]
+            }));
     }
+
     Promise.all(promises).then(function (results) {
         res.sendStatus(200);
     });

@@ -151,15 +151,35 @@ module.exports = function () {
         next();
     });
 
-    //redis.get(__config.redis_prefix + 'all_modules', function (err, results) {
-    //    if (results != null) {
-    //        global.__modules = JSON.parse(results);
-    //    } else {
-    //
-    //        redis.set(__config.redis_prefix + 'all_modules', JSON.stringify(__modules), redis.print);
-    //    }
-    //});
+    /** Store module status (active|unactive) in Redis */
+    redis.get(__config.redis_prefix + 'all_modules', function (err, results) {
+        if (results != null) {
+            global.__modules = JSON.parse(results);
+        } else {
+            let adminModules = __config.getOverrideCorePath(__base + 'core/modules/*/module.js', __base + 'app/modules/*/module.js', 2);
+            for (let index in adminModules) {
+                if (adminModules.hasOwnProperty(index)) {
+                    require(path.resolve(adminModules[index]))(__modules);
+                }
+            }
 
+            redis.set(__config.redis_prefix + 'all_modules', JSON.stringify(__modules), redis.print);
+        }
+    });
+
+    /** Module manager backend */
+    require(__base + 'core_route')(app);
+    app.use('/' + __config.admin_prefix + '/*', require('../core/middleware/modules-plugin.js'));
+
+    /** Globbing backend route files */
+    let adminRoute = __config.getOverrideCorePath(__base + 'core/modules/*/backend/route.js', __base + 'app/modules/*/backend/route.js', 3);
+    for (let index in adminRoute) {
+        if (adminRoute.hasOwnProperty(index)) {
+            app.use('/' + __config.admin_prefix, require(path.resolve(adminRoute[index])));
+        }
+    }
+
+    /** Check authenticate in backend */
     app.use('/' + __config.admin_prefix + '/*', function (req, res, next) {
         if (!req.isAuthenticated()) {
             return res.redirect('/' + __config.admin_prefix + '/login');
@@ -167,57 +187,28 @@ module.exports = function () {
         next();
     });
 
-    // Module manager backend
-    require(__base + 'core_route')(app);
-    app.use('/' + __config.admin_prefix + '/*', require('../core/middleware/modules-plugin.js'));
+    /** Module manager frontend */
+    app.use('/*', require('../core/middleware/modules-f-plugin.js'));
 
-    // Globbing admin module files
-    let adminModules = [];
-    __config.getGlobbedFiles(__base + 'core/modules/*/module.js').forEach(function (routePath) {
-        adminModules = __config.getOverrideGlobbedFiles(adminModules, routePath, 2);
-    });
-    __config.getGlobbedFiles(__base + 'modules/*/module.js').forEach(function (routePath) {
-        adminModules = __config.getOverrideGlobbedFiles(adminModules, routePath, 2);
-    });
-    for(let index in adminModules){
-        if (adminModules.hasOwnProperty(index)){
-            require(path.resolve(adminModules[index]))(__modules);
+    // Globbing frontend menu files
+    //todo: xu ly menu backend va frontend chung
+    //__config.getGlobbedFiles('./core/modules/*/frontend/settings/*.js').forEach(function (routePath) {
+    //    __setting_menu_module.push(require(path.resolve(routePath))(app, __config));
+    //});
+    //__config.getGlobbedFiles('./app/modules/*/frontend/settings/*.js').forEach(function (routePath) {
+    //    __setting_menu_module.push(require(path.resolve(routePath))(app, __config));
+    //});
+
+    /** Globbing route frontend files */
+    let frontRoute = __config.getOverrideCorePath(__base + 'core/modules/*/frontend/route.js', __base + 'app/modules/*/frontend/route.js', 3);
+    for (let index in frontRoute) {
+        if (frontRoute.hasOwnProperty(index)) {
+            require(path.resolve(frontRoute[index]))(app);
         }
     }
-
-    // Globbing routing admin files
-    let adminRoute = [];
-    __config.getGlobbedFiles(__base + 'core/modules/*/backend/route.js').forEach(function (routePath) {
-        adminRoute = __config.getOverrideGlobbedFiles(adminModules, routePath, 3);
-        //app.use('/' + __config.admin_prefix, require(path.resolve(routePath)));
-    });
-    __config.getGlobbedFiles(__base + 'modules/*/backend/route.js').forEach(function (routePath) {
-        adminRoute = __config.getOverrideGlobbedFiles(adminModules, routePath, 3);
-        //app.use('/' + __config.admin_prefix, require(path.resolve(routePath)));
-    });
-    for(let index in adminRoute){
-        if (adminRoute.hasOwnProperty(index)){
-            app.use('/' + __config.admin_prefix, require(path.resolve(adminRoute[index])));
-        }
-    }
-
-    // Globbing routing admin files
-    __config.getGlobbedFiles('./core/modules/*/frontend/settings/*.js').forEach(function (routePath) {
-        __setting_menu_module.push(require(path.resolve(routePath))(app, __config));
-    });
-    __config.getGlobbedFiles('./modules/*/frontend/settings/*.js').forEach(function (routePath) {
-        __setting_menu_module.push(require(path.resolve(routePath))(app, __config));
-    });
-
-    // Globbing route frontend files
-    __config.getGlobbedFiles(__base + 'core/modules/*/frontend/route.js').forEach(function (routePath) {
-        require(path.resolve(routePath))(app);
-    });
-    __config.getGlobbedFiles(__base + 'modules/*/frontend/route.js').forEach(function (routePath) {
-        require(path.resolve(routePath))(app);
-    });
 
     // Globbing menu files
+    //todo: xu ly menu backend va frontend chung
     __config.getGlobbedFiles('./menus/*/*.js').forEach(function (routePath) {
         require(path.resolve(routePath))(__menus);
     });

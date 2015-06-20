@@ -2,6 +2,7 @@
 
 let config = require(__base + 'config/config');
 
+//todo: hoi anh thanh
 module.exports = function (env) {
     env.addFilter('date_time', function (input) {
         if (input != '') {
