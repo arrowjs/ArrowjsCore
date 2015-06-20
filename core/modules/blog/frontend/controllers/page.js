@@ -3,11 +3,7 @@
 let _ = require('lodash'),
     promise = require('bluebird');
 
-function BlogModule() {
-    BaseModuleFrontend.call(this);
-    this.path = "/blog";
-}
-var _module = new BlogModule();
+var _module = new FrontModule('blog');
 
 _module.index = function (req, res) {
     __models.post.find({

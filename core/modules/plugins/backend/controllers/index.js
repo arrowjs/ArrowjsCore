@@ -11,11 +11,7 @@ let formidable = require('formidable');
 Promise.promisifyAll(formidable);
 let renameAsync = Promise.promisify(require('fs').rename);
 
-function PluginsModule() {
-    BaseModuleBackend.call(this);
-    this.path = "/plugins";
-}
-let _module = new PluginsModule();
+let _module = new BackModule('plugins');
 
 function renderView(req, res, env, plugin){
     env.render('setting.html', {
@@ -104,5 +100,4 @@ _module.reload = function (req, res, next) {
     next();
 };
 
-util.inherits(PluginsModule, BaseModuleBackend);
 module.exports = _module;

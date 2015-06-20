@@ -4,11 +4,7 @@ let   util = require('util'),
     _ = require('lodash');
 let redis = require('redis').createClient();
 
-function ConfigurationsModule() {
-    BaseModuleBackend.call(this);
-    this.path = "/configurations";
-}
-let _module = new ConfigurationsModule();
+let _module = new BackModule('configurations');
 
 _module.index = function (req, res) {
     _module.render(req, res, 'sites/index', {
@@ -51,5 +47,4 @@ _module.update_setting = function (req, res, next) {
     next();
 };
 
-util.inherits(ConfigurationsModule, BaseModuleBackend);
 module.exports = _module;

@@ -21,11 +21,8 @@ let edit_template = 'new.html';
 let folder_upload = '/img/users/';
 let route = 'users';
 
-function UsersModule() {
-    BaseModuleBackend.call(this);
-    this.path = "/users";
-}
-let _module = new UsersModule();
+
+let _module = new BackModule('users');
 
 _module.list = function (req, res) {
     // Add button
@@ -475,5 +472,4 @@ _module.hasAuthorization = function (req, res, next) {
     return true;
 };
 
-util.inherits(UsersModule, BaseModuleBackend);
 module.exports = _module;

@@ -8,11 +8,8 @@ let formidable = require('formidable');
 let sequelize = require('sequelize');
 promise.promisifyAll(formidable);
 
-function PagesModule() {
-    BaseModuleBackend.call(this);
-    this.path = "/blog";
-}
-let _module = new PagesModule;
+
+let _module = new BackModule('blog');
 
 _module.list = function (req, res) {
     // Add buttons
@@ -259,5 +256,4 @@ _module.delete = function (req, res) {
     });
 };
 
-util.inherits(PagesModule, BaseModuleBackend);
 module.exports = _module;

@@ -7,11 +7,7 @@ let path = require('path');
 
 let route = 'roles';
 
-function RolesModule() {
-    BaseModuleBackend.call(this);
-    this.path = "/roles";
-}
-let _module = new RolesModule();
+let _module = new BackModule('roles');
 
 _module.list = function (req, res) {
     // Add button
@@ -215,5 +211,4 @@ _module.delete = function (req, res) {
     });
 };
 
-util.inherits(RolesModule, BaseModuleBackend);
 module.exports = _module;

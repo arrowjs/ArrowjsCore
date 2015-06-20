@@ -7,11 +7,7 @@ let fs = require("fs");
 let Promise = require("bluebird");
 let route = 'modules';
 
-function WidgetsModule() {
-    BaseModuleBackend.call(this);
-    this.path = "/widgets";
-}
-let _module = new WidgetsModule();
+let _module = new BackModule('widgets');
 
 _module.index = function (req, res) {
     _module.render(req, res, 'index', {
@@ -103,5 +99,4 @@ _module.clear_sidebar_cache = function (req, res) {
     });
 };
 
-util.inherits(WidgetsModule, BaseModuleBackend);
 module.exports = _module;

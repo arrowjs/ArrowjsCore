@@ -5,11 +5,7 @@ var util = require('util'),
 let redis = require('redis').createClient();
 let route = 'modules';
 
-function ModulesModule() {
-    BaseModuleBackend.call(this);
-    this.path = "/modules";
-}
-let _module = new ModulesModule();
+let _module = new BackModule('menus');
 
 _module.index = function (req, res) {
     _module.render(req, res, 'index', {
@@ -38,5 +34,4 @@ _module.reload = function (req, res, next) {
     next();
 };
 
-util.inherits(ModulesModule, BaseModuleBackend);
 module.exports = _module;

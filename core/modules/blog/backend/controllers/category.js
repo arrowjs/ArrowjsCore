@@ -4,11 +4,8 @@ let route = 'blog';
 let util = require('util');
 let slug = require('slug');
 
-function CategoriesModule() {
-    BaseModuleBackend.call(this);
-    this.path = "/blog";
-}
-let _module = new CategoriesModule;
+
+let _module = new BackModule('blog');
 
 /**
  * List of categories
@@ -185,6 +182,4 @@ _module.listAll = function (req, res) {
         res.json(result);
     });
 };
-
-util.inherits(CategoriesModule, BaseModuleBackend);
 module.exports = _module;

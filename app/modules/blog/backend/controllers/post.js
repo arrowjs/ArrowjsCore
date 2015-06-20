@@ -9,11 +9,7 @@ let Promise = require('bluebird');
 let route = 'blog';
 let edit_view = 'post/new';
 
-function PostsModule() {
-    BaseModuleBackend.call(this);
-    this.path = "/blog";
-}
-let _module = new PostsModule;
+let _module = new BackModule('blog');
 
 _module.list = function (req, res) {
     // Add buttons
@@ -392,5 +388,4 @@ _module.hasAuthorization = function (req, res, next) {
     return (req.post.created_by !== req.user.id);
 };
 
-util.inherits(PostsModule, BaseModuleBackend);
 module.exports = _module;

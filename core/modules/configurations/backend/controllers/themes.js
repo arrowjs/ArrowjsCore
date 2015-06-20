@@ -8,11 +8,7 @@ var util = require('util'),
 var redis = require("redis").createClient(),
     route = 'configurations';
 
-function ConfigurationsThemesModule() {
-    BaseModuleBackend.call(this);
-    this.path = "/configurations";
-}
-let _module = new ConfigurationsThemesModule();
+let _module = new BackModule('configurations');
 
 //todo: co loi chua sua duoc
 _module.index = function (req, res) {
@@ -72,5 +68,4 @@ _module.import = function (req, res) {
     res.send("ok")
 };
 
-util.inherits(ConfigurationsThemesModule, BaseModuleBackend);
 module.exports = _module;

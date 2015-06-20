@@ -6,11 +6,8 @@ let promise = require('bluebird');
 
 let route = 'menus';
 
-function MenusModule() {
-    BaseModuleBackend.call(this);
-    this.path = "/menus";
-}
-let _module = new MenusModule();
+
+let _module = new BackModule('menus');
 
 _module.index = function (req, res) {
     // Add button
@@ -223,5 +220,4 @@ _module.menuitem = function (req, res) {
     _module.render(req, res, 'menuitem');
 };
 
-util.inherits(MenusModule, BaseModuleBackend);
 module.exports = _module;
