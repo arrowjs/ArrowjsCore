@@ -11,10 +11,8 @@ function ConfigurationsModule() {
 let _module = new ConfigurationsModule();
 
 _module.index = function (req, res) {
-    let seo_enable = __seo_enable;
     _module.render(req, res, 'sites/index', {
         __config: __config,
-        seo_enable: seo_enable,
         title: 'Cấu hình hệ thống'
     });
 };
@@ -47,7 +45,6 @@ _module.update_setting = function (req, res, next) {
                 console.log(" Redis reply: " + res);
             }
         });
-        __seo_enable = false;
     } else {
         redis.set(__config.redis_prefix +"seo_enable", true, function (err, res) {
             if (err) {
@@ -56,7 +53,6 @@ _module.update_setting = function (req, res, next) {
                 console.log(" Redis reply: " + res);
             }
         });
-        __seo_enable = true;
     }
 
     //redis info

@@ -26,8 +26,6 @@ router.post('/users/create', __acl.isAllow(moduleName, 'create'), controller.sav
 router.get('/users/:cid', __acl.isAllow(moduleName, 'update'), controller.view);
 router.post('/users/:cid', __acl.isAllow(moduleName, 'update'), controller.update, controller.list);
 
-router.get('/users/course-view/:email', __acl.isAllow(moduleName, 'update'), controller.course_of);
-
 router.param('cid', controller.userById);
 
 module.exports = router;
