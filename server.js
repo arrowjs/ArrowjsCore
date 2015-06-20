@@ -28,6 +28,8 @@ global.__current_theme = {};
 global.__cache = require(__base + 'core/libs/arr_caching')();
 global.BaseModuleBackend = require(__base + 'core/libs/base_module');
 global.BaseModuleFrontend = require(__base + 'core/libs/base_module_f');
+global.BackModule = require(__base + 'core/libs/backModule');
+global.FrontModule = require(__base + 'core/libs/frontModule');
 global.ArrModule = require(__base + 'core/libs/ArrModule');
 __pluginManager.loadAllPlugins();
 
