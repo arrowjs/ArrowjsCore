@@ -21,7 +21,7 @@ var _base_config = {
 // Base constructor
 function BaseWidget() {
     _.assign(this, _base_config);
-    this.env = __.createNewEnv([__base + 'core/widgets/', __base + "themes/frontend/" + __config.themes + "/_widgets/"]);
+    this.env = __.createNewEnv([__base + 'core/widgets/', __base + 'app/widgets/', __base + "themes/frontend/" + __config.themes + "/_widgets/"]);
 }
 BaseWidget.prototype.getAllLayouts = function (alias) {
     let files = [];
@@ -30,6 +30,7 @@ BaseWidget.prototype.getAllLayouts = function (alias) {
         let s = path.split('/');
         files.push(s[s.length - 1]);
     });
+
     if (files.length == 0) {
         __config.getGlobbedFiles(__base + "themes/frontend/default/_widgets/" + alias + "/*.html").forEach(function (path) {
             let s = path.split('/');
@@ -46,6 +47,7 @@ BaseWidget.prototype.save = function (data) {
         delete json_data.sidebar;
         delete json_data.id;
         json_data = JSON.stringify(json_data);
+
         if (data.id != '') {
             __models.widgets.findById(data.id).then(function (widget) {
                 widget.updateAttributes({
@@ -55,7 +57,6 @@ BaseWidget.prototype.save = function (data) {
                     done(widget.id);
                 });
             });
-
         } else {
             __models.widgets.create({
                 widget_type: data.widget,
@@ -66,12 +67,12 @@ BaseWidget.prototype.save = function (data) {
                 done(widget.id);
             });
         }
-
     });
 };
 
 BaseWidget.prototype.render_setting = function (widget_type, widget) {
     let _this = this;
+
     return new Promise(function (done, reject) {
         _this.env.render(widget_type + '/setting.html', {widget: widget, widget_type: widget_type, files: _this.files},
             function (err, re) {
@@ -80,10 +81,8 @@ BaseWidget.prototype.render_setting = function (widget_type, widget) {
                 reject(err);
             });
     });
-
 };
 
-//Render v
 BaseWidget.prototype.render = function (widget, data) {
     let _this = this;
 
@@ -103,6 +102,7 @@ BaseWidget.prototype.render = function (widget, data) {
         }
 
         let context = _.assign({widget: widget}, data);
+
         resolve(renderWidget(widgetFilePath, context).catch(function (err) {
             return "<p>" + err.cause;
         }));
