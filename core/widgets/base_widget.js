@@ -21,7 +21,7 @@ var _base_config = {
 // Base constructor
 function BaseWidget() {
     _.assign(this, _base_config);
-    this.env = __.createNewEnv([__base + 'core/widgets/', __base + 'app/widgets/', __base + "themes/frontend/" + __config.themes + "/_widgets/"]);
+    this.env = __.createNewEnv([__base + 'app/widgets/', __base + 'core/widgets/', __base + "themes/frontend/" + __config.themes + "/_widgets/"]);
 }
 BaseWidget.prototype.getAllLayouts = function (alias) {
     let files = [];

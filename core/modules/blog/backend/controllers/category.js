@@ -14,7 +14,6 @@ let _module = new CategoriesModule;
  * List of categories
  */
 _module.list = function (req, res) {
-res.send('MODULE CORE'); return;
     // Add buttons
     res.locals.deleteButton = __acl.addButton(req, route, 'category_delete');
 

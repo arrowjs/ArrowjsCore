@@ -1,6 +1,6 @@
 'use strict';
 
-var BaseWidget = require('../base_widget'),
+var BaseWidget = require(__base + 'core/widgets/base_widget'),
     util = require('util'),
     _ = require('lodash');
 
