@@ -1,23 +1,24 @@
-'use strict'
-/**
- * Created by thanhnv on 2/20/15.
- */
+'use strict';
+
 let fs = require('fs');
+
 module.exports = function (req, res, next) {
-    // grab reference of render
+    // Grab reference of render
     let _render = res.render;
-    // override logic
+
+    // Override logic
     res.render = function (view, options, fn) {
-        //get messages from session
+        // Get messages from session
         res.locals.messages = req.session.messages;
-        //clear session messages
+
+        // Clear session messages
         req.session.messages = [];
-        //Check if is using admin view
+
+        // Check if is using admin view
         let route = res.locals.route.split('/')[1];
         if (route === __config.admin_prefix) {
             view = 'admin/' + view;
-        }
-        else {
+        } else {
             let tmp = __config.themes + '/' + view;
             if (fs.existsSync(__base + 'app/themes/' + tmp + '.html')) {
                 view = tmp;
@@ -25,10 +26,10 @@ module.exports = function (req, res, next) {
             else {
                 view = "default/" + view;
             }
-
         }
+
         // continue with original render
         _render.call(this, view, options, fn);
-    }
+    };
     next();
-}
+};

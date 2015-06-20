@@ -1,9 +1,6 @@
-'use strict'
-/**
- * Created by thanhnv on 2/17/15.
- */
-var
-    util = require('util'),
+'use strict';
+
+var util = require('util'),
     _ = require('lodash');
 
 function DashboardModule() {
@@ -11,6 +8,7 @@ function DashboardModule() {
     this.path = "/dashboard";
 }
 let _module = new DashboardModule();
+
 _module.index = function (req, res) {
     _module.render(req, res, 'index');
 };

@@ -103,7 +103,6 @@ _module.view = function (req, res) {
             title: "Update Role",
             modules: __modules,
             role: roles,
-            f_modules: __f_modules,
             rules: JSON.parse(roles.rules),
             f_rules: JSON.parse(roles.f_rules)
         });
@@ -112,7 +111,6 @@ _module.view = function (req, res) {
         _module.render(req, res, 'new', {
             title: "Update Role",
             modules: __modules,
-            f_modules: __f_modules,
             role: null,
             rules: null
         });
@@ -162,8 +160,7 @@ _module.create = function (req, res) {
 
     _module.render(req, res, 'new', {
         title: "New Role",
-        modules: __modules,
-        f_modules: __f_modules
+        modules: __modules
     });
 };
 

@@ -1,9 +1,6 @@
-'use strict'
-/**
- * Created by thanhnv on 2/17/15.
- */
-var
-    util = require('util'),
+'use strict';
+
+var util = require('util'),
     _ = require('lodash');
 let redis = require('redis').createClient();
 let route = 'modules';
@@ -25,18 +22,17 @@ _module.active = function (req, res) {
     if (__modules[req.params.route].active == undefined || __modules[req.params.route].active == false) {
         req.flash.success('Module ' + req.params.route + ' has active');
         __modules[req.params.route].active = true;
-    }
-    else {
+    } else {
         req.flash.error('Module ' + req.params.route + ' has un-active');
         __modules[req.params.route].active = false;
     }
 
-    redis.set(__config.redis_prefix +'all_modules', JSON.stringify(__modules), redis.print);
+    redis.set(__config.redis_prefix + 'all_modules', JSON.stringify(__modules), redis.print);
     return res.redirect('/admin/modules');
 };
 
 _module.reload = function (req, res, next) {
-    let md = require(__base + 'libs/modules_backend_manager.js');
+    let md = require(__base + 'core/libs/modules_manager.js');
     md.loadAllModules();
     req.flash.success("Reload all modules");
     next();
