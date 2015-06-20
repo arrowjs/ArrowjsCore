@@ -1,7 +1,5 @@
-'use strict'
-/**
- * Created by thanhnv on 3/11/15.
- */
+'use strict';
+
 let passport = require('passport');
 let _ = require('lodash');
 let config = require(__base + 'config/config.js');

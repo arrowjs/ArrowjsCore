@@ -167,7 +167,7 @@ module.exports = function () {
         }
     });
 
-    /** Module manager backend */
+    /** Module manager */
     require(__base + 'core_route')(app);
     app.use('/' + __config.admin_prefix + '/*', require('../core/middleware/modules-plugin.js'));
 
@@ -186,18 +186,6 @@ module.exports = function () {
         }
         next();
     });
-
-    /** Module manager frontend */
-    app.use('/*', require('../core/middleware/modules-f-plugin.js'));
-
-    // Globbing frontend menu files
-    //todo: xu ly menu backend va frontend chung
-    //__config.getGlobbedFiles('./core/modules/*/frontend/settings/*.js').forEach(function (routePath) {
-    //    __setting_menu_module.push(require(path.resolve(routePath))(app, __config));
-    //});
-    //__config.getGlobbedFiles('./app/modules/*/frontend/settings/*.js').forEach(function (routePath) {
-    //    __setting_menu_module.push(require(path.resolve(routePath))(app, __config));
-    //});
 
     /** Globbing route frontend files */
     let frontRoute = __config.getOverrideCorePath(__base + 'core/modules/*/frontend/route.js', __base + 'app/modules/*/frontend/route.js', 3);
@@ -222,13 +210,6 @@ module.exports = function () {
 
         // Log it
         console.error(err.stack);
-
-        // Log error into database
-        __models.logs.create({
-            event_name: err.name,
-            message: err.stack,
-            type: 0 // warning or error
-        });
 
         // Error page
         res.status(500).render('500', {

@@ -2,6 +2,7 @@
 
 let redis = require('redis').createClient();
 let path = require('path');
+let _ = require('lodash');
 let modules = {};
 
 module.exports = function () {
@@ -9,11 +10,15 @@ module.exports = function () {
 };
 
 module.exports.loadAllModules = function () {
-    // Globbing admin module files
     let module_tmp = {};
-    __config.getGlobbedFiles(__base + 'app/frontend/*/module.js').forEach(function (routePath) {
-        require(path.resolve(routePath))(module_tmp);
-    });
+
+    // Load modules
+    let adminModules = __config.getOverrideCorePath(__base + 'core/modules/*/module.js', __base + 'app/modules/*/module.js', 2);
+    for (let index in adminModules) {
+        if (adminModules.hasOwnProperty(index)) {
+            require(path.resolve(adminModules[index]))(module_tmp);
+        }
+    }
 
     // Add new module
     for (let i in module_tmp) {
@@ -21,8 +26,8 @@ module.exports.loadAllModules = function () {
             __modules[i] = module_tmp[i];
         }
         else {
-            _.assign(module_tmp[i], __modules[i]);
-            __modules[i] = module_tmp[i];
+            delete module_tmp[i].active;
+            _.assign(__modules[i], module_tmp[i]);
         }
     }
 
@@ -32,6 +37,6 @@ module.exports.loadAllModules = function () {
             delete __modules[i];
         }
     }
-    redis.set('all_f_modules', JSON.stringify(__f_modules), redis.print);
-};
 
+    redis.set(__config.redis_prefix +'all_modules', JSON.stringify(__modules), redis.print);
+};
