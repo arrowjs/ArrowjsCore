@@ -10,9 +10,10 @@ let moduleName = 'blog';
 
 router.route('/blog').get(__acl.isAllow(moduleName, 'post_index'), post.list);
 
-router.route('/blog/categories').get(__acl.isAllow(moduleName, 'category_index'), category.listAll)
+router.route('/blog/categories').get(__acl.isAllow(moduleName, 'category_index'), category.list)
     .delete(__acl.isAllow(moduleName, 'category_delete'), category.delete);
 router.route('/blog/categories/page/:page').get(__acl.isAllow(moduleName, 'category_index'), category.list);
+router.route('/blog/categories/page/:page/sort/:sort/(:order)?').get(__acl.isAllow(moduleName, 'category_index'), category.list);
 router.route('/blog/categories/create').post(__acl.isAllow(moduleName, 'category_create'), category.save);
 router.route('/blog/categories/:catId').post(__acl.isAllow(moduleName, 'category_edit'), category.update);
 

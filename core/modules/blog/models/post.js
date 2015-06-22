@@ -2,16 +2,25 @@
 
 module.exports = function (sequelize, DataTypes) {
     let Posts = sequelize.define("post", {
-        title: DataTypes.STRING(255),
+        title: {
+            type: DataTypes.STRING,
+            validate: {
+                max: 255,
+                notNull: true
+            }
+        },
         alias: DataTypes.STRING(255),
         intro_text: DataTypes.TEXT,
-        full_text: DataTypes.TEXT,
+        full_text: {
+            type: DataTypes.TEXT,
+            validate: {
+                notNull: true
+            }
+        },
         image: DataTypes.STRING(255),
         tags: DataTypes.TEXT,
-        hit: DataTypes.BIGINT,
         published: DataTypes.INTEGER,
         published_at: DataTypes.DATE,
-        cache: DataTypes.TEXT,
         categories: DataTypes.TEXT,
         type: DataTypes.STRING(15),
         seo_info: DataTypes.JSONB,

@@ -26,7 +26,7 @@
             <div class="box box-solid box-primary">
                 <div class="box-body table-responsive no-padding">
                     {% include 'basic_table.html' %}
-                    {{ totalPage|pagination(currentPage,'/admin/blog/category/page/{page}/sort/'+currentColumn+'/'+currentOrder)|safe }}
+                    {{ totalPage|pagination(currentPage,'/admin/blog/categories/page/{page}/sort/'+currentColumn+'/'+currentOrder)|safe }}
                 </div>
             </div>
         </div>
@@ -42,13 +42,13 @@
 
             if (ids.length > 0) {
                 $.ajax({
-                    url: '/admin/blog/category',
+                    url: '/admin/blog/categories',
                     type: 'DELETE',
                     data: {
                         ids: ids.join()
                     }
                 }).done(function () {
-                    window.location.href = "/admin/blog/category";
+                    window.location.href = "/admin/blog/categories";
                 });
             }
         }
