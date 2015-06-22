@@ -62,7 +62,28 @@ module.exports = function (modules) {
                 name: 'page_delete',
                 title: 'Delete Page'
             }
-        ]
+        ],
+        backend_menu: {
+            title:'Blog',
+            icon:'fa fa-newspaper-o',
+            menus: [
+                {
+                    rule: 'post_index',
+                    title: 'List all posts',
+                    link: '/posts/page/1'
+                },
+                {
+                    rule: 'page_index',
+                    title: 'Pages',
+                    link: '/pages/page/1'
+                },
+                {
+                    rule: 'category_index',
+                    title: 'Post\'s categories',
+                    link: '/categories/page/1'
+                }
+            ]
+        }
     };
     return modules;
 };

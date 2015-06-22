@@ -155,15 +155,14 @@ module.exports = function () {
     redis.get(__config.redis_prefix + 'all_modules', function (err, results) {
         if (results != null) {
             global.__modules = JSON.parse(results);
+            redis.get(__config.redis_prefix + 'backend_menus', function(err, menus) {
+                if(menus != null)
+                    global.__menus = JSON.parse(menus);
+                else console.log('Backend menus is not defined!!!');
+            });
         } else {
-            let adminModules = __config.getOverrideCorePath(__base + 'core/modules/*/module.js', __base + 'app/modules/*/module.js', 2);
-            for (let index in adminModules) {
-                if (adminModules.hasOwnProperty(index)) {
-                    require(path.resolve(adminModules[index]))(__modules);
-                }
-            }
-
-            redis.set(__config.redis_prefix + 'all_modules', JSON.stringify(__modules), redis.print);
+            let md = require(__base + 'core/libs/modules_manager.js');
+            md.loadAllModules();
         }
     });
 
@@ -197,9 +196,10 @@ module.exports = function () {
 
     // Globbing menu files
     //todo: xu ly menu backend va frontend chung
-    __config.getGlobbedFiles('./menus/*/*.js').forEach(function (routePath) {
-        require(path.resolve(routePath))(__menus);
-    });
+    // menus has been loaded when loading modules
+    //__config.getGlobbedFiles('./menus/*/*.js').forEach(function (routePath) {
+    //    require(path.resolve(routePath))(__menus);
+    //});
 
     /** Assume 'not found' in the error msgs is a 404.
      * This is somewhat silly, but valid, you can do whatever you like, set properties, use instanceof etc.

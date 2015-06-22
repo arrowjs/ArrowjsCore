@@ -24,8 +24,24 @@ module.exports = function (modules) {
                 name: 'delete_themes',
                 title: 'Delete theme'
             }
-        ]
-    }
+        ],
+        backend_menu: {
+            title:'Configuration',
+            icon:"fa fa-cog",
+            menus: [
+                {
+                    rule: 'update_info',
+                    title: 'Systems',
+                    link: '/site-info'
+                },
+                {
+                    rule: 'change_themes',
+                    title: 'Themes',
+                    link: '/themes'
+                }
+            ]
+        }
+    };
     return modules;
 
 };

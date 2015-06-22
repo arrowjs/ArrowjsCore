@@ -1,4 +1,4 @@
-'use strict'
+'use strict';
 /**
  * Created by thanhnv on 2/17/15.
  */
@@ -26,7 +26,24 @@ module.exports = function (modules) {
                 name: 'delete',
                 title: 'Delete'
             }
-        ]
+        ],
+        backend_menu: {
+            title:'Roles',
+            icon:"fa fa-group",
+            menus: [
+                {
+                    rule: 'index',
+                    title: 'All roles',
+                    link: '/'
+                },
+                {
+                    rule: 'create',
+                    title: 'Create new role',
+                    link: '/create'
+                }
+
+            ]
+        }
     };
 
     return modules;

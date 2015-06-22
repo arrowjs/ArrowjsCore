@@ -10,6 +10,7 @@ module.exports = function () {
 };
 
 module.exports.loadAllModules = function () {
+    let menuManger = require(__base + 'core/libs/menus_manager');
     let module_tmp = {};
 
     // Load modules
@@ -24,19 +25,23 @@ module.exports.loadAllModules = function () {
     for (let i in module_tmp) {
         if (__modules[i] == undefined) {
             __modules[i] = module_tmp[i];
+            menuManger.addMenu(i);
         }
         else {
             delete module_tmp[i].active;
             _.assign(__modules[i], module_tmp[i]);
+            menuManger.modifyMenu(i);
         }
     }
 
     // Remove module
     for (let i in __modules) {
         if (module_tmp[i] == undefined) {
+            menuManger.removeMenu(i);
             delete __modules[i];
         }
     }
 
+    redis.set(__config.redis_prefix + 'backend_menus', JSON.stringify(__menus), redis.print);
     redis.set(__config.redis_prefix +'all_modules', JSON.stringify(__modules), redis.print);
 };
