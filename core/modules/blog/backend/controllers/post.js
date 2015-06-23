@@ -181,7 +181,6 @@ _module.view = function (req, res) {
             categories: results[0],
             users: results[1],
             post: data,
-            seo_enable: __seo_enable,
             seo_info: encodeURIComponent(data.seo_info) || ''
         });
     });
@@ -234,7 +233,7 @@ _module.update = function (req, res, next) {
 
         if (data.published != post.published && data.published == 1) data.published_at = __models.sequelize.fn('NOW');
 
-        post.updateAttributes(data).on('success', function () {
+        post.updateAttributes(data).then(function () {
             Promise.all([
                 function () {
                     return new Promise(function (fulfill, reject) {

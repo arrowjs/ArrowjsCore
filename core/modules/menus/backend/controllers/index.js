@@ -128,7 +128,7 @@ _module.read = function (req, res) {
 
     // Get module links
     res.locals.setting_menu_module = __setting_menu_module;
-    console.log('aasdasdasd');
+
     // Render view
     _module.render(req, res, 'new', {
         title: 'Cập nhật menu'

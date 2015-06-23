@@ -5,17 +5,14 @@ module.exports = function (sequelize, DataTypes) {
         title: {
             type: DataTypes.STRING,
             validate: {
-                max: 255,
-                notNull: true
+                max: 255
             }
         },
         alias: DataTypes.STRING(255),
         intro_text: DataTypes.TEXT,
         full_text: {
             type: DataTypes.TEXT,
-            validate: {
-                notNull: true
-            }
+            allowNull: false
         },
         image: DataTypes.STRING(255),
         tags: DataTypes.TEXT,
