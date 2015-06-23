@@ -1,10 +1,10 @@
-'use strict'
+'use strict';
 /**
  * Created by thanhnv on 2/17/15.
  */
 module.exports = function (modules) {
     modules.widgets = {
-        title: 'Wdigets',
+        title: 'Widgets',
         author: 'Nguyen Van Thanh',
         version: '0.1.1',
         description: 'Widget management of website',
@@ -14,8 +14,24 @@ module.exports = function (modules) {
                 name: 'index',
                 title: 'All Widgets'
             }
-        ]
-    }
+        ],
+        backend_menu: {
+            title: 'Widgets',
+            icon: 'fa fa-file-text',
+            menus: [
+                {
+                    rule: 'index',
+                    title: 'All Sidebars',
+                    link: '/sidebars'
+                },
+                {
+                    rule: 'index',
+                    title: 'All Widgets',
+                    link: '/'
+                }
+            ]
+        }
+    };
     return modules;
 
 };

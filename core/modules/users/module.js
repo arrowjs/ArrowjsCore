@@ -1,4 +1,4 @@
-'use strict'
+'use strict';
 /**
  * Created by thanhnv on 2/17/15.
  */
@@ -30,7 +30,24 @@ module.exports = function (modules) {
                 name: 'delete',
                 title: 'Delete'
             }
-        ]
+        ],
+        backend_menu: {
+            title:'Users',
+            icon:"fa fa-user",
+            menus: [
+                {
+                    rule: 'index',
+                    title: 'All users',
+                    link: '/'
+                },
+                {
+                    rule: 'create',
+                    title: 'Create new user',
+                    link: '/create'
+                }
+
+            ]
+        }
     };
     return modules;
 

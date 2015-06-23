@@ -200,6 +200,30 @@ _module.menuById = function (req, res, next, id) {
     });
 };
 
+_module.sortAdminMenu = function (req, res) {
+    res.locals.saveButton = __acl.addButton(req, route, 'update');
+    _module.render(req, res, 'admin_sort', {
+        title: "Sorting Admin Menu",
+        menus: __menus,
+        messages: req.messages || []
+    });
+};
+
+_module.saveSortAdminMenu = function (req, res) {
+    let redis = require("redis").createClient();
+    let systems = req.body.s || [];
+    let defaults = req.body.d || [];
+    //Them button
+    if (systems.length > 0) {
+        __menus.sorting.systems = systems;
+    }
+    if (defaults.length > 0) {
+        __menus.sorting.default = defaults;
+    }
+    redis.set(__config.redis_prefix + 'backend_menus', JSON.stringify(__menus), redis.print);
+    res.sendStatus(200);
+};
+
 _module.delete = function (req, res) {
     __models.menus.destroy({
         where: {

@@ -1,17 +1,25 @@
 'use strict';
+let slug = require('slug');
 
 module.exports = function (sequelize, DataTypes) {
     return sequelize.define("category", {
-        id : {
+        count: {
             type: DataTypes.INTEGER,
-            autoIncrement :  true
+            defaultValue: 0
         },
-        count: DataTypes.INTEGER,
-        name: DataTypes.STRING,
+        name: {
+            type: DataTypes.STRING,
+            unique: true
+        },
         slug: DataTypes.STRING
     }, {
         tableName: 'arr_category',
-        createdAt: false,
-        updatedAt: false
+        timestamps: false,
+        hooks: {
+            beforeCreate: function (category, op, fn) {
+                category.slug = slug(category.name).toLowerCase();
+                fn(null, category);
+            }
+        }
     });
 };

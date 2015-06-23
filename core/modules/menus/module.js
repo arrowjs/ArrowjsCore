@@ -24,7 +24,28 @@ module.exports = function (modules) {
                 name: 'delete',
                 title: 'Delete Menu'
             }
-        ]
+        ],
+        backend_menu: {
+            title:'Menus',
+            icon:"fa fa-bars",
+            menus: [
+                {
+                    rule: 'index',
+                    title: 'All menus',
+                    link: '/'
+                },
+                {
+                    rule: 'create',
+                    title: 'Create new',
+                    link: '/create'
+                },
+                {
+                    rule: 'update',
+                    title: 'Sorting Admin menu',
+                    link: '/sort-admin-menu'
+                }
+            ]
+        }
     };
     return modules;
 };

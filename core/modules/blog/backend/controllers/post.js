@@ -388,5 +388,4 @@ _module.hasAuthorization = function (req, res, next) {
     return (req.post.created_by !== req.user.id);
 };
 
-//util.inherits(PostsModule, BaseModuleBackend);
 module.exports = _module;

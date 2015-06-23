@@ -1,4 +1,4 @@
-'use strict'
+'use strict';
 /**
  * Created by thanhnv on 2/17/15.
  */
@@ -19,8 +19,20 @@ module.exports = function (modules) {
                 title: 'Active Modules'
             }
 
-        ]
-    }
+        ],
+        backend_menu: {
+            title:'Modules',
+            icon:"fa fa-rocket",
+            menus: [
+                {
+                    rule: 'index',
+                    title: 'All modules',
+                    link: '/'
+                }
+
+            ]
+        }
+    };
     return modules;
 
 };
