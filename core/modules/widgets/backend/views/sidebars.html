@@ -150,9 +150,9 @@
                     <div class="box-body">
                         <ul class="widget-list" id="widgets">
                             {% for widget in widgets %}
-                                <li class="widget-item" data-alias="{{ widget.alias }}">
-                                    {{ widget.name }}
-                                    <a class="information" title="{{ widget.description }}">
+                                <li class="widget-item" data-alias="{{ widget.config.alias }}">
+                                    {{ widget.config.name }}
+                                    <a class="information" title="{{ widget.config.description }}">
                                         <i class="fa fa-info-circle"></i>
                                     </a>
                                 </li>

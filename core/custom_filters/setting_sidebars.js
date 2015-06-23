@@ -23,7 +23,7 @@ module.exports = function (env) {
                         if (results[i]) {
                             let w = __.getWidget(widgets[i].widget_type);
                             html += '<li style="position: relative" id="' + widgets[i].id + '">' +
-                            '<div class="widget-item" style="position: relative">' + w.name + '</div>' +
+                            '<div class="widget-item" style="position: relative">' + w.config.name + '</div>' +
                             '<a href="#" class="fa fa-caret-left expand_arrow" onclick="return showDetail(this);"></a>' +
                             '<div class="box box-solid close"><div class="box-body">' + results[i] + '</div></div></li>';
                         }

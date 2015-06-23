@@ -24,7 +24,6 @@ exports.createBreadcrumb = function (root) {
  * @param {integer} index
  * @returns {string}
  */
-//todo: hoi anh thanh
 exports.active_menu = function (value, string_to_compare, css_class, index) {
     let arr = value.split('/');
     let st = "active";
@@ -87,7 +86,7 @@ exports.sortMenus = function (menus) {
 exports.getWidget = function (alias) {
     for (let i in __widgets) {
         if (__widgets.hasOwnProperty(i)) {
-            if (__widgets[i].alias == alias) {
+            if (__widgets[i].config && __widgets[i].config.alias == alias) {
                 return __widgets[i];
             }
         }

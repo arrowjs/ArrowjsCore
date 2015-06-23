@@ -1,12 +1,12 @@
-'use strict'
+'use strict';
+
 let BaseModule = require('./baseModule.js');
 let _ = require('lodash');
-
 
 class BackModule extends BaseModule {
     constructor(path) {
         super(path);
-        this.env = __.createNewEnv([__base + 'themes/backend/default/', __base + 'core/modules/', __base + 'modules/']);
+        this.env = __.createNewEnv([__base + 'app/modules/', __base + 'core/modules/', __base + 'themes/backend/default/']);
     }
 
     render(req, res, view, options, fn) {
@@ -30,13 +30,12 @@ class BackModule extends BaseModule {
         if (fn) {
             this.env.render(view, _.assign(res.locals, options), fn);
         } else {
-            //console.log('*************', this.env.loaders, view);
             this.env.render(view, _.assign(res.locals, options), function (err, re) {
                 if (err) {
                     res.send(err.stack);
+                }else{
+                    res.send(re);
                 }
-                res.send(re);
-
             });
         }
     }
@@ -50,20 +49,21 @@ class BackModule extends BaseModule {
         if (view.indexOf('.html') == -1) {
             view += '.html';
         }
+
         this.env.loaders[0].searchPaths = [__base + 'themes/backend/default'];
+
         this.env.render(view, _.assign(res.locals, {}), function (err, re) {
             res.send(re);
         });
     }
 
     render404(req, res) {
-        render_error(req, res, '404');
+        this.render_error(req, res, '404');
     }
 
     render500(req, res) {
-        render_error(req, res, '500');
+        this.render_error(req, res, '500');
     }
 }
-
 
 module.exports = BackModule;

@@ -25,9 +25,8 @@ global.__pluginManager = require(__base + 'core/libs/plugins_manager');
 global.__messages = [];
 global.__current_theme = {};
 global.__cache = require(__base + 'core/libs/arr_caching')();
-global.BackModule = require(__base + 'core/libs/backModule');
-global.FrontModule = require(__base + 'core/libs/frontModule');
-global.ArrModule = require(__base + 'core/libs/ArrModule');
+global.BackModule = require(__base + 'core/libs/BackModule');
+global.FrontModule = require(__base + 'core/libs/FrontModule');
 __pluginManager.loadAllPlugins();
 
 /** Init the express application */

@@ -5,7 +5,7 @@ var util = require('util'),
 let redis = require('redis').createClient();
 let route = 'modules';
 
-let _module = new BackModule('menus');
+let _module = new BackModule('modules');
 
 _module.index = function (req, res) {
     _module.render(req, res, 'index', {

@@ -5,8 +5,8 @@ module.exports = function (modules) {
         title: 'Configuration',
         author: 'Nguyen Van Thanh',
         version: '0.0.1',
-        description:'Configuration information of website',
-        system:true,
+        description: 'Configuration information of website',
+        system: true,
         rules: [
             {
                 name: 'update_info',
@@ -25,8 +25,8 @@ module.exports = function (modules) {
                 title: 'Delete theme'
             }
         ]
-    }
-    return modules;
+    };
 
+    return modules;
 };
 

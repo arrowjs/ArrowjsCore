@@ -15,9 +15,9 @@
 {% block content %}
     <a class="btn btn-success" style="margin-bottom: 10px;">
         <i class="fa fa-plus"></i>
-								<span class="hidden-480">
-								Import Widgets </span>
+        <span class="hidden-480"> Import Widgets </span>
     </a>
+
     <div class="row">
         <div class="col-md-12">
             <div class="box box-solid box-primary">
@@ -26,17 +26,12 @@
                         <table class="table table-striped table-bordered table-hover" id="datatable_orders">
                             <thead>
                             <tr role="row" class="heading">
-                                <th>
-                                    Name
-                                </th>
-                                <th>
-                                    Version
-                                </th>
-                                <th>
-                                    Description
-                                </th>
+                                <th>Name</th>
+                                <th>Version</th>
+                                <th>Description</th>
                             </tr>
                             </thead>
+
                             <tbody>
                             {% for widget in widgets %}
                                 <tr>
@@ -46,9 +41,7 @@
                                             <span class="module-author">{{ widget.author }}</span>
                                         </div>
                                     </td>
-                                    <td>
-                                        {{ widget.version }}
-                                    </td>
+                                    <td>{{ widget.version }}</td>
                                     <td>{{ widget.description }}</td>
                                 </tr>
                             {% endfor %}
@@ -61,14 +54,17 @@
         </div>
     </div>
 {% endblock %}
+
 {% block jsFooter %}
     <script>
         function deleteCourses() {
             var ids = [];
+
             $("input:checkbox[name='id[]']:checked").each(function () {
                 ids.push($(this).val());
             });
-            if (ids.length > 0)
+
+            if (ids.length > 0) {
                 $.ajax({
                     url: '/admin/widgets',
                     type: 'DELETE',
@@ -80,6 +76,7 @@
                         window.location.href = "/widgets";
                     }
                 });
+            }
         }
     </script>
 {% endblock %}

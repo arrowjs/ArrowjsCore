@@ -3,8 +3,10 @@
 let util = require('util'),
     _ = require('lodash');
 let redis = require('redis').createClient();
-let fs = require("fs");
 let Promise = require("bluebird");
+let fs = require("fs");
+let readFileAsync = Promise.promisify(fs.readFile);
+
 let route = 'modules';
 
 let _module = new BackModule('widgets');
@@ -23,8 +25,7 @@ _module.sidebar = function (req, res, next) {
         link: "/admin/widgets/sidebars/clear"
     }];
 
-    Promise.promisifyAll(fs);
-    fs.readFileAsync(__base + "themes/frontend/" + __config.themes + "/theme.json", "utf8").then(function (data) {
+    readFileAsync(__base + "themes/frontend/" + __config.themes + "/theme.json", "utf8").then(function (data) {
         _module.render(req, res, 'sidebars', {
             title: "Sidebars",
             sidebars: JSON.parse(data).sidebars,
@@ -35,6 +36,7 @@ _module.sidebar = function (req, res, next) {
 
 _module.addWidget = function (req, res) {
     let widget = __.getWidget(req.params.widget);
+
     widget.render_setting(req.params.widget).then(function (re) {
         res.send(re);
     });
@@ -43,6 +45,7 @@ _module.addWidget = function (req, res) {
 _module.saveWidget = function (req, res) {
     let widget_type = req.body.widget;
     var widget = __.getWidget(widget_type);
+
     widget.save(req.body).then(function (id) {
         res.send(id.toString());
     })
@@ -50,8 +53,8 @@ _module.saveWidget = function (req, res) {
 
 _module.read = function (req, res) {
     __models.widgets.find(req.params.cid).then(function (widget) {
-        var widget = __.getWidget(widget.widget_type);
-        widget.render_setting(req, res, widget.widget_type, widget).then(function (re) {
+        let w = __.getWidget(widget.widget_type);
+        w.render_setting(req, res, widget.widget_type, widget).then(function (re) {
             res.send(re);
         });
     });

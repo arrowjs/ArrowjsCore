@@ -21,8 +21,9 @@ var _base_config = {
 // Base constructor
 function BaseWidget() {
     _.assign(this, _base_config);
-    this.env = __.createNewEnv([__base + 'app/widgets/', __base + 'core/widgets/', __base + "themes/frontend/" + __config.themes + "/_widgets/"]);
+    this.env = __.createNewEnv([__base + 'app/widgets/', __base + 'core/widgets/', __base + "themes/frontend"]);
 }
+
 BaseWidget.prototype.getAllLayouts = function (alias) {
     let files = [];
 
@@ -94,7 +95,7 @@ BaseWidget.prototype.render = function (widget, data) {
         if (!fs.existsSync(widgetFilePath)) {
             widgetFilePath = 'default/_widgets/' + widgetFile;
         } else {
-            widgetFilePath = __base + 'themes/frontend/' + __config.themes + '/_widgets/' + widgetFile;
+            widgetFilePath = __config.themes + '/_widgets/' + widgetFile;
         }
 
         if (widgetFilePath.indexOf('.html') == -1) {

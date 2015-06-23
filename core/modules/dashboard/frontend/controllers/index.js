@@ -1,13 +1,10 @@
 'use strict';
 
-let util = require('util'),
-    _ = require('lodash');
-
-let _module = new BackModule('dashboard');
+let _module = new FrontModule('dashboard');
 
 _module.index = function (req, res) {
-    let index_view = 'index';
-    _module.render(req, res, index_view, {
+    //_module.render404(req, res); return;
+    _module.render(req, res, 'index', {
         user: req.user || null
     });
 };

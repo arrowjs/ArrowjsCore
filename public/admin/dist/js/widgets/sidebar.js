@@ -1,10 +1,3 @@
-/**
- * Created by thanhnv on 3/9/15.
- */
-
-// Use for CKEDITOR version
-/*var _ckeditor_id = 1;*/
-
 var maximize_button = '<div class="maximize-toolbar">' +
     '<a href="javascript:void(0)" title="Maximize" onclick="maximizeEditor(this)">' +
     '<i class="fa fa-arrows-alt"></i></a></div>';
@@ -30,17 +23,7 @@ $(function () {
                 });
             }
         }
-
-        // Init tooltip for maximize toolbar
-        //$('.maximize-toolbar > a').tooltip();
     }
-
-    // CKEDITOR version: Init ckeditor
-    /*$('textarea.ckeditor').each(function () {
-     $(this).attr('id', 'ckeditor' + _ckeditor_id);
-
-     initCkeditor();
-     });*/
 
     // Collapse all widgets after init code mirror to prevent cursor height bug
     $('.sidebar-list').find('div.widget-item')
@@ -90,14 +73,7 @@ $(function () {
                             });
                         }
                     }
-
-                    // Init tooltip for maximize toolbar
-                    //$('.maximize-toolbar > a').tooltip();
                 }
-
-                // CKEDITOR version: Init ckeditor for new textarea
-                /*$(li).find('textarea.ckeditor').first().attr('id', 'ckeditor' + _ckeditor_id);
-                 initCkeditor();*/
             });
         }
     }).sortable({
@@ -149,9 +125,6 @@ function maximizeEditor(button) {
     });
 
     editor.children().first().before(minimize_button);
-
-    // Init tooltip for minimize toolbar
-    //$('.minimize-toolbar > a').tooltip();
 }
 
 function minimizeEditor(button) {
@@ -172,19 +145,6 @@ function minimizeEditor(button) {
     // Save the editor and current widget
     editor.parents('form').first().find('.arr-btn-submit').first().trigger('click');
 }
-
-// CKEDITOR version
-/*function initCkeditor() {
- CKEDITOR.config.startupMode = 'source';
- CKEDITOR.replace('ckeditor' + _ckeditor_id, {
- height: 150,
- toolbar: [
- { name: 'tools', items: [ 'Maximize', 'ShowBlocks' ] },
- ]
- });
-
- _ckeditor_id++;
- }*/
 
 function showDetail(element, changeIcon) {
     var box = $(element).parents("li").first().find('.box').first();
@@ -219,19 +179,12 @@ function saveWidget(button) {
     var form = $(button).parents('form').first();
     var box = $(button).parents('.box').first();
 
-    // CKEDITOR version: save textarea values
-    /*var textareas = form.find('textarea.ckeditor');
-     for(var i =0; i< textareas.length; i++){
-     var textarea_id = $(textareas[i]).attr('id');
-     $(textareas[i]).val(CKEDITOR.instances[textarea_id].getData());
-     }*/
-
     showBlock(box);
 
     $.ajax({
         type: "POST",
         url: '/admin/widgets/sidebars/save',
-        data: form.serialize() // serializes the form's elements.
+        data: form.serialize()
     }).done(function (id) {
         form.find('input[name="id"]').val(id);
         form.find('input[name="ordering"]').remove();

@@ -1,6 +1,6 @@
 "use strict";
 
-let   util = require('util'),
+let util = require('util'),
     _ = require('lodash');
 let redis = require('redis').createClient();
 
@@ -42,7 +42,7 @@ _module.update_setting = function (req, res, next) {
     __config.redis.host = data.redis_host;
     __config.redis.port = data.redis_port;
 
-    redis.set(__config.redis_prefix +__config.key, JSON.stringify(__config), redis.print);
+    redis.set(__config.redis_prefix + __config.key, JSON.stringify(__config), redis.print);
     req.flash.success('Saved success');
     next();
 };

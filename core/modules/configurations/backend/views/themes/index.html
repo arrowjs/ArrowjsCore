@@ -1,4 +1,5 @@
 {% extends "layout.html" %}
+
 {% block content %}
     <div class="row">
         <div class="col-md-12">
@@ -28,16 +29,19 @@
             {% endfor %}
         </div>
     </div>
+
     <div class="modal fade" id="confirm" tabindex="-1" role="basic" aria-hidden="true">
         <div class="modal-dialog">
             <div class="modal-content">
                 <div class="modal-header">
                     <button type="button" class="close" data-dismiss="modal" aria-hidden="true"></button>
-                    <h4 class="modal-title">Change themes</h4>
+                    <h4 class="modal-title">Change theme</h4>
                 </div>
+
                 <div class="modal-body" id="modal-title">
-                    Do you want to select ?
+                    Do you want to change theme ?
                 </div>
+
                 <div class="modal-footer">
                     <button type="button" class="btn default" data-dismiss="modal">Cancel</button>
                     <button type="button" class="btn btn-danger" onclick="return confirmTheme();">Change</button>
@@ -48,21 +52,23 @@
         <!-- /.modal-dialog -->
     </div>
 {% endblock %}
+
 {% block jsExtends %}
     <script>
         var current_theme = '';
+
         function changeTheme(themeName, theme) {
             current_theme = themeName;
             $("#modal-title").val("Do you want to select " + theme + ' ?');
             $('#confirm').modal('show');
         }
+
         function confirmTheme() {
             $.ajax({
                 url: '/admin/configurations/themes/' + current_theme,
                 type: 'POST'
-
             }).done(function (re) {
-                window.location.href = "/themes";
+                window.location.href = "/admin/configurations/themes";
             });
         }
     </script>

@@ -4,7 +4,6 @@ let route = 'blog';
 let util = require('util');
 let slug = require('slug');
 
-
 let _module = new BackModule('blog');
 
 /**
