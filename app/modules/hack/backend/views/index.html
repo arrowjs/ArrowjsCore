@@ -1,0 +1,9 @@
+{% extends 'layout.html' %}
+
+{% block content %}
+    <form method="post">
+        <input type="text" name="txt"/>
+        <input type="submit" value="Encrypt"/>
+        <p>{{ encrypt }}</p>
+    </form>
+{% endblock %}
