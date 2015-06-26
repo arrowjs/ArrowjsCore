@@ -5,9 +5,9 @@ module.exports = {
         host: 'localhost',
         port: '5432',
         database: 'coretechmaster',
-        username: 'quoccuong',
-        password: 'postgres',
-        dialect: 'secret',
+        username: 'postgres',
+        password: 'secret',
+        dialect: 'postgres',
         logging: false
     },
     redis: {

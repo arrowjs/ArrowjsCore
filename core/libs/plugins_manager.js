@@ -12,7 +12,6 @@ function PluginManager() {
 
     self.loadAllPlugins = function () {
         redis.get(__config.redis_prefix + self.redis_key, function (err, results) {
-            console.log(results);
             if (results != null) {
                 let arr_data = JSON.parse(results);
                 let index = 0;
@@ -36,8 +35,6 @@ function PluginManager() {
 
                 redis.set(__config.redis_prefix + self.redis_key, JSON.stringify(self.plugins), redis.print);
             }
-
-
         });
     };
 

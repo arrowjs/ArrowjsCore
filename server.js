@@ -30,19 +30,12 @@ global.BackModule = require(__base + 'core/libs/BackModule');
 global.FrontModule = require(__base + 'core/libs/FrontModule');
 __pluginManager.loadAllPlugins();
 
-/**
- * Create app dir if not exist
- */
-try {
-    fs.mkdirSync(__base + 'app', 755);
-    fs.mkdirSync(__base + 'app/custom_filters', 755);
-    fs.mkdirSync(__base + 'app/modules', 755);
-    fs.mkdirSync(__base + 'app/plugins', 755);
-    fs.mkdirSync(__base + 'app/widgets', 755);
-} catch (err) {
-    console.log("Create app dir:");
-    console.log(err);
-}
+/** Create app dir if not exist */
+__utils.createDirectory('app');
+__utils.createDirectory('app/custom_filters');
+__utils.createDirectory('app/modules');
+__utils.createDirectory('app/plugins');
+__utils.createDirectory('app/widgets');
 
 /** Init the express application */
 let app = require('./config/app')();
