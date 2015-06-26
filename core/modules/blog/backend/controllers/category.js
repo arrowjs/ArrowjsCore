@@ -1,10 +1,9 @@
 'use strict';
 
-let route = 'blog';
-let util = require('util');
 let slug = require('slug');
 
 let _module = new BackModule('blog');
+let route = 'blog';
 
 /**
  * List of categories
@@ -140,7 +139,7 @@ _module.delete = function (req, res, next) {
                     if (posts.length > 0) {
                         posts.forEach(function (post) {
                             let btag = post.cat_id;
-                            //replace id cua tag cu bang id moi la 0 ~ uncategorize
+                            // 0 ~ uncategorize
                             let newBtag = btag.replace(':' + id + ':', ':0:');
                             post.updateAttributes({
                                 cat_id: newBtag

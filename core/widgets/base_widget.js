@@ -27,7 +27,7 @@ function BaseWidget() {
 BaseWidget.prototype.getAllLayouts = function (alias) {
     let files = [];
 
-    __config.getGlobbedFiles(__base + "themes/frontend/" + __config.themes + '/_widgets/' + alias + '/*.html').forEach(function (path) {
+    __config.getGlobbedFiles(__base + "themes/frontend/" + __config.theme + '/_widgets/' + alias + '/*.html').forEach(function (path) {
         let s = path.split('/');
         files.push(s[s.length - 1]);
     });
@@ -90,12 +90,12 @@ BaseWidget.prototype.render = function (widget, data) {
     return new Promise(function (resolve, reject) {
         let renderWidget = Promise.promisify(_this.env.render, _this.env);
         let widgetFile = widget.widget_type + '/' + widget.data.file;
-        let widgetFilePath = __base + 'themes/frontend/' + __config.themes + '/_widgets/' + widgetFile;
+        let widgetFilePath = __base + 'themes/frontend/' + __config.theme + '/_widgets/' + widgetFile;
 
         if (!fs.existsSync(widgetFilePath)) {
             widgetFilePath = 'default/_widgets/' + widgetFile;
         } else {
-            widgetFilePath = __config.themes + '/_widgets/' + widgetFile;
+            widgetFilePath = __config.theme + '/_widgets/' + widgetFile;
         }
 
         if (widgetFilePath.indexOf('.html') == -1) {

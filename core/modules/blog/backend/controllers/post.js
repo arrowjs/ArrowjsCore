@@ -1,15 +1,12 @@
 'use strict';
 
-let util = require('util');
-let config = require(__base + 'config/config');
 let slug = require('slug');
 let sequelize = require('sequelize');
 let Promise = require('bluebird');
 
+let _module = new BackModule('blog');
 let route = 'blog';
 let edit_view = 'post/new';
-
-let _module = new BackModule('blog');
 
 _module.list = function (req, res) {
     // Add buttons
@@ -105,10 +102,10 @@ _module.list = function (req, res) {
         ],
         where: filter.values,
         order: filter.sort,
-        limit: config.pagination.number_item,
-        offset: (page - 1) * config.pagination.number_item
+        limit: __config.pagination.number_item,
+        offset: (page - 1) * __config.pagination.number_item
     }).then(function (results) {
-        let totalPage = Math.ceil(results.count / config.pagination.number_item);
+        let totalPage = Math.ceil(results.count / __config.pagination.number_item);
 
         // Render view
         _module.render(req, res, '/post/index', {

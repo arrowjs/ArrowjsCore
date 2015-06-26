@@ -1,6 +1,7 @@
 'use strict';
 
-let mailer = require('nodemailer');
+let mailer = require('nodemailer'),
+    fs = require('fs');
 
 /**
  * Create breadcrumb
@@ -358,5 +359,69 @@ exports.sendMail = function (mailOptions) {
             }
         });
     });
+};
+
+/**
+ * Check security of file by regex
+ * @param {string} file_path
+ * @returns {object}
+ */
+exports.checkFileSecurity = function (file_path) {
+    let content = fs.readFileSync(file_path).toString();
+    let result = {};
+
+    // Check file activities
+    let fileCheck = [
+        "readFile",
+        "readFileSync"
+    ];
+    let fileCheckRegex = new RegExp(fileCheck.join('|'), 'g');
+
+    if (content.match(fileCheckRegex) != null) {
+        result.file_activities = "Read files";
+    }
+
+    // Check database activities
+    let databaseCheck = [
+        "__models"
+    ];
+    let databaseCheckRegex = new RegExp(databaseCheck.join('|'), 'g');
+
+    if (content.match(databaseCheckRegex) != null) {
+        result.database_activities = "Connect database";
+    }
+
+    // Set file path
+    if (result.hasOwnProperty('file_activities') || result.hasOwnProperty('database_activities')) {
+        result.file_path = file_path.replace(__base + 'app/modules/', '');
+    }
+
+    return result;
+};
+
+/**
+ * Check security of all file in directory
+ * @param path
+ * @param {array} result
+ * @returns {boolean}
+ */
+exports.checkDirectorySecurity = function (path, result) {
+    try {
+        let files = fs.readdirSync(path);
+
+        if (files.length > 0) {
+            files.forEach(function (file) {
+                let file_path = path + '/' + file;
+
+                if (fs.lstatSync(file_path).isDirectory()) {
+                    __.checkDirectorySecurity(file_path, result);
+                } else {
+                    result.push(__.checkFileSecurity(file_path));
+                }
+            });
+        }
+    } catch (ex) {
+        return false;
+    }
 };
 

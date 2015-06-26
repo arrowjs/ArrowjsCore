@@ -1,14 +1,11 @@
 'use strict';
-/**
- * Created by thanhnv on 2/17/15.
- */
+
 module.exports = function (modules) {
     modules.users = {
         title: 'Users',
         author: 'Nguyen Van Thanh',
         version: '0.1.0',
-        description:'Users management of website',
-        system:true,
+        description: 'Users management of website',
         rules: [
             {
                 name: 'index',
@@ -32,8 +29,8 @@ module.exports = function (modules) {
             }
         ],
         backend_menu: {
-            title:'Users',
-            icon:"fa fa-user",
+            title: 'Users',
+            icon: "fa fa-user",
             menus: [
                 {
                     rule: 'index',
@@ -49,7 +46,7 @@ module.exports = function (modules) {
             ]
         }
     };
-    return modules;
 
+    return modules;
 };
 

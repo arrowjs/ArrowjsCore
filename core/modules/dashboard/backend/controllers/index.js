@@ -1,7 +1,6 @@
 'use strict';
 
-var util = require('util'),
-    _ = require('lodash');
+var _ = require('lodash');
 
 let _module = new BackModule('dashboard');
 

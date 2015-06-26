@@ -21,20 +21,8 @@ module.exports = function () {
 
     // Sorting menu
     menus.sorting = {};
-    menus.sorting.default = [
-        //"dashboard",
-        //"blog"
-        //"logs"
-    ];
-    menus.sorting.systems = [
-        //"users",
-        //"roles",
-        //"menus",
-        //"widgets",
-        //"modules",
-        //"plugins",
-        //"configurations"
-    ];
+    menus.sorting.default = [];
+    menus.sorting.systems = [];
     return menus;
 };
 

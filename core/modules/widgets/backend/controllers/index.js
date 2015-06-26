@@ -1,13 +1,10 @@
 'use strict';
 
-let util = require('util'),
-    _ = require('lodash');
+let _ = require('lodash');
 let redis = require('redis').createClient();
 let Promise = require("bluebird");
 let fs = require("fs");
 let readFileAsync = Promise.promisify(fs.readFile);
-
-let route = 'modules';
 
 let _module = new BackModule('widgets');
 
@@ -25,7 +22,7 @@ _module.sidebar = function (req, res, next) {
         link: "/admin/widgets/sidebars/clear"
     }];
 
-    readFileAsync(__base + "themes/frontend/" + __config.themes + "/theme.json", "utf8").then(function (data) {
+    readFileAsync(__base + "themes/frontend/" + __config.theme + "/theme.json", "utf8").then(function (data) {
         _module.render(req, res, 'sidebars', {
             title: "Sidebars",
             sidebars: JSON.parse(data).sidebars,

@@ -1,7 +1,6 @@
 'use strict';
 
-var config = require(__base + 'config/config'),
-    _ = require('lodash'),
+var _ = require('lodash'),
     redis = require('redis').createClient(),
     Promise = require('bluebird');
 
@@ -12,7 +11,8 @@ function PluginManager() {
     self.plugins = [];
 
     self.loadAllPlugins = function () {
-        redis.get(config.redis_prefix + self.redis_key, function (err, results) {
+        redis.get(__config.redis_prefix + self.redis_key, function (err, results) {
+            console.log(results);
             if (results != null) {
                 let arr_data = JSON.parse(results);
                 let index = 0;
@@ -25,8 +25,7 @@ function PluginManager() {
                         self.plugins.push(plugin);
                     }
                 }
-            }
-            else {
+            } else {
                 let plugins = __config.getOverrideCorePath(__base + 'core/plugins/*/*.js', __base + 'app/plugins/*/*.js', 2);
                 for (let i in plugins) {
                     if (plugins.hasOwnProperty(i)) {
@@ -35,21 +34,29 @@ function PluginManager() {
                     }
                 }
 
-                redis.set(config.redis_prefix +self.redis_key, JSON.stringify(self.plugins), redis.print);
+                redis.set(__config.redis_prefix + self.redis_key, JSON.stringify(self.plugins), redis.print);
             }
-        });
 
+
+        });
     };
 
     self.reloadAllPlugins = function () {
         self.plugins = [];
 
         let plugins = __config.getOverrideCorePath(__base + 'core/plugins/*/*.js', __base + 'app/plugins/*/*.js', 2);
+
+        //console.log(plugins);
+        //console.log(require.cache['/Users/huydq/PhpstormProjects/crazyarrow/core/plugins/facebook/facebook-plugin.js']);
+        //console.log(require('/Users/huydq/PhpstormProjects/crazyarrow/core/plugins/facebook/facebook-plugin.js'));
+
         for (let i in plugins) {
             if (plugins.hasOwnProperty(i)) {
                 self.plugins.push(require(plugins[i]));
             }
         }
+
+        //redis.set(__config.redis_prefix + self.redis_key, JSON.stringify(self.plugins), redis.print);
     };
 
     self.getPlugin = function (alias) {

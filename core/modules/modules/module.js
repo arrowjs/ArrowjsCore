@@ -1,7 +1,5 @@
 'use strict';
-/**
- * Created by thanhnv on 2/17/15.
- */
+
 module.exports = function (modules) {
     modules.modules = {
         title: 'Modules',
@@ -16,24 +14,26 @@ module.exports = function (modules) {
             },
             {
                 name: 'active',
-                title: 'Active Modules'
+                title: 'Activate/Deactivate Modules'
+            },
+            {
+                name: 'import',
+                title: 'Import New Module'
             }
-
         ],
         backend_menu: {
-            title:'Modules',
-            icon:"fa fa-rocket",
+            title: 'Modules',
+            icon: "fa fa-rocket",
             menus: [
                 {
                     rule: 'index',
-                    title: 'All modules',
+                    title: 'All Modules',
                     link: '/'
                 }
-
             ]
         }
     };
-    return modules;
 
+    return modules;
 };
 

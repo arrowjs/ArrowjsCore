@@ -10,6 +10,7 @@
  */
 exports.isAllow = function (route, action, orAction, hasAuthorize) {
     return function (req, res, next) {
+
         // Check module active
         if (__modules[route] != undefined && (__modules[route].system || __modules[route].active)) {
             // Check acl
@@ -86,7 +87,6 @@ exports.customButton = function (url) {
  * @param {string} action - Action which user access.
  * @returns {boolean}
  */
-//todo: rename function
 exports.allow = function (req, route, action) {
     if (__modules[route] != undefined && (__modules[route].system || __modules[route].active)) {
         if (req.user != undefined && req.user.acl[route] != undefined) {

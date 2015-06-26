@@ -1,10 +1,11 @@
+'use strict';
+
 module.exports = function (modules) {
     modules.blog = {
         title: 'Blog',
         author: 'TechmasterVN',
         version: '0.0.1',
         description: 'Blog Manager',
-        system: true,
         rules: [
             {
                 name: 'category_index',
@@ -64,8 +65,8 @@ module.exports = function (modules) {
             }
         ],
         backend_menu: {
-            title:'Blog',
-            icon:'fa fa-newspaper-o',
+            title: 'Blog',
+            icon: 'fa fa-newspaper-o',
             menus: [
                 {
                     rule: 'post_index',
@@ -85,6 +86,7 @@ module.exports = function (modules) {
             ]
         }
     };
+
     return modules;
 };
 

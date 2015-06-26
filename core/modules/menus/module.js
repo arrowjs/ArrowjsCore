@@ -6,7 +6,6 @@ module.exports = function (modules) {
         author: 'Nguyen Van Thanh',
         version: '0.0.1',
         description: 'Menu management of website frontend',
-        system : true,
         rules: [
             {
                 name: 'index',
@@ -26,8 +25,8 @@ module.exports = function (modules) {
             }
         ],
         backend_menu: {
-            title:'Menus',
-            icon:"fa fa-bars",
+            title: 'Menus',
+            icon: "fa fa-bars",
             menus: [
                 {
                     rule: 'index',
@@ -47,6 +46,7 @@ module.exports = function (modules) {
             ]
         }
     };
+
     return modules;
 };
 

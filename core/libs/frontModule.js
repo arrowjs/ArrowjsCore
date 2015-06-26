@@ -23,13 +23,13 @@ class FrontModule extends BaseModule {
             view += '.html';
         }
 
-        let tmp = __config.themes + '/_modules' + self.path + '/' + view;
+        let tmp = __config.theme + '/_modules' + self.path + '/' + view;
 
         if (fs.existsSync(__base + 'themes/frontend/' + tmp)) {
             this.env.loaders[0].searchPaths = [__base + 'themes/frontend' ];
-            view = __config.themes + '/_modules' + self.path + '/' + view;
+            view = __config.theme + '/_modules' + self.path + '/' + view;
         } else {
-            this.env.loaders[0].searchPaths = [__base + 'app/modules', __base + 'core/modules', __base + 'themes/frontend', __base + 'themes/frontend/' + __config.themes];
+            this.env.loaders[0].searchPaths = [__base + 'app/modules', __base + 'core/modules', __base + 'themes/frontend', __base + 'themes/frontend/' + __config.theme];
 
             if (self.path.indexOf('/') == 0) {
                 view = self.path.substring(1) + '/frontend/views/' + view;
@@ -62,7 +62,7 @@ class FrontModule extends BaseModule {
             view += '.html';
         }
 
-        this.env.loaders[0].searchPaths = [__base + '/themes/frontend/', __base + '/themes/frontend/' + __config.themes];
+        this.env.loaders[0].searchPaths = [__base + '/themes/frontend/', __base + '/themes/frontend/' + __config.theme];
 
         this.env.render(view, _.assign(res.locals, {}), function (err, re) {
             res.send(re);

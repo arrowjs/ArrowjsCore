@@ -19,7 +19,7 @@ module.exports = function (req, res, next) {
         if (route === __config.admin_prefix) {
             view = 'admin/' + view;
         } else {
-            let tmp = __config.themes + '/' + view;
+            let tmp = __config.theme + '/' + view;
             if (fs.existsSync(__base + 'app/themes/' + tmp + '.html')) {
                 view = tmp;
             }

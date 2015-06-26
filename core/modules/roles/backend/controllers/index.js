@@ -1,13 +1,11 @@
 'use strict';
 
-let util = require('util'),
-    _ = require('lodash');
+let _ = require('lodash');
 let fs = require('fs');
 let path = require('path');
 
-let route = 'roles';
-
 let _module = new BackModule('roles');
+let route = 'roles';
 
 _module.list = function (req, res) {
     // Add button

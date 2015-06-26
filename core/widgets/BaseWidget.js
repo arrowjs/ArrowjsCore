@@ -26,7 +26,7 @@ class BaseWidget {
     getAllLayouts(alias) {
         let files = [];
 
-        __config.getGlobbedFiles(__base + "themes/frontend/" + __config.themes + '/_widgets/' + alias + '/*.html').forEach(function (path) {
+        __config.getGlobbedFiles(__base + "themes/frontend/" + __config.theme + '/_widgets/' + alias + '/*.html').forEach(function (path) {
             let s = path.split('/');
             files.push(s[s.length - 1]);
         });
@@ -94,15 +94,15 @@ class BaseWidget {
             let renderWidget = Promise.promisify(self.env.render, self.env);
             let widgetFile = widget.widget_type + '/' + widget.data.file;
 
-            let widgetFilePath = __base + 'themes/frontend/' + __config.themes + '/_widgets/' + widgetFile;
+            let widgetFilePath = __base + 'themes/frontend/' + __config.theme + '/_widgets/' + widgetFile;
 
             if (!fs.existsSync(widgetFilePath)) {
                 widgetFilePath = __base + 'themes/frontend/default/_widgets/' + widgetFile;
             } else {
-                widgetFilePath = __base + 'themes/frontend/' +__config.themes + '/_widgets/' + widgetFile;
+                widgetFilePath = __base + 'themes/frontend/' +__config.theme + '/_widgets/' + widgetFile;
             }
 
-            if (widgetFilePath.indexOf('.html') == -1) {
+            if (widgetFilePath.indexOf('.html') === -1) {
                 widgetFilePath += '.html';
             }
 

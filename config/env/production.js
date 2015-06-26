@@ -4,10 +4,10 @@ module.exports = {
     db: {
         host: 'localhost',
         port: '5432',
-        database: 'arr_techmaster',
+        database: 'coretechmaster',
         username: 'quoccuong',
-        password: '',
-        dialect: 'postgres',
+        password: 'postgres',
+        dialect: 'secret',
         logging: false
     },
     redis: {

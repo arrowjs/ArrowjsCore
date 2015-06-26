@@ -37,7 +37,7 @@ module.exports = function () {
     /** Set static resources path */
     app.use(express.static(path.resolve('./public'), {maxAge: 3600}));
 
-    //todo: hoi anh thanh
+    /** Assign config with Redis */
     redis.get(__config.redis_prefix + __config.key, function (err, result) {
         if (result != null) {
             let tmp = JSON.parse(result);
@@ -65,8 +65,7 @@ module.exports = function () {
     /** Set views path and view engine */
     app.set('view engine', 'html');
 
-    // Initials custom filter
-    //todo: create env moi lai phai add lai custom filter?
+    /** Initials custom filter */
     __.getAllCustomFilter(e);
 
     /** Environment dependent middleware */
@@ -155,9 +154,9 @@ module.exports = function () {
     redis.get(__config.redis_prefix + 'all_modules', function (err, results) {
         if (results != null) {
             global.__modules = JSON.parse(results);
-            redis.get(__config.redis_prefix + 'backend_menus', function(err, menus) {
-                if(menus != null)
-                    global.__menus = JSON.parse(menus);
+
+            redis.get(__config.redis_prefix + 'backend_menus', function (err, menus) {
+                if (menus != null) global.__menus = JSON.parse(menus);
                 else console.log('Backend menus is not defined!!!');
             });
         } else {
@@ -167,7 +166,7 @@ module.exports = function () {
     });
 
     /** Module manager */
-    require(__base + 'core_route')(app);
+    require(__base + 'core/libs/core_route')(app);
     app.use('/' + __config.admin_prefix + '/*', require('../core/middleware/modules-plugin.js'));
 
     /** Globbing backend route files */
@@ -194,14 +193,7 @@ module.exports = function () {
         }
     }
 
-    // Globbing menu files
-    //todo: xu ly menu backend va frontend chung
-    // menus has been loaded when loading modules
-    //__config.getGlobbedFiles('./menus/*/*.js').forEach(function (routePath) {
-    //    require(path.resolve(routePath))(__menus);
-    //});
-
-    /** Assume 'not found' in the error msgs is a 404.
+    /** Assume 'not found' in the error msg is a 404.
      * This is somewhat silly, but valid, you can do whatever you like, set properties, use instanceof etc.
      */
     app.use(function (err, req, res, next) {

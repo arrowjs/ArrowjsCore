@@ -22,8 +22,8 @@ module.exports = {
     mailer_config: {
         service: 'Gmail',
         auth: {
-            user: 'support@techmaster.vn',
-            pass: 'aikido2015-'
+            user: '66203170ded0024029ebd6be09d93e33ee8ca830c2',
+            pass: '743c2a69d5cd44306cbb98'
         },
         mailer_from: "Techmaster <support@techmaster.vn>",
         mailer_to: "cuong@techmaster.vn"
@@ -35,7 +35,7 @@ module.exports = {
     templateEngine: 'nunjucks',
     sessionSecret: 'GREEN',
     sessionCollection: 'sessions',
-    themes: 'default',
+    theme: 'default',
     assets: {
         lib: {
             css: [

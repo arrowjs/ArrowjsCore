@@ -4,6 +4,7 @@
   "version": "0.0.1",
   "author": "TechmasterVN",
   "dependencies": {
+    "adm-zip": "^0.4.7",
     "bluebird": "^2.9.12",
     "body-parser": "~1.9.0",
     "compression": "~1.2.0",

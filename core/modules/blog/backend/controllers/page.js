@@ -1,15 +1,14 @@
 'use strict';
 
 let promise = require('bluebird');
-let route = 'blog';
-let util = require('util');
+
 let slug = require('slug');
 let formidable = require('formidable');
 let sequelize = require('sequelize');
 promise.promisifyAll(formidable);
 
-
 let _module = new BackModule('blog');
+let route = 'blog';
 
 _module.list = function (req, res) {
     // Add buttons

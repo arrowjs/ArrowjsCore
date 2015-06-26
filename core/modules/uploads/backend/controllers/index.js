@@ -1,7 +1,5 @@
-'use strict'
-/**
- * Created by thanhnv on 2/2/15.
- */
+'use strict';
+
 let fs = require('fs'),
     sizeOf = require('image-size'),
     im = require('imagemagick'),
@@ -168,7 +166,7 @@ exports.thumb = function (req, res) {
     // Check file exit
     if (fs.existsSync(tmpFolder + '/' + filename)) {
         let img = fs.readFileSync(tmpFolder + '/' + filename);
-        res.writeHead(200, {'Content-Type': 'image/' + getExtension(filename) });
+        res.writeHead(200, {'Content-Type': 'image/' + getExtension(filename)});
         res.end(img, 'binary');
     } else {
         // Create thumbnail
@@ -180,7 +178,7 @@ exports.thumb = function (req, res) {
         }, function (err, stdout, stderr) {
             if (err) throw err;
             let img = fs.readFileSync(tmpFolder + '/' + filename);
-            res.writeHead(200, {'Content-Type': 'image/' + getExtension(filename) });
+            res.writeHead(200, {'Content-Type': 'image/' + getExtension(filename)});
             res.end(img, 'binary');
         });
     }
