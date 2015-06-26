@@ -63,7 +63,7 @@ module.exports.overrideCorePath = function(paths, routePath, checkIndex){
     let check_obj = {};
     check_obj[checkName] = routePath;
 
-    paths = _.assign(paths, check_obj);
+    _.assign(paths, check_obj);
     return paths;
 };
 

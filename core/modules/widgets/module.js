@@ -1,18 +1,19 @@
 'use strict';
-/**
- * Created by thanhnv on 2/17/15.
- */
+
 module.exports = function (modules) {
     modules.widgets = {
         title: 'Widgets',
         author: 'Nguyen Van Thanh',
         version: '0.1.1',
         description: 'Widget management of website',
-        system: true,
         rules: [
             {
                 name: 'index',
                 title: 'All Widgets'
+            },
+            {
+                name: 'import',
+                title: 'Import New Widget'
             }
         ],
         backend_menu: {
@@ -32,7 +33,7 @@ module.exports = function (modules) {
             ]
         }
     };
-    return modules;
 
+    return modules;
 };
 

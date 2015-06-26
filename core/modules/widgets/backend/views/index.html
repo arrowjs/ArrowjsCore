@@ -1,4 +1,5 @@
 {% extends 'layout.html' %}
+
 {% block cssExtends %}
     <style>
         .module-title {
@@ -12,11 +13,16 @@
         }
     </style>
 {% endblock %}
+
 {% block content %}
-    <a class="btn btn-success" style="margin-bottom: 10px;">
+    <a class="btn btn-success" style="margin-bottom: 10px;" onclick="$('#zip_file').click();">
         <i class="fa fa-plus"></i>
-        <span class="hidden-480"> Import Widgets </span>
+        <span class="hidden-480">Import Widget</span>
     </a>
+
+    <form method="post" action="/admin/widgets/import-widgets" enctype="multipart/form-data">
+        <input type="file" id="zip_file" name="zip_file" onchange="this.form.submit();" style="display: none;" />
+    </form>
 
     <div class="row">
         <div class="col-md-12">
@@ -36,19 +42,37 @@
                             {% for widget in widgets %}
                                 <tr>
                                     <td>
-                                        <div class="module-title">{{ widget.name }}</div>
+                                        <div class="module-title">{{ widget.config.name }}</div>
                                         <div class="module-info">
-                                            <span class="module-author">{{ widget.author }}</span>
+                                            <span class="module-author">{{ widget.config.author }}</span>
                                         </div>
                                     </td>
-                                    <td>{{ widget.version }}</td>
-                                    <td>{{ widget.description }}</td>
+                                    <td>{{ widget.config.version }}</td>
+                                    <td>{{ widget.config.description }}</td>
                                 </tr>
                             {% endfor %}
-
                             </tbody>
                         </table>
                     </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal fade" id="security-modal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" aria-hidden="true"></button>
+                    <h4 class="modal-title">Check security</h4>
+                </div>
+                <div class="modal-body">
+                    <div class="activity-list"></div>
+                    <div><p>&nbsp;</p><strong>Are you sure to Activate this widget?</strong></div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn default" data-dismiss="modal">Cancel</button>
+                    <a href="#" class="btn btn-primary btn-activate">Activate</a>
                 </div>
             </div>
         </div>
@@ -57,26 +81,45 @@
 
 {% block jsFooter %}
     <script>
-        function deleteCourses() {
-            var ids = [];
+        function checkSecurity(widget, title) {
+            var activityList = $('.activity-list');
 
-            $("input:checkbox[name='id[]']:checked").each(function () {
-                ids.push($(this).val());
+            $.get('/admin/widgets/check-security/' + widget, function (result, status) {
+                if (status == 'success') {
+                    if (typeof result == 'object') {
+                        var list_activities = '';
+
+                        result.forEach(function (obj) {
+                            if (obj.hasOwnProperty('file_path')) {
+                                list_activities += obj.file_path + ' has activities: <br/>';
+                            }
+
+                            if (obj.hasOwnProperty('file_activities')) {
+                                list_activities += '- ' + obj.file_activities + '<br/>';
+                            }
+
+                            if (obj.hasOwnProperty('database_activities')) {
+                                list_activities += '- ' + obj.database_activities + '<br/>';
+                            }
+                        });
+
+                        var html = '';
+                        if (list_activities == '') {
+                            html = 'This widget does not have special activities.';
+                        } else {
+                            html = 'This mowidgetdule has some activities can cause security problem: <br/>' + list_activities;
+                        }
+                        activityList.html(html);
+                    } else activityList.html(result);
+                } else {
+                    activityList.html('Cannot get activities of this widget!');
+                }
+
+                $('#security-modal h4.modal-title').text('Check security for widget ' + title);
+                $('#security-modal').modal('show');
+                $('.btn-activate').attr('href', '/admin/widget/' + widget);
             });
-
-            if (ids.length > 0) {
-                $.ajax({
-                    url: '/admin/widgets',
-                    type: 'DELETE',
-                    data: {
-                        ids: ids.join()
-                    },
-                    success: function (result) {
-                        // Do something with the result
-                        window.location.href = "/widgets";
-                    }
-                });
-            }
+            return false;
         }
     </script>
 {% endblock %}

@@ -2,13 +2,13 @@
 
 let passport = require('passport');
 let _ = require('lodash');
-let config = require(__base + 'config/config.js');
 
 let mailer = require('nodemailer');
 
 let promise = require('bluebird');
 let randomBytesAsync = promise.promisify(require('crypto').randomBytes);
 let env = __.createNewEnv(__base + 'themes/backend/default');
+
 let render = function (req, res, view, options, fn) {
     res.locals.messages = req.session.messages;
     req.session.messages = [];
@@ -27,7 +27,7 @@ let render = function (req, res, view, options, fn) {
 };
 
 module.exports = function (app) {
-    app.route('/admin/login').get(function (req, res) {
+    app.route('/' + __config.admin_prefix + '/login').get(function (req, res) {
         if (req.isAuthenticated()) {
             return res.redirect('/admin');
         } else {
@@ -54,7 +54,7 @@ module.exports = function (app) {
         })(req, res, next);
     });
 
-    app.route('/admin/forgot-password').get(function (req, res) {
+    app.route('/' + __config.admin_prefix + '/forgot-password').get(function (req, res) {
         render(req, res, 'forgot-password.html');
     }).post(function (req, res, next) {
         if (!req.body.email) {
@@ -101,7 +101,7 @@ module.exports = function (app) {
             // Send reset password email
             render(req, res, 'email-templates/reset-password-email', {
                 name: user.display_name,
-                appName: config.app.title,
+                appName: __config.app.title,
                 url: 'http://' + req.headers.host + '/admin/reset/' + user.id + '/' + token
             }, function (err, emailHTML) {
                 if (err) {
@@ -110,7 +110,7 @@ module.exports = function (app) {
                 } else {
                     let mailOptions = {
                         to: user.user_email,
-                        from: config.mailer_config.mailer_from,
+                        from: __config.mailer_config.mailer_from,
                         subject: 'Password Reset',
                         html: emailHTML
                     };
@@ -127,7 +127,7 @@ module.exports = function (app) {
         });
     });
 
-    app.route('/admin/reset/:userid/:token').get(function (req, res, next) {
+    app.route('/' + __config.admin_prefix + '/reset/:userid/:token').get(function (req, res, next) {
         __models.user.find({
             where: {
                 id: req.params.userid,
@@ -181,13 +181,13 @@ module.exports = function (app) {
         }).then(function (user) {
             render(req, res, 'email-templates/reset-password-confirm-email', {
                 name: user.display_name,
-                appName: config.app.title,
+                appName: __config.app.title,
                 site: 'http://' + req.headers.host,
                 login_url: 'http://' + req.headers.host + '/admin/login'
             }, function (err, emailHTML) {
                 let mailOptions = {
                     to: user.user_email,
-                    from: config.mailer_config.mailer_from,
+                    from: __config.mailer_config.mailer_from,
                     subject: 'Your password has been changed',
                     html: emailHTML
                 };
@@ -203,24 +203,20 @@ module.exports = function (app) {
         });
     });
 
-    app.use('/admin/*', function (req, res, next) {
+    app.use('/' + __config.admin_prefix + '/*', function (req, res, next) {
         if (!req.isAuthenticated()) {
             return res.redirect('/admin/login');
-        }
-
-        if (req.user && req.user.role_id === 21) {
-            return res.redirect('/');
         }
 
         next();
     });
 
     // Error in backend
-    app.route('/admin/err/500').get(function (req, res) {
+    app.route('/' + __config.admin_prefix + '/err/500').get(function (req, res) {
         render(req, res, '500.html');
     });
 
-    app.route('/admin/err/404').get(function (req, res) {
+    app.route('/' + __config.admin_prefix + '/err/404').get(function (req, res) {
         render(req, res, '404.html');
     });
 };

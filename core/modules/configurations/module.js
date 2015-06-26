@@ -5,8 +5,7 @@ module.exports = function (modules) {
         title: 'Configuration',
         author: 'Nguyen Van Thanh',
         version: '0.0.1',
-        description:'Configuration information of website',
-        system:true,
+        description: 'Configuration information of website',
         rules: [
             {
                 name: 'update_info',
@@ -26,8 +25,8 @@ module.exports = function (modules) {
             }
         ],
         backend_menu: {
-            title:'Configuration',
-            icon:"fa fa-cog",
+            title: 'Configuration',
+            icon: "fa fa-cog",
             menus: [
                 {
                     rule: 'update_info',
@@ -42,7 +41,7 @@ module.exports = function (modules) {
             ]
         }
     };
-    return modules;
 
+    return modules;
 };
 

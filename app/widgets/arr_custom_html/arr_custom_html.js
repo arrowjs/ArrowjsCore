@@ -1,5 +1,5 @@
 'use strict';
-
+//readFile
 let BaseWidget = require(__base + 'core/widgets/BaseWidget'),
     _ = require('lodash');
 
@@ -9,8 +9,8 @@ class CustomHtml extends BaseWidget {
 
         let conf = {
             alias: "arr_custom_html",
-            name: "Custom HTML",
-            description: "Create block HTML to view",
+            name: "Custom HTML TEST IMPORT",
+            description: "Create block HTML to view XXX",
             author: "Nguyen Van Thanh",
             version: "0.1.0",
             options: {

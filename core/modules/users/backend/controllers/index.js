@@ -1,28 +1,19 @@
 'use strict';
 
-let util = require('util'),
-    _ = require('lodash');
-
+let _ = require('lodash');
 let fs = require('fs');
-
+let redis = require('redis').createClient();
+let path = require('path');
+let slug = require('slug');
 let promise = require('bluebird');
-
 let writeFileAsync = promise.promisify(require('fs').writeFile);
-
 let formidable = require('formidable');
 promise.promisifyAll(formidable);
 
-let redis = require('redis').createClient();
-
-let path = require('path');
-let slug = require('slug');
-
+let _module = new BackModule('users');
 let edit_template = 'new.html';
 let folder_upload = '/img/users/';
 let route = 'users';
-
-
-let _module = new BackModule('users');
 
 _module.list = function (req, res) {
     // Add button

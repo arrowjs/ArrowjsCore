@@ -1,15 +1,7 @@
 'use strict';
 
+let fs = require('fs');
 let isArray;
-
-/**
- * Strip leading and trailing whitespace from a string.
- * @param  {string} input
- * @return {string} Stripped input.
- */
-exports.strip = function (input) {
-    return input.replace(/^\s+|\s+$/g, '');
-};
 
 /**
  * Test if a string starts with a given prefix.
@@ -249,4 +241,15 @@ exports.shuffle = function (array) {
     }
 
     return array;
+};
+
+/**
+ * Create directory
+ * @param {string} path
+ * return {void}
+ */
+exports.createDirectory = function (path) {
+    fs.mkdir(__base + path, function (err) {
+        if (err == null) console.log('Create directory ' + path);
+    });
 };

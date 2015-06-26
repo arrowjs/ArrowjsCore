@@ -6,7 +6,7 @@ let redis = require('redis').createClient();
 
 module.exports = function (env) {
     env.addFilter('get_sidebar', function (sidebarName, route, cb) {
-        let key = 'sidebar:' + __config.themes + ':' + sidebarName;
+        let key = 'sidebar:' + __config.theme + ':' + sidebarName;
 
         redis.get(config.redis_prefix + key, function (err, result) {
             if (result != null) {

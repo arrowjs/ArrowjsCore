@@ -1,20 +1,22 @@
 'use strict';
 
-let util = require('util'),
-    _ = require('lodash');
-let redis = require('redis').createClient();
+let _ = require('lodash'),
+    redis = require('redis').createClient(),
+    formidable = require('formidable'),
+    admzip = require('adm-zip');
+
 let Promise = require("bluebird");
 let fs = require("fs");
 let readFileAsync = Promise.promisify(fs.readFile);
 
-let route = 'modules';
-
 let _module = new BackModule('widgets');
 
 _module.index = function (req, res) {
+    let widgets = require(__base + 'core/libs/widgets_manager')();
+
     _module.render(req, res, 'index', {
         title: "All Widgets",
-        widgets: __widgets
+        widgets: widgets
     });
 };
 
@@ -25,11 +27,13 @@ _module.sidebar = function (req, res, next) {
         link: "/admin/widgets/sidebars/clear"
     }];
 
-    readFileAsync(__base + "themes/frontend/" + __config.themes + "/theme.json", "utf8").then(function (data) {
+    readFileAsync(__base + "themes/frontend/" + __config.theme + "/theme.json", "utf8").then(function (data) {
+        let widgets = require(__base + 'core/libs/widgets_manager')();
+
         _module.render(req, res, 'sidebars', {
             title: "Sidebars",
             sidebars: JSON.parse(data).sidebars,
-            widgets: __widgets
+            widgets: widgets
         });
     });
 };
@@ -99,6 +103,84 @@ _module.clear_sidebar_cache = function (req, res) {
                 res.redirect('/admin/widgets/sidebars');
             });
         }
+    });
+};
+
+_module.importWidget = function (req, res) {
+    let max_size = 100;
+
+    let form = new formidable.IncomingForm();
+    form.parse(req, function (err, fields, files) {
+        let file_size = Math.round(files.zip_file.size / 1000);
+        let file_name = files.zip_file.name;
+        let tmp_path = files.zip_file.path;
+
+        if (file_size > max_size) {
+            req.flash.error("File upload is too large! Max file size is " + max_size + " KB");
+            return res.redirect('/admin/widgets');
+        }
+
+        if (file_name.substr(file_name.lastIndexOf('.') + 1) != 'zip') {
+            req.flash.error("Only zip file is allowed!");
+            return res.redirect('/admin/widgets');
+        }
+
+        // Use admzip to unzip uploaded file
+        var zip = new admzip(tmp_path);
+        var zipEntries = zip.getEntries();
+
+        // Extract all inside files to app/widgets
+        try {
+            zipEntries.forEach(function (zipEntry) {
+                if (zipEntry.isDirectory == false) {
+                    zip.extractEntryTo(zipEntry.entryName, __base + 'app/widgets/');
+                }
+            });
+
+            req.flash.success("Import widget successfully");
+
+            // Check security of imported widget
+            let widget_name = '';
+            for (let zipEntry in zipEntries){
+                if(zipEntries.hasOwnProperty(zipEntry)){
+                    widget_name = zipEntries[zipEntry].entryName.split('/')[0];
+                    break;
+                }
+            }
+            let widget_path = __base + 'app/widgets/' + widget_name ;
+            let result = [];
+
+            __.checkDirectorySecurity(widget_path, result);
+
+            if (result == false) {
+                req.flash.warning('Cannot get activities of this widget!');
+            } else {
+                let list_activities = '';
+
+                result.forEach(function(obj){
+                    if (obj.hasOwnProperty('file_path')) {
+                        list_activities += obj.file_path + ' has activities: <br/>';
+                    }
+
+                    if (obj.hasOwnProperty('file_activities')) {
+                        list_activities += '- ' + obj.file_activities + '<br/>';
+                    }
+
+                    if (obj.hasOwnProperty('database_activities')) {
+                        list_activities += '- ' + obj.database_activities + '<br/>';
+                    }
+                });
+
+                if(list_activities != ''){
+                    list_activities = 'This module has some activities can cause security problem: <br/>' + list_activities;
+                }
+                req.flash.warning(list_activities);
+            }
+        } catch (error) {
+            req.flash.error(error);
+        }
+
+        res.redirect('/admin/widgets');
     });
 };
 

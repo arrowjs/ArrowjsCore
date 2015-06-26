@@ -1,11 +1,10 @@
 'use strict';
 
-var util = require('util'),
-    _ = require('lodash');
-var redis = require("redis").createClient(),
-    route = 'configurations';
+var _ = require('lodash');
+var redis = require("redis").createClient();
 
 let _module = new BackModule('configurations');
+let route = 'configurations';
 
 _module.index = function (req, res) {
     let themes = [];
@@ -16,7 +15,7 @@ _module.index = function (req, res) {
 
     let current_theme;
     for (let i in themes) {
-        if (themes.hasOwnProperty(i) && themes[i].alias.toLowerCase() == __config.themes.toLowerCase()) {
+        if (themes.hasOwnProperty(i) && themes[i].alias.toLowerCase() == __config.theme.toLowerCase()) {
             current_theme = __current_theme = themes[i];
         }
     }
@@ -51,7 +50,7 @@ _module.detail = function (req, res) {
 };
 
 _module.change_themes = function (req, res) {
-    __config.themes = req.params.themeName;
+    __config.theme = req.params.themeName;
     redis.set(__config.redis_prefix + __config.key, JSON.stringify(__config), redis.print);
     res.send("ok");
 };

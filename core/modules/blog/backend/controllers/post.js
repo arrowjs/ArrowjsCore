@@ -1,15 +1,12 @@
 'use strict';
 
-let util = require('util');
-let config = require(__base + 'config/config');
 let slug = require('slug');
 let sequelize = require('sequelize');
 let Promise = require('bluebird');
 
+let _module = new BackModule('blog');
 let route = 'blog';
 let edit_view = 'post/new';
-
-let _module = new BackModule('blog');
 
 _module.list = function (req, res) {
     // Add buttons
@@ -105,10 +102,10 @@ _module.list = function (req, res) {
         ],
         where: filter.values,
         order: filter.sort,
-        limit: config.pagination.number_item,
-        offset: (page - 1) * config.pagination.number_item
+        limit: __config.pagination.number_item,
+        offset: (page - 1) * __config.pagination.number_item
     }).then(function (results) {
-        let totalPage = Math.ceil(results.count / config.pagination.number_item);
+        let totalPage = Math.ceil(results.count / __config.pagination.number_item);
 
         // Render view
         _module.render(req, res, '/post/index', {
@@ -244,7 +241,7 @@ _module.update = function (req, res, next) {
 
                                     tag.updateAttributes({
                                         count: count
-                                    }).on('success', function (data) {
+                                    }).then(function (data) {
                                         fulfill(data);
                                     });
                                 });
@@ -257,12 +254,9 @@ _module.update = function (req, res, next) {
                             onlyInB.forEach(function (id) {
                                 __models.category.find(id).then(function (tag) {
                                     let count = +tag.count + 1;
-
                                     tag.updateAttributes({
                                         count: count
-                                    }).on('success', function () {
-                                        //console.log(chalk.green('Update category ' + tag.id + ': count+1 success'));
-                                    });
+                                    })
                                 });
                             });
                         }
@@ -349,7 +343,7 @@ _module.delete = function (req, res) {
 
                 if (tag.length > 0) {
                     tag.forEach(function (id) {
-                        __models.category.find(id).then(function (cat) {
+                        __models.category.findById(id).then(function (cat) {
                             let count = +cat.count - 1;
                             cat.updateAttributes({
                                 count: count
@@ -361,20 +355,20 @@ _module.delete = function (req, res) {
                 }
             }
             __models.post.destroy({
-                where: 'id=' + post.id
+                where: {
+                    id: post.id
+                }
+            }).catch(function(err) {
+                req.flash.error('Post id: ' + post.id + ' | ' + err.name + ' : ' + err.message);
             });
         });
         req.flash.success('Xóa bài viết thành công');
-        res.send(200);
+        res.sendStatus(200);
     });
 };
 
 _module.read = function (req, res, next, id) {
-    __models.post.find({
-        where: {
-            id: id
-        }
-    }).then(function (post) {
+    __models.post.findById(id).then(function (post) {
         req.post = post;
         next();
     });

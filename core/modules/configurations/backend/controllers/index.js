@@ -1,7 +1,6 @@
 "use strict";
 
-let util = require('util'),
-    _ = require('lodash');
+let _ = require('lodash');
 let redis = require('redis').createClient();
 
 let _module = new BackModule('configurations');

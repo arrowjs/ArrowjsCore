@@ -1,13 +1,10 @@
 'use strict';
 
-let util = require('util'),
-    _ = require('lodash');
+let _ = require('lodash');
 let promise = require('bluebird');
 
-let route = 'menus';
-
-
 let _module = new BackModule('menus');
+let route = 'menus';
 
 _module.index = function (req, res) {
     // Add button
