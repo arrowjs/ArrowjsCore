@@ -1,25 +1,24 @@
 'use strict';
 
-var BaseWidget = require(__base + 'core/widgets/base_widget'),
-    util = require('util'),
+var BaseWidget = require(__base + 'core/widgets/BaseWidget'),
     _ = require('lodash');
 
-function FacebookShare() {
-    let _base_config = {
-        alias: "arr_facebook_share",
-        name: "Facebook Share",
-        description: "Facebook Share. Require active Facebook SDK plugin first!",
-        author: "Robin Huy",
-        version: "0.1.0",
-        options: {
-            layout_type: ''
-        }
-    };
-
-    FacebookShare.super_.call(this);
-    _.assign(this, _base_config);
-    this.files = BaseWidget.prototype.getAllLayouts.call(this, _base_config.alias);
+class FacebookShare extends BaseWidget {
+    constructor(){
+        super();
+        let conf = {
+            alias: "arr_facebook_share",
+            name: "Facebook Share",
+            description: "Facebook Share. Require active Facebook SDK plugin first!",
+            author: "Robin Huy",
+            version: "0.1.0",
+            options: {
+                layout_type: ''
+            }
+        };
+        conf = _.assign(this.config, conf);
+        this.files = this.getAllLayouts(conf.alias);
+    }
 }
-util.inherits(FacebookShare, BaseWidget);
 
 module.exports = FacebookShare;

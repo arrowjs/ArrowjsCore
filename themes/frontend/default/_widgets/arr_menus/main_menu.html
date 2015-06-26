@@ -14,6 +14,7 @@
         <li class="{{ cls }}"><a href="{{ menu_data.link }}"> {{ menu_data.name }}</a></li>
     {% endif %}
 {% endmacro %}
+
 <ul class="nav navbar-nav">
     {% for mn in _menus %}
         {% set menu_data = mn.id|get_menu_data(_menus_data) %}

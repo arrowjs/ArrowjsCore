@@ -1,68 +1,78 @@
 "use strict";
 
-var BaseWidget = require(__base + 'core/widgets/base_widget'),
-    util = require('util'),
+/**
+ * Chưa ổn
+ */
+
+var BaseWidget = require(__base + 'core/widgets/BaseWidget'),
     _ = require('lodash'),
     Promise = require('bluebird');
 
-function PickedPosts() {
-    let _base_config = {
-        alias: "arr_picked_posts",
-        name: "Picked posts",
-        description: "Display the picked posts",
-        author: "ZaiChi",
-        version: "0.1.0",
-        options: {
-            id: '',
-            title: '',
-            text_ids: '',
-            display_date: '',
-            display_index: ''
-        }
-    };
-    PickedPosts.super_.call(this);
-    _.assign(this, _base_config);
-    this.files = BaseWidget.prototype.getAllLayouts.call(this, _base_config.alias);
-}
-util.inherits(PickedPosts, BaseWidget);
-
-PickedPosts.prototype.save = function (data, done) {
-    //Processing here
-    if (data.text_ids.length > 0) {
-        let ids = data.text_ids.split(',');
-        if (ids.length > 0) {
-            for (let i = 0; i < ids.length; i++) {
-                ids[i] = parseInt(ids[i]);
+class PickedPosts extends BaseWidget {
+    constructor(){
+        super();
+        let conf = {
+            alias: "arr_picked_posts",
+            name: "Picked posts",
+            description: "Display the picked posts",
+            author: "ZaiChi",
+            version: "0.1.0",
+            options: {
+                id: '',
+                title: '',
+                text_ids: '',
+                display_date: '',
+                display_index: ''
             }
-        }
-        data.text_ids = ids.join(',');
-    } else {
-        data.text_ids = '';
+        };
+        conf = _.assign(this.config, conf);
+        this.files = this.getAllLayouts(conf.alias);
     }
-    return BaseWidget.prototype.save.call(this, data, done);
-};
 
-PickedPosts.prototype.render = function (widget) {
-    let _this = this;
-    return new Promise(function (resolve) {
-        let ids = widget.data.text_ids.split(',');
-        widget.data.text_ids = widget.data.text_ids.trim();
-        if (widget.data.text_ids.length > 0 && ids.length > 0) {
-            __models.posts.findAll({
-                include: [__models.user],
-                order: "hit ASC",
-                attributes: ['id', 'title', 'alias', 'image', 'intro_text', 'created_at'],
-                where: {
-                    id: ids,
-                    type: 'post'
+    save(data, done) {
+        //Processing here
+        console.log("+++++++++++++++");
+        if (data.text_ids.length > 0) {
+            let ids = data.text_ids.split(',');
+            if (ids.length > 0) {
+                for (let i = 0; i < ids.length; i++) {
+                    ids[i] = parseInt(ids[i]);
                 }
-            }).then(function (posts) {
-                resolve(BaseWidget.prototype.render.call(_this, widget, {items: posts}));
-            });
+            }
+            data.text_ids = ids.join(',');
         } else {
-            resolve(BaseWidget.prototype.render.call(_this, widget, {items: []}));
+            data.text_ids = '';
         }
-    });
-};
+        console.log("----------",data);
+        return BaseWidget.prototype.save.call(this, data, done);
+    }
+
+    render(widget){
+        let self = this;
+        return new Promise(function (resolve) {
+            let ids = widget.data.text_ids.split(',');
+            widget.data.text_ids = widget.data.text_ids.trim();
+            console.log("length", widget.data.text_ids.length);
+            if (widget.data.text_ids.length > 0 && ids.length > 0) {
+                console.log("**********");
+
+                __models.post.findAll({
+                    include: [__models.user],
+                    order: "hit ASC",
+                    attributes: ['id', 'title', 'alias', 'image', 'intro_text', 'created_at'],
+                    where: {
+                        id: ids,
+                        type: 'post'
+                    }
+                }).then(function (posts) {
+                    console.log("=======",posts[0]);
+                    resolve(BaseWidget.prototype.render.call(self, widget, {items: posts}));
+                });
+            } else {
+                resolve(BaseWidget.prototype.render.call(self, widget, {items: []}));
+            }
+        });
+    }
+}
 
 module.exports = PickedPosts;
