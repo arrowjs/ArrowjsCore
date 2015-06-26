@@ -57,34 +57,13 @@ _module.setting = function (req, res) {
 };
 
 _module.save_setting = function (req, res, next) {
-    let folder_to_upload = __base + '__config/env/';
     let plugin = __pluginManager.getPlugin(req.params.alias);
-    let form = new formidable.IncomingForm();
-    form.parseAsync(req).then(function (result) {
-        return new Promise(function (fullfil, reject) {
-            let data = result[0];
-            let files = result[1];
+    plugin.options = req.body;
 
-            // Check if key file was uploaded and file type is '.pem'
-            if (files.serviceAKeyFile && files.serviceAKeyFile.name != '' && files.serviceAKeyFile.type == 'application/x-x509-ca-cert') {
-                renameAsync(files.serviceAKeyFile.path, folder_to_upload + files.serviceAKeyFile.name)
-                    .then(function () {
-                        data.serviceAKeyFile = folder_to_upload + files.serviceAKeyFile.name;
-                        fullfil(data);
-                    }).catch(function (err) {
-                        reject(err);
-                    });
-            } else fullfil(data);
-        });
-    }).then(function (data) {
-        plugin.options = data;
-        redis.set(__config.redis_prefix + 'all_plugins', JSON.stringify(__pluginManager.plugins), redis.print);
-        req.flash.success("Saved success");
-        next();
-    }).catch(function (err) {
-        req.flash.error(err.name + ': ' + err.message);
-        next();
-    });
+    redis.set(__config.redis_prefix + 'all_plugins', JSON.stringify(__pluginManager.plugins), redis.print);
+
+    req.flash.success("Saved success");
+    next();
 };
 
 _module.checkSecurity = function (req, res) {
@@ -104,9 +83,9 @@ _module.active = function (req, res) {
     let alias = req.params.alias;
     let plugin = __pluginManager.getPlugin(alias);
 
-    if (plugin.active == undefined || plugin.active == false){
+    if (plugin.active == undefined || plugin.active == false) {
         req.flash.success('Plugin ' + plugin.name + ' has been activated');
-    }else{
+    } else {
         req.flash.warning('Plugin ' + plugin.name + ' has been deactivated');
     }
     plugin.active = !plugin.active;
@@ -119,7 +98,7 @@ _module.reload = function (req, res) {
     let pm = require(__base + 'core/libs/plugins_manager.js');
     pm.reloadAllPlugins();
 
-    req.flash.success("Reload all plugins");
+    req.flash.success("Reload all plugins successfully");
     res.redirect('/admin/plugins');
 };
 
@@ -157,6 +136,8 @@ _module.importPlugin = function (req, res) {
             // Reload all plugins
             let mm = require(__base + 'core/libs/plugins_manager.js');
             mm.reloadAllPlugins();
+
+            req.flash.success("Import plugin successfully");
         } catch (error) {
             req.flash.error(error);
         }

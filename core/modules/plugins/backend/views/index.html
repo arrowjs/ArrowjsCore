@@ -15,7 +15,7 @@
 {% endblock %}
 
 {% block content %}
-    <a class="btn btn-danger" data-toggle="modal" href="#confirm" style="margin-bottom: 10px;">
+    <a class="btn btn-danger" data-toggle="modal" href="/admin/plugins/reload-plugins" style="margin-bottom: 10px;">
         <i class="fa fa-refresh"></i>
         <span class="hidden-480">Reload Plugins</span>
     </a>
@@ -80,26 +80,6 @@
                             </tbody>
                         </table>
                     </div>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <div class="modal fade" id="confirm" tabindex="-1" aria-hidden="true">
-        <div class="modal-dialog">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <button type="button" class="close" data-dismiss="modal" aria-hidden="true"></button>
-                    <h4 class="modal-title">Reload all plugins</h4>
-                </div>
-
-                <div class="modal-body">
-                    Do you want to reload all plugins?
-                </div>
-
-                <div class="modal-footer">
-                    <button type="button" class="btn default" data-dismiss="modal">Cancel</button>
-                    <a href="/admin/plugins/reload-plugins" class="btn btn-danger">OK</a>
                 </div>
             </div>
         </div>

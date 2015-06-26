@@ -48,12 +48,12 @@ _module.reload = function (req, res) {
     let mm = require(__base + 'core/libs/modules_manager.js');
     mm.loadAllModules();
 
-    req.flash.success("Reload all modules");
+    req.flash.success("Reload all modules successfully");
     res.redirect('/admin/modules');
 };
 
 _module.importModule = function (req, res) {
-    let core_module = ['blog', 'configurations', 'dashboard', 'menus', 'modules', 'plugins', 'roles', 'uploads', 'users', 'widgets'];
+    let core_modules = ['blog', 'configurations', 'dashboard', 'menus', 'modules', 'plugins', 'roles', 'uploads', 'users', 'widgets'];
     let max_size = 100;
 
     let form = new formidable.IncomingForm();
@@ -76,17 +76,32 @@ _module.importModule = function (req, res) {
         var zip = new admzip(tmp_path);
         var zipEntries = zip.getEntries();
 
-        // Extract all inside files to app/modules
         try {
-            zipEntries.forEach(function (zipEntry) {
-                if (zipEntry.isDirectory == false) {
-                    zip.extractEntryTo(zipEntry.entryName, __base + 'app/modules/');
+            let extract = true;
+
+            for (let zipEntry in zipEntries){
+                if(zipEntries.hasOwnProperty(zipEntry)){
+                    let entry = zipEntries[zipEntry];
+
+                    // Check if imported module has same name as core module
+                    if(core_modules.indexOf(entry.entryName.split('/')[0]) > -1){
+                        req.flash.error('Cannot import module has same name as core module. Please import manually!');
+                        extract = false;
+                        break;
+                    }
+
+                    // Extract all inside files to app/modules
+                    if (entry.isDirectory == false) {
+                        zip.extractEntryTo(entry.entryName, __base + 'app/modules/');
+                    }
                 }
-            });
+            }
 
             // Reload all modules
             let mm = require(__base + 'core/libs/modules_manager.js');
             mm.loadAllModules();
+
+            if(extract) req.flash.success("Import module successfully");
         } catch (error) {
             req.flash.error(error);
         }

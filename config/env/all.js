@@ -2,7 +2,7 @@
 
 module.exports = {
     key:'site_setting',
-    redis_prefix: 'tech_tm_',
+    redis_prefix: 'arrowjs_',
     app: {
         title: 'Techmaster Việt Nam',
         description: 'Đào tạo công nghệ thông tin | Thiết kế web | Xây dựng ứng dụng di động',

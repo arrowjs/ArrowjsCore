@@ -10,6 +10,10 @@ module.exports = function (modules) {
             {
                 name: 'index',
                 title: 'All Widgets'
+            },
+            {
+                name: 'import',
+                title: 'Import New Widget'
             }
         ],
         backend_menu: {

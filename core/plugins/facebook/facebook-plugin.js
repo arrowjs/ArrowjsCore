@@ -6,7 +6,7 @@ var Promise = require('bluebird'),
 function FacebookPlugin() {
     let _base_config = {
         alias: 'facebook',
-        name: 'Facebook SDK yyy',
+        name: 'Facebook SDK 7',
         author: 'Jack',
         version: '0.1.0',
         description: 'Facebook SDK for JavaScript v2.3',

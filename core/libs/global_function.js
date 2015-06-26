@@ -85,10 +85,12 @@ exports.sortMenus = function (menus) {
  * @returns {object}
  */
 exports.getWidget = function (alias) {
-    for (let i in __widgets) {
-        if (__widgets.hasOwnProperty(i)) {
-            if (__widgets[i].config && __widgets[i].config.alias == alias) {
-                return __widgets[i];
+    let widgets = require(__base + 'core/libs/widgets_manager')();
+
+    for (let i in widgets) {
+        if (widgets.hasOwnProperty(i)) {
+            if (widgets[i].config && widgets[i].config.alias == alias) {
+                return widgets[i];
             }
         }
     }
@@ -393,7 +395,7 @@ exports.checkFileSecurity = function (file_path) {
 
     // Set file path
     if (result.hasOwnProperty('file_activities') || result.hasOwnProperty('database_activities')) {
-        result.file_path = file_path.replace(__base + 'app/modules/', '');
+        result.file_path = file_path.replace(__base + 'app/', '');
     }
 
     return result;

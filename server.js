@@ -21,13 +21,17 @@ global.__models = require(__base + 'core/libs/models_manager');
 global.__acl = require(__base + 'core/libs/acl');
 global.__menus = require(__base + 'core/libs/menus_manager')();
 global.__setting_menu_module = [];
-global.__widgets = require(__base + 'core/libs/widgets_manager')();
 global.__pluginManager = require(__base + 'core/libs/plugins_manager');
 global.__messages = [];
 global.__current_theme = {};
 global.__cache = require(__base + 'core/libs/arr_caching')();
 global.BackModule = require(__base + 'core/libs/BackModule');
 global.FrontModule = require(__base + 'core/libs/FrontModule');
+
+/** Init widgets */
+require(__base + 'core/libs/widgets_manager')();
+
+/** Init plugins */
 __pluginManager.loadAllPlugins();
 
 /** Create app dir if not exist */
