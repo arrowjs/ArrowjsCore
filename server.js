@@ -5,7 +5,8 @@
  */
 let debug = require('debug')('ArrowJs');
 let init = require('./config/init')(),
-    config = require('./config/config');
+    config = require('./config/config'),
+    fs = require('fs');
 
 /**
  * Main application entry file.
@@ -28,6 +29,20 @@ global.__cache = require(__base + 'core/libs/arr_caching')();
 global.BackModule = require(__base + 'core/libs/BackModule');
 global.FrontModule = require(__base + 'core/libs/FrontModule');
 __pluginManager.loadAllPlugins();
+
+/**
+ * Create app dir if not exist
+ */
+try {
+    fs.mkdirSync(__base + 'app', 755);
+    fs.mkdirSync(__base + 'app/custom_filters', 755);
+    fs.mkdirSync(__base + 'app/modules', 755);
+    fs.mkdirSync(__base + 'app/plugins', 755);
+    fs.mkdirSync(__base + 'app/widgets', 755);
+} catch (err) {
+    console.log("Create app dir:");
+    console.log(err);
+}
 
 /** Init the express application */
 let app = require('./config/app')();
