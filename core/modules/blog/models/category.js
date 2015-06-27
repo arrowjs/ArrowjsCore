@@ -1,4 +1,5 @@
 'use strict';
+
 let slug = require('slug');
 
 module.exports = function (sequelize, DataTypes) {
@@ -11,13 +12,13 @@ module.exports = function (sequelize, DataTypes) {
             type: DataTypes.STRING,
             unique: true
         },
-        slug: DataTypes.STRING
+        alias: DataTypes.STRING
     }, {
         tableName: 'arr_category',
         timestamps: false,
         hooks: {
             beforeCreate: function (category, op, fn) {
-                category.slug = slug(category.name).toLowerCase();
+                category.alias = slug(category.name).toLowerCase();
                 fn(null, category);
             }
         }

@@ -97,9 +97,9 @@ _module.update = function (req, res) {
         data.name = data.value;
     }
 
-    if (data.name == 'slug') {
+    if (data.name == 'alias') {
         delete data['name'];
-        data.slug = data.value;
+        data.alias = data.value;
     }
 
     __models.category.find({

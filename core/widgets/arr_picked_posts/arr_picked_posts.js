@@ -1,9 +1,5 @@
 "use strict";
 
-/**
- * Chưa ổn
- */
-
 var BaseWidget = require(__base + 'core/widgets/BaseWidget'),
     _ = require('lodash'),
     Promise = require('bluebird');
@@ -60,7 +56,7 @@ class PickedPosts extends BaseWidget {
             if (widget.data.text_ids.length > 0 && ids.length > 0) {
                 __models.post.findAll({
                     include: [__models.user],
-                    order: "hit ASC",
+                    order: "published_at DESC",
                     attributes: ['id', 'title', 'alias', 'image', 'intro_text', 'created_at'],
                     where: {
                         id: ids,

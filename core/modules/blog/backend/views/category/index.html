@@ -10,19 +10,18 @@
                         <div class="col-md-6 col-sm-6">
                             <div class="row">
                                 <div class="input-group">
-                            <span class="input-group-addon">
-        <i class="fa fa-plus"></i>
-        </span>
+                                    <span class="input-group-addon"><i class="fa fa-plus"></i></span>
                                     <input type="text" class="form-control" name="name">
-                            <span class="input-group-btn">
-        <button class="btn btn-primary btn-flat" type="submit">Thêm danh mục</button>
-        </span>
+                                    <span class="input-group-btn">
+                                        <button class="btn btn-primary btn-flat" type="submit">Thêm danh mục</button>
+                                    </span>
                                 </div>
                             </div>
                         </div>
                     </form>
                 </div>
             </div>
+
             <div class="box box-solid box-primary">
                 <div class="box-body table-responsive no-padding">
                     {% include 'basic_table.html' %}
@@ -32,6 +31,7 @@
         </div>
     </div>
 {% endblock %}
+
 {% block jsExtends %}
     <script>
         function deleteRecords() {

@@ -311,8 +311,6 @@ _module.save = function (req, res) {
                         let count = +cat.count + 1;
                         cat.updateAttributes({
                             count: count
-                        }).on('success', function () {
-                            //console.log(chalk.green('Update cat ' + cat.id + ': count+1 success'));
                         });
                     });
                 });
@@ -347,8 +345,6 @@ _module.delete = function (req, res) {
                             let count = +cat.count - 1;
                             cat.updateAttributes({
                                 count: count
-                            }).on('success', function () {
-                                //console.log(chalk.green('Update cat ' + cat.name + ': count-1 success'));
                             });
                         });
                     });
