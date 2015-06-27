@@ -31,9 +31,9 @@ class PostArchives extends BaseWidget {
 
         let sql = "";
         if (widget.data.show_post_count == '1') {
-            sql = "SELECT count(id) AS count, ConCat(to_char(created_at, 'YYYY-MM'),'-01') AS date, ConCat(to_char(created_at, 'YYYY-MM'),'-99') AS dateX FROM arr_post WHERE type='post' GROUP BY date, dateX ORDER BY date DESC";
+            sql = "SELECT COUNT(id) AS count, CONCAT(TO_CHAR(created_at, 'YYYY-MM'),'-01') AS date, CONCAT(TO_CHAR(created_at, 'YYYY-MM'),'-99') AS dateX FROM arr_post WHERE type='post' GROUP BY date, dateX ORDER BY date DESC";
         } else {
-            sql = "SELECT ConCat(to_char(created_at, 'YYYY-MM'),'-01') AS date, ConCat(to_char(created_at, 'YYYY-MM'),'-99') AS dateX FROM arr_post WHERE type='post' GROUP BY date, dateX ORDER BY date DESC";
+            sql = "SELECT CONCAT(TO_CHAR(created_at, 'YYYY-MM'),'-01') AS date, CONCAT(TO_CHAR(created_at, 'YYYY-MM'),'-99') AS dateX FROM arr_post WHERE type='post' GROUP BY date, dateX ORDER BY date DESC";
         }
 
         return new Promise(function (resolve, reject) {

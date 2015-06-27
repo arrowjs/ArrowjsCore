@@ -3,28 +3,7 @@
 {% block content %}
     <div class="row">
         <div class="col-md-12">
-            <div class="form-group">
-                <label for="number_to_show">Number of posts to show</label>
-                <input type="text" class="form-control" name="number_to_show" id="number_to_show" value="{{ widget.data.number_to_show }}">
-            </div>
-        </div>
-    </div>
 
-    <div class="row">
-        <div class="col-md-12">
-            <div class="form-group">
-                <label for="display_date">Display date</label>
-                <input type="checkbox" value="1" {% if widget.data.display_date == '1' %}checked="checked" {% endif %} name="display_date" id="display_date">
-            </div>
         </div>
     </div>
-
-    <div class="row">
-        <div class="col-md-12">
-            <div class="form-group">
-                <label for="display_index">Display index</label>
-                <input type="checkbox" value="1" {% if widget.data.display_index == '1' %}checked="checked" {% endif %} name="display_index" id="display_index">
-            </div>
-        </div>
-    </div>
-    {% endblock %}
+{% endblock %}

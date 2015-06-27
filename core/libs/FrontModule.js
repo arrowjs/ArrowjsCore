@@ -1,12 +1,13 @@
 'use strict';
 
-let BaseModule = require('./baseModule.js');
-let _ = require('lodash');
+let BaseModule = require('./BaseModule.js');
+let fs = require('fs'),
+    _ = require('lodash');
 
-class BackModule extends BaseModule {
+class FrontModule extends BaseModule {
     constructor(path) {
         super(path);
-        this.env = __.createNewEnv([__base + 'app/modules/', __base + 'core/modules/', __base + 'themes/backend/default/']);
+        this.env = __.createNewEnv([__base + 'app/modules/', __base + 'core/modules/', __base + 'themes/frontend/']);
     }
 
     render(req, res, view, options, fn) {
@@ -17,14 +18,24 @@ class BackModule extends BaseModule {
 
         // Clear session messages
         req.session.messages = [];
+
         if (view.indexOf('.html') == -1) {
             view += '.html';
         }
 
-        if (self.path.indexOf('/') == 0) {
-            view = self.path.substring(1) + '/backend/views/' + view;
+        let tmp = __config.theme + '/_modules' + self.path + '/' + view;
+
+        if (fs.existsSync(__base + 'themes/frontend/' + tmp)) {
+            this.env.loaders[0].searchPaths = [__base + 'themes/frontend' ];
+            view = __config.theme + '/_modules' + self.path + '/' + view;
         } else {
-            view = self.path + '/backend/views/' + view;
+            this.env.loaders[0].searchPaths = [__base + 'app/modules', __base + 'core/modules', __base + 'themes/frontend', __base + 'themes/frontend/' + __config.theme];
+
+            if (self.path.indexOf('/') == 0) {
+                view = self.path.substring(1) + '/frontend/views/' + view;
+            } else {
+                view = self.path + '/views/' + view;
+            }
         }
 
         if (fn) {
@@ -33,7 +44,7 @@ class BackModule extends BaseModule {
             this.env.render(view, _.assign(res.locals, options), function (err, re) {
                 if (err) {
                     res.send(err.stack);
-                }else{
+                } else {
                     res.send(re);
                 }
             });
@@ -46,11 +57,12 @@ class BackModule extends BaseModule {
 
         // Clear session messages
         req.session.messages = [];
+
         if (view.indexOf('.html') == -1) {
             view += '.html';
         }
 
-        this.env.loaders[0].searchPaths = [__base + 'themes/backend/default'];
+        this.env.loaders[0].searchPaths = [__base + '/themes/frontend/', __base + '/themes/frontend/' + __config.theme];
 
         this.env.render(view, _.assign(res.locals, {}), function (err, re) {
             res.send(re);
@@ -66,4 +78,4 @@ class BackModule extends BaseModule {
     }
 }
 
-module.exports = BackModule;
+module.exports = FrontModule;
