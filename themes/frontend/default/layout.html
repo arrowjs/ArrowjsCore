@@ -40,8 +40,6 @@
 {% block content %}
 {% endblock %}
 
-{{ "test"|get_sidebar(route)|safe }}
-
 <section id="bottom">
     <div class="container wow fadeInDown" data-wow-duration="1000ms" data-wow-delay="600ms">
         <div class="row">
@@ -111,6 +109,8 @@
         </div>
     </div>
 </section>
+
+{{ "sidebar1"|get_sidebar(route)|safe }}
 <!--/#bottom-->
 
 {% include 'default/footer.html' %}

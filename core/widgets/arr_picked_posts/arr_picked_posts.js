@@ -9,8 +9,9 @@ var BaseWidget = require(__base + 'core/widgets/BaseWidget'),
     Promise = require('bluebird');
 
 class PickedPosts extends BaseWidget {
-    constructor(){
+    constructor() {
         super();
+
         let conf = {
             alias: "arr_picked_posts",
             name: "Picked posts",
@@ -26,12 +27,13 @@ class PickedPosts extends BaseWidget {
             }
         };
         conf = _.assign(this.config, conf);
+
         this.files = this.getAllLayouts(conf.alias);
     }
 
     save(data, done) {
-        //Processing here
-        console.log("+++++++++++++++");
+        let base_save = super.save;
+
         if (data.text_ids.length > 0) {
             let ids = data.text_ids.split(',');
             if (ids.length > 0) {
@@ -43,19 +45,19 @@ class PickedPosts extends BaseWidget {
         } else {
             data.text_ids = '';
         }
-        console.log("----------",data);
-        return BaseWidget.prototype.save.call(this, data, done);
+
+        return base_save.call(this, data, done);
     }
 
-    render(widget){
+    render(widget) {
+        let base_render = super.render;
         let self = this;
+
         return new Promise(function (resolve) {
             let ids = widget.data.text_ids.split(',');
             widget.data.text_ids = widget.data.text_ids.trim();
-            console.log("length", widget.data.text_ids.length);
-            if (widget.data.text_ids.length > 0 && ids.length > 0) {
-                console.log("**********");
 
+            if (widget.data.text_ids.length > 0 && ids.length > 0) {
                 __models.post.findAll({
                     include: [__models.user],
                     order: "hit ASC",
@@ -65,11 +67,10 @@ class PickedPosts extends BaseWidget {
                         type: 'post'
                     }
                 }).then(function (posts) {
-                    console.log("=======",posts[0]);
-                    resolve(BaseWidget.prototype.render.call(self, widget, {items: posts}));
+                    resolve(base_render.call(self, widget, {items: posts}));
                 });
             } else {
-                resolve(BaseWidget.prototype.render.call(self, widget, {items: []}));
+                resolve(base_render.call(self, widget, {items: []}));
             }
         });
     }

@@ -4,14 +4,10 @@ var BaseWidget = require(__base + 'core/widgets/BaseWidget'),
     _ = require('lodash'),
     Promise = require('bluebird');
 
-
-
 class Categories extends BaseWidget {
-
-
-
     constructor() {
         super();
+
         let conf = {
             alias: "arr_categories",
             name: "Categories",
@@ -22,12 +18,15 @@ class Categories extends BaseWidget {
                 title: ''
             }
         };
+
         conf = _.assign(this.config, conf);
+
         this.files = this.getAllLayouts(conf.alias);
     }
 
-    render(widget){
-       let self = this;
+    render(widget) {
+        let base_render = super.render;
+        let self = this;
 
         return new Promise(function (resolve) {
             __models.category.findAll({
@@ -42,13 +41,12 @@ class Categories extends BaseWidget {
                     resultsCategories.push(parent);
                 });
 
-                resolve(BaseWidget.prototype.render.call(self, widget, {items: resultsCategories}));
+                resolve(base_render.call(self, widget, {items: resultsCategories}));
             });
         })
-
     }
-
 }
+
 let StringUtilities = {
     repeat: function (str, times) {
         return (new Array(times + 1)).join(str);

@@ -7,9 +7,7 @@ let _ = require('lodash'),
     admzip = require('adm-zip');
 
 let Promise = require('bluebird');
-
 Promise.promisifyAll(formidable);
-let renameAsync = Promise.promisify(require('fs').rename);
 
 let _module = new BackModule('plugins');
 

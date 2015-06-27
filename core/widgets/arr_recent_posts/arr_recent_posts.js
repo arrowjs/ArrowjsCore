@@ -1,13 +1,13 @@
 "use strict";
 
-
 var BaseWidget = require(__base + 'core/widgets/BaseWidget'),
     _ = require('lodash'),
     Promise = require('bluebird');
 
 class RecentPosts extends BaseWidget {
-    constructor(){
+    constructor() {
         super();
+
         let conf = {
             alias: "arr_recent_posts",
             name: "Recent posts",
@@ -22,10 +22,13 @@ class RecentPosts extends BaseWidget {
             }
         };
         conf = _.assign(this.config, conf);
+
         this.files = this.getAllLayouts(conf.alias);
     }
 
-    save(data, done){
+    save(data, done) {
+        let base_save = super.save;
+
         if (data.text_ids.length > 0) {
             let ids = data.text_ids.split(',');
 
@@ -39,11 +42,13 @@ class RecentPosts extends BaseWidget {
         } else {
             data.text_ids = '';
         }
-        return BaseWidget.prototype.save.call(this, data, done);
+        return base_save.call(this, data, done);
     }
 
-    render(widget){
+    render(widget) {
+        let base_render = super.render;
         let self = this;
+
         return new Promise(function (resolve) {
             let conditions = "type = 'post'";
 
@@ -56,16 +61,17 @@ class RecentPosts extends BaseWidget {
             }
 
             let limit = 5;
-            if(!isNaN(parseInt(widget.data.number_to_show))){
+            if (!isNaN(parseInt(widget.data.number_to_show))) {
                 limit = widget.data.number_to_show;
             }
+
             __models.post.findAll({
                 order: "published_at DESC",
                 attributes: ['title', 'alias', 'id', 'published_at'],
                 where: [conditions],
                 limit: limit
             }).then(function (posts) {
-                resolve(BaseWidget.prototype.render.call(self, widget, {items: posts}));
+                resolve(base_render.call(self, widget, {items: posts}));
             });
         });
     }

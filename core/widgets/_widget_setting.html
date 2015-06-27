@@ -6,13 +6,13 @@
         {% block title %}
             <div class="col-md-12">
                 <div class="form-group">
-                    <label>Title</label>
+                    <label for="title">Title</label>
                     <input type="text" class="form-control" name="title" id="title" value="{{ widget.data.title }}">
                 </div>
             </div>
             <div class="col-md-12">
                 <div class="form-group">
-                    <label>Class</label>
+                    <label for="cls">Class</label>
                     <input type="text" class="form-control" name="cls" id="cls" value="{{ widget.data.cls }}">
                 </div>
             </div>
@@ -26,8 +26,8 @@
         <div class="row">
             <div class="col-md-12">
                 <div class="form-group">
-                    <label>Layout file</label>
-                    <select class="form-control" name="file">
+                    <label for="file">Layout file</label>
+                    <select class="form-control" name="file" id="file">
                         {% for file in files %}
                             {% if file == widget.data.file %}
                                 <option selected value="{{ file }}">{{ file }}</option>
@@ -39,6 +39,7 @@
                 </div>
             </div>
         </div>
+
         <div class="row">
             <div class="col-md-12">
                 <div class="form-group">

@@ -47,6 +47,7 @@ class Menus extends BaseWidget {
     }
 
     render(widget, route) {
+        let base_render = super.render;
         let self = this;
 
         return new Promise(function (resolve, reject) {
@@ -59,7 +60,7 @@ class Menus extends BaseWidget {
                 }).then(function (menu_details) {
                     let menu_order = JSON.parse(menu.menu_order);
 
-                    resolve(BaseWidget.prototype.render.call(self, widget, {
+                    resolve(base_render.call(self, widget, {
                         route: route,
                         _menus: menu_order,
                         _menus_data: menu_details

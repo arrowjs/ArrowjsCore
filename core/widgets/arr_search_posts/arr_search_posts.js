@@ -5,8 +5,9 @@ var BaseWidget = require(__base + 'core/widgets/BaseWidget'),
     Promise = require('bluebird');
 
 class SearchPosts extends BaseWidget {
-    constructor(){
+    constructor() {
         super();
+
         let conf = {
             alias: "arr_search_posts",
             name: "Search posts",
@@ -20,15 +21,19 @@ class SearchPosts extends BaseWidget {
                 button_name: ''
             }
         };
-        conf =  _.assign(this.config, conf);
+        conf = _.assign(this.config, conf);
+
         this.files = this.getAllLayouts(conf.alias);
     }
 
-    save(data, done){
+    save(data, done) {
+        let base_save = super.save;
+
         if (data.button_name.length == 0) {
             data.button_name = 'Search';
         }
-        return BaseWidget.prototype.save.call(this, data, done);
+
+        return base_save.call(this, data, done);
     }
 }
 

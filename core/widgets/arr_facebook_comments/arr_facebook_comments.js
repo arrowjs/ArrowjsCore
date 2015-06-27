@@ -1,11 +1,10 @@
 'use strict';
 
-
 var BaseWidget = require(__base + 'core/widgets/BaseWidget'),
     _ = require('lodash');
 
-class FacebookComments extends BaseWidget{
-    constructor(){
+class FacebookComments extends BaseWidget {
+    constructor() {
         super();
         let conf = {
             alias: "arr_facebook_comments",
@@ -23,7 +22,6 @@ class FacebookComments extends BaseWidget{
 
         this.files = this.getAllLayouts(conf.alias);
     }
-
 }
 
 module.exports = FacebookComments;
