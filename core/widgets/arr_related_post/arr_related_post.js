@@ -32,7 +32,7 @@ class RelatedPost extends BaseWidget {
         let self = this;
 
         return new Promise(function (resolve) {
-            let conditions = "status = 'publish'";
+            let conditions = "published_at = 1";
 
             let limit = 5;
             if (!isNaN(parseInt(widget.data.number_to_show))) {
@@ -40,9 +40,9 @@ class RelatedPost extends BaseWidget {
             }
 
             __models.post.findAll({
-                // order: "publish_date DESC",
-                attributes: ['title', 'name', 'id', 'publish_date'],
+                attributes: ['id', 'title', 'name', 'publish_date'],
                 // where: conditions,
+                // order: "publish_date DESC",
                 limit: limit
             }).then(function (posts) {
                 resolve(base_render.call(self, widget, {items: posts}));

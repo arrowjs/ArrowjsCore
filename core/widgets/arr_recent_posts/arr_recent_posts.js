@@ -67,7 +67,7 @@ class RecentPosts extends BaseWidget {
 
             __models.post.findAll({
                 order: "published_at DESC",
-                attributes: ['title', 'alias', 'id', 'published_at'],
+                attributes: ['id', 'title', 'alias', 'published_at'],
                 where: [conditions],
                 limit: limit
             }).then(function (posts) {
