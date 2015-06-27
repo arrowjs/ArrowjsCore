@@ -15,12 +15,10 @@ module.exports = function (sequelize, DataTypes) {
             allowNull: false
         },
         image: DataTypes.STRING(255),
-        tags: DataTypes.TEXT,
         published: DataTypes.INTEGER,
         published_at: DataTypes.DATE,
         categories: DataTypes.TEXT,
         type: DataTypes.STRING(15),
-        seo_info: DataTypes.JSONB,
         created_at: DataTypes.DATE,
         created_by: DataTypes.INTEGER,
         modified_at: DataTypes.DATE,
