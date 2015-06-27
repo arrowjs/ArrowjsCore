@@ -28,22 +28,22 @@ class RelatedPost extends BaseWidget {
 
     render(widget){
         let self = this;
+        let k = super.render;
         return new Promise(function (resolve) {
-            let conditions = "status = 'publish'";
+            let conditions = "published = 1";
 
             let limit = 5;
             if(!isNaN(parseInt(widget.data.number_to_show))){
                 limit = widget.data.number_to_show;
             }
-            console.log("=======");
             __models.post.findAll({
-               // order: "publish_date DESC",
-                attributes: ['title', 'name', 'id', 'publish_date'],
-               // where: conditions,
+               order: "published_at DESC",
+                attributes: ['title', 'id', 'published_at'],
+               where: [conditions],
                 limit: limit
             }).then(function (posts) {
-                console.log(posts[0]);
-                resolve(BaseWidget.prototype.render.call(self, widget, {items: posts}));
+
+                resolve(k.call(self,widget, {items: posts}));
             });
         });
     }
