@@ -38,7 +38,9 @@ class PostTopView extends BaseWidget {
                 order: "hit DESC",
                 limit: parseInt(widget.data.number_to_show)
             }).then(function (posts) {
-                resolve(base_render.call(self, widget, {items: posts}));
+                resolve(base_render.call(self, widget, {
+                    items: posts
+                }));
             });
         });
     }

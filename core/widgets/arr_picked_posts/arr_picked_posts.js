@@ -63,10 +63,14 @@ class PickedPosts extends BaseWidget {
                         type: 'post'
                     }
                 }).then(function (posts) {
-                    resolve(base_render.call(self, widget, {items: posts}));
+                    resolve(base_render.call(self, widget, {
+                        items: posts
+                    }));
                 });
             } else {
-                resolve(base_render.call(self, widget, {items: []}));
+                resolve(base_render.call(self, widget, {
+                    items: []
+                }));
             }
         });
     }

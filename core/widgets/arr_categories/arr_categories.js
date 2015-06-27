@@ -32,7 +32,9 @@ class Categories extends BaseWidget {
             __models.category.findAll({
                 order: "name ASC"
             }).then(function (categories) {
-                resolve(base_render.call(self, widget, {items: categories}));
+                resolve(base_render.call(self, widget, {
+                    items: categories
+                }));
             });
         })
     }

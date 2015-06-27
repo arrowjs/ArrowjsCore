@@ -38,7 +38,9 @@ class PostArchives extends BaseWidget {
 
         return new Promise(function (resolve, reject) {
             __models.sequelize.query(sql).then(function (archives) {
-                resolve(base_render.call(self, widget, {items: archives[0]}));
+                resolve(base_render.call(self, widget, {
+                    items: archives[0]
+                }));
             });
         });
     }
