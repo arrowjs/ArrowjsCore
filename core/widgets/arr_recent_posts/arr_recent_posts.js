@@ -71,7 +71,9 @@ class RecentPosts extends BaseWidget {
                 where: [conditions],
                 limit: limit
             }).then(function (posts) {
-                resolve(base_render.call(self, widget, {items: posts}));
+                resolve(base_render.call(self, widget, {
+                    items: posts
+                }));
             });
         });
     }
