@@ -189,7 +189,9 @@ _module.update = function (req, res, next) {
     res.locals.deleteButton = __acl.addButton(req, route, 'post_delete');
 
     let data = req.body;
-    data.seo_info = decodeURIComponent(data.seo_info);
+
+    data.categories = data.categories || "";
+
     data.author_visible = (data.author_visible != null);
     if (!data.published) data.published = 0;
 
@@ -200,7 +202,6 @@ _module.update = function (req, res, next) {
             tag.shift();
             tag.pop(tag.length - 1);
         } else tag = [];
-
         let newtag = data.categories;
         if (newtag != null && newtag != '') {
             newtag = newtag.split(':');
@@ -220,16 +221,15 @@ _module.update = function (req, res, next) {
                         return current_b == current
                     }).length == 0
             });
-
             onlyInB = newtag.filter(function (current) {
                 return tag.filter(function (current_a) {
                         return current_a == current
                     }).length == 0
             });
+
         }
 
         if (data.published != post.published && data.published == 1) data.published_at = __models.sequelize.fn('NOW');
-
         post.updateAttributes(data).then(function () {
             Promise.all([
                 function () {
