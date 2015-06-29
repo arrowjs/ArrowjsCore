@@ -2,47 +2,46 @@
 
 module.exports = function (modules) {
     modules.users = {
-        title: 'Users',
+        title: __.t('m_users_title'),
         author: 'Nguyen Van Thanh',
         version: '0.1.0',
-        description: 'Users management of website',
+        description: __.t('m_users_description'),
         rules: [
             {
                 name: 'index',
-                title: 'All Users'
+                title: __.t('m_users_rule_index')
             },
             {
                 name: 'create',
-                title: 'Create New'
+                title: __.t('m_users_rule_create')
             },
             {
                 name: 'update',
-                title: 'Update'
+                title: __.t('m_users_rule_update')
             },
             {
-                name: 'update_profile',
-                title: 'Update profile'
+                name: "update_profile",
+                title: __.t('m_users_rule_update_profile')
             },
             {
                 name: 'delete',
-                title: 'Delete'
+                title: __.t('m_users_rule_delete')
             }
         ],
         backend_menu: {
-            title: __.t('m_user_title'),
+            title: __.t('m_users_title'),
             icon: "fa fa-user",
             menus: [
                 {
                     rule: 'index',
-                    title: 'All users',
+                    title: __.t('m_users_rule_index'),
                     link: '/'
                 },
                 {
                     rule: 'create',
-                    title: 'Create new user',
+                    title: __.t('m_users_rule_create'),
                     link: '/create'
                 }
-
             ]
         }
     };

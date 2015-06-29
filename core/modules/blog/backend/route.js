@@ -5,7 +5,6 @@ let express = require('express'),
     category = require('./controllers/category'),
     post = require('./controllers/post'),
     page = require('./controllers/page');
-
 let moduleName = 'blog';
 
 router.route('/blog').get(__acl.isAllow(moduleName, 'post_index'), post.list);

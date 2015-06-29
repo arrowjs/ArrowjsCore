@@ -430,13 +430,13 @@ exports.checkDirectorySecurity = function (path, result) {
 
 /**
  * Translate text with language in lang folder
- * @params {array}
- * @returns {string}
+ * @params {string} - String arguments to translate, argument 0 is translate key
+ * @returns {string} - Translated string or Undefined if translate key is not exists
  */
 exports.t = function () {
     let currentLang = __config.app.language;
 
     var args = Array.prototype.slice.call(arguments);
-    args[0] = __lang[currentLang][args[0]];
+    args[0] = __lang[currentLang][args[0]] || 'Undefined';
     return util.format.apply(util, args);
 };
