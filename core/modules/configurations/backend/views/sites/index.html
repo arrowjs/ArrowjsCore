@@ -12,11 +12,11 @@
     <div class="row">
         <div class="col-md-12">
             <form id="edit-form" method="post" role="form">
-                <div class="nav-tabs-custom" style="cursor: move;">
-                    <!-- Tabs within a box -->
+                <div class="nav-tabs-custom">
                     <ul class="nav nav-tabs pull-right ui-sortable-handle">
                         <li class=""><a href="#redis-setting" data-toggle="tab" aria-expanded="false">Redis</a></li>
-                        <li class=""><a href="#database-setting" data-toggle="tab" aria-expanded="false">Database</a>
+                        <li class="">
+                            <a href="#database-setting" data-toggle="tab" aria-expanded="false">Database</a>
                         </li>
                         <li class="active"><a href="#site-setting" data-toggle="tab" aria-expanded="true">Site</a></li>
                         <li class="pull-left header"><i class="fa fa-inbox"></i> Setting</li>
@@ -25,7 +25,6 @@
                     <div class="row">
                         <div class="col-md-12">
                             <div class="tab-content">
-                                <!-- Morris chart - Sales -->
                                 <div class="tab-pane active" id="site-setting">
                                     <div class="col-sm-6">
                                         <div class="form-group">
@@ -42,16 +41,29 @@
                                     </div>
 
                                     <div class="col-sm-6">
-                                        <div class="form-group">
-                                            <label>Logo</label>
-                                            <input type="text" name="logo" class="form-control"
-                                                   value="{{ config.app.logo }}">
-                                        </div>
+                                        {#<div class="form-group">#}
+                                        {#<label>Logo</label>#}
+                                        {#<input type="text" name="logo" class="form-control"#}
+                                        {#value="{{ config.app.logo }}">#}
+                                        {#</div>#}
+
+                                        {#<div class="form-group">#}
+                                        {#<label>Icon</label>#}
+                                        {#<input type="text" name="icon" class="form-control"#}
+                                        {#value="{{ config.app.icon }}">#}
+                                        {#</div>#}
 
                                         <div class="form-group">
-                                            <label>Icon</label>
-                                            <input type="text" name="icon" class="form-control"
-                                                   value="{{ config.app.icon }}">
+                                            <label>Language code</label>
+                                            <select name="language" id="language" class="form-control">
+                                                {% for key, value in lang %}
+                                                    {% if key == config.app.language %}
+                                                        <option value="{{ key }}" selected>{{ key }}</option>
+                                                    {% else %}
+                                                        <option value="{{ key }}">{{ key }}</option>
+                                                    {% endif %}
+                                                {% endfor %}
+                                            </select>
                                         </div>
                                     </div>
 

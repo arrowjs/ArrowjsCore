@@ -23,7 +23,6 @@ module.exports = function (sequelize, DataTypes) {
 
         classMethods: {
             associate: function (models) {
-                User.hasOne(models.users_info, {foreignKey: 'user_id'});
                 User.hasMany(models.menus, {foreignKey: 'id'});
                 User.hasMany(models.menu_detail, {foreignKey: 'id'});
                 User.belongsTo(models.role, {foreignKey: 'role_id'});
@@ -48,7 +47,6 @@ module.exports = function (sequelize, DataTypes) {
                 fn(null, user);
             }
         }
-
     });
 
     return User;

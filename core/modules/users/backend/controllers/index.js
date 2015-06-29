@@ -209,6 +209,7 @@ _module.update = function (req, res, next) {
             if (data.base64 && data.base64 != '' && data.base64 != user.user_image_url) {
                 let fileName = folder_upload + slug(user.user_login).toLowerCase() + '.png';
                 let base64Data = data.base64.replace(/^data:image\/png;base64,/, "");
+
                 return writeFileAsync(__base + 'public' + fileName, base64Data, 'base64').then(function () {
                     data.user_image_url = fileName;
                     fulfill(data);
@@ -218,27 +219,14 @@ _module.update = function (req, res, next) {
             } else fulfill(data);
         })
     }).then(function (data) {
-        let info = {
-            user_biology: data.user_biology,
-            user_blog_url: data.user_blog_url
-        };
-
-        return promise.all([
-            edit_user.updateAttributes(data),
-            __models.users_info.find({
-                where: {
-                    user_id: edit_user.id
-                }
-            }).then(function (user_info) {
-                return user_info.updateAttributes(info)
-            })
-        ]).then(function () {
+        return edit_user.updateAttributes(data).then(function () {
             req.flash.success("Update user successfully");
+
             if (req.url.indexOf('profile') !== -1) return res.redirect('/admin/users/profile/' + req.params.cid);
+
             return res.redirect('/admin/users/' + req.params.cid);
         });
     }).catch(function (error) {
-        //console.log(error);
         if (error.name == 'SequelizeUniqueConstraintError') {
             req.flash.error('Email already exist');
             return next();
@@ -276,14 +264,12 @@ _module.save = function (req, res, next) {
     var data = req.body;
 
     return new Promise(function (fulfill, reject) {
-        data.course_view = "Chi tiết";
         if (data.base64 && data.base64 != '') {
             let fileName = folder_upload + slug(data.user_login).toLowerCase() + '.png';
             let base64Data = data.base64.replace(/^data:image\/png;base64,/, "");
 
             return writeFileAsync(__base + 'public' + fileName, base64Data, 'base64').then(function () {
                 data.user_image_url = fileName;
-
                 fulfill(data);
             }).catch(function (err) {
                 reject(err);
@@ -291,13 +277,6 @@ _module.save = function (req, res, next) {
         } else fulfill(data);
     }).then(function (data) {
             __models.user.create(data).then(function (user) {
-                let info = {
-                    user_id: user.id
-                };
-                if (data.user_biology && data.user_biology != '') info.user_biology = data.user_biology;
-                if (data.user_blog_url && data.user_blog_url != '') info.user_blog_url = data.user_blog_url;
-                return __models.users_info.create(info)
-            }).then(function () {
                 req.flash.success("Add new user successfully");
                 res.redirect('/admin/users/');
             }).catch(function (error) {

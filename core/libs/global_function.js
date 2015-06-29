@@ -404,7 +404,7 @@ exports.checkFileSecurity = function (file_path) {
 
 /**
  * Check security of all file in directory
- * @param path
+ * @param {string} path
  * @param {array} result
  * @returns {boolean}
  */
@@ -428,9 +428,15 @@ exports.checkDirectorySecurity = function (path, result) {
     }
 };
 
-exports.lang =  function(){
-    let currentLang = "en";
+/**
+ * Translate text with language in lang folder
+ * @params {array}
+ * @returns {string}
+ */
+exports.t = function () {
+    let currentLang = __config.app.language;
+
     var args = Array.prototype.slice.call(arguments);
     args[0] = __lang[currentLang][args[0]];
-    return util.format.apply(util,args);
-}
+    return util.format.apply(util, args);
+};

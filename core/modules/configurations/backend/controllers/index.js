@@ -7,7 +7,8 @@ let _module = new BackModule('configurations');
 
 _module.index = function (req, res) {
     _module.render(req, res, 'sites/index', {
-        __config: __config,
+        config: __config,
+        lang: __lang,
         title: 'Cấu hình hệ thống'
     });
 };
@@ -20,6 +21,7 @@ _module.update_setting = function (req, res, next) {
     __config.app.description = data.description;
     __config.app.logo = data.logo;
     __config.app.icon = data.icon;
+    __config.app.language = data.language;
     __config.pagination.number_item = data.number_item;
 
     // Database info
@@ -40,9 +42,13 @@ _module.update_setting = function (req, res, next) {
     // Redis info
     __config.redis.host = data.redis_host;
     __config.redis.port = data.redis_port;
-
     redis.set(__config.redis_prefix + __config.key, JSON.stringify(__config), redis.print);
-    req.flash.success('Saved success');
+
+    // Reload all modules
+    let mm = require(__base + 'core/libs/modules_manager.js');
+    mm.loadAllModules();
+
+    req.flash.success('Setting was saved successfully');
     next();
 };
 

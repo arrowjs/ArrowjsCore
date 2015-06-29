@@ -16,7 +16,7 @@ _module.index = function (req, res) {
     let current_theme;
     for (let i in themes) {
         if (themes.hasOwnProperty(i) && themes[i].alias.toLowerCase() == __config.theme.toLowerCase()) {
-            current_theme = __current_theme = themes[i];
+            current_theme = themes[i];
         }
     }
 
@@ -39,7 +39,7 @@ _module.detail = function (req, res) {
     let current_theme;
     for (let i in themes) {
         if (themes.hasOwnProperty(i) && themes[i].alias.toLowerCase() == req.params.themeName) {
-            current_theme = __current_theme = themes[i];
+            current_theme = themes[i];
         }
     }
 

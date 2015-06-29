@@ -14,18 +14,17 @@ let init = require('./config/init')(),
  */
 global.__base = __dirname + '/';
 global.__config = config;
-global.__lang = require(__base + 'core/libs/multilanguage.js')();
-global.__utils = require(__base + 'core/libs/utils');
 global.__ = require(__base + 'core/libs/global_function');
-global.__modules = require(__base + 'core/libs/modules_manager')();
-global.__models = require(__base + 'core/libs/models_manager');
+global.__lang = require(__base + 'core/libs/i18n.js')();
+global.__utils = require(__base + 'core/libs/utils');
 global.__acl = require(__base + 'core/libs/acl');
-global.__menus = require(__base + 'core/libs/menus_manager')();
-global.__setting_menu_module = [];
+global.__models = require(__base + 'core/libs/models_manager');
 global.__pluginManager = require(__base + 'core/libs/plugins_manager');
-global.__messages = [];
-global.__current_theme = {};
+global.__menus = require(__base + 'core/libs/menus_manager')();
+global.__modules = require(__base + 'core/libs/modules_manager')();
 global.__cache = require(__base + 'core/libs/arr_caching')();
+global.__messages = [];
+global.__setting_menu_module = [];
 global.BackModule = require(__base + 'core/libs/BackModule');
 global.FrontModule = require(__base + 'core/libs/FrontModule');
 

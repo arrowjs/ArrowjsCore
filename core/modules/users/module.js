@@ -29,7 +29,7 @@ module.exports = function (modules) {
             }
         ],
         backend_menu: {
-            title: 'Users',
+            title: __.t('m_user_title'),
             icon: "fa fa-user",
             menus: [
                 {
