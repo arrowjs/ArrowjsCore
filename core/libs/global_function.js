@@ -1,7 +1,8 @@
 'use strict';
 
 let mailer = require('nodemailer'),
-    fs = require('fs');
+    fs = require('fs'),
+    util = require('util');
 
 /**
  * Create breadcrumb
@@ -427,3 +428,9 @@ exports.checkDirectorySecurity = function (path, result) {
     }
 };
 
+exports.lang =  function(){
+    let currentLang = "en";
+    var args = Array.prototype.slice.call(arguments);
+    args[0] = __lang[currentLang][args[0]];
+    return util.format.apply(util,args);
+}
