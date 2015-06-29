@@ -14,6 +14,7 @@ let init = require('./config/init')(),
  */
 global.__base = __dirname + '/';
 global.__config = config;
+global.__lang = require(__base + 'core/libs/multilanguage.js')();
 global.__utils = require(__base + 'core/libs/utils');
 global.__ = require(__base + 'core/libs/global_function');
 global.__modules = require(__base + 'core/libs/modules_manager')();
