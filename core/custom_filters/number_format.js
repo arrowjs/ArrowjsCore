@@ -1,11 +1,10 @@
 "use strict";
 
 /** Format currency */
-let config = require(__base + 'config/config');
 
 module.exports = function (env) {
     env.addFilter('number_format', function (value) {
-        let format = config.number_format;
+        let format = __config.number_format;
         let c = format.length;
         let d = format.decimal;
         let t = format.thousand;

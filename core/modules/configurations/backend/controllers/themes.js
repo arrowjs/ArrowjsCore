@@ -9,7 +9,7 @@ let route = 'configurations';
 _module.index = function (req, res) {
     let themes = [];
 
-    __config.getGlobbedFiles(__base + 'themes/frontend/*/theme.json').forEach(function (filePath) {
+    __.getGlobbedFiles(__base + 'themes/frontend/*/theme.json').forEach(function (filePath) {
         themes.push(require(filePath));
     });
 
@@ -32,7 +32,7 @@ _module.detail = function (req, res) {
 
     let themes = [];
 
-    __config.getGlobbedFiles(__base + 'themes/frontend/*/theme.json').forEach(function (filePath) {
+    __.getGlobbedFiles(__base + 'themes/frontend/*/theme.json').forEach(function (filePath) {
         themes.push(require(filePath));
     });
 

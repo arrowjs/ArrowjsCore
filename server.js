@@ -4,16 +4,14 @@
  * Module dependencies.
  */
 let debug = require('debug')('ArrowJs');
-let init = require('./config/init')(),
-    config = require('./config/config'),
-    fs = require('fs');
+let fs = require('fs');
 
 /**
  * Main application entry file.
  * Please note that the order of loading is important.
  */
 global.__base = __dirname + '/';
-global.__config = config;
+global.__config = require(__base + 'core/libs/config_manager.js');
 global.__ = require(__base + 'core/libs/global_function');
 global.__lang = require(__base + 'core/libs/i18n.js')();
 global.__utils = require(__base + 'core/libs/utils');
@@ -48,11 +46,11 @@ let app = require('./config/app')();
 require('./config/passport')();
 
 /** Start the app by listening on <port> */
-let server = app.listen(config.port);
+let server = app.listen(__config.port);
 
 /** Expose app */
 module.exports = app;
 
 /** Logging initialization */
-console.log('Application started on port ' + config.port);
+console.log('Application started on port ' + __config.port);
 

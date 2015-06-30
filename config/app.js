@@ -24,8 +24,8 @@ let fs = require('fs'),
 
 module.exports = function () {
     /** Initialize express app */
-    let app = express();
 
+    let app = express();
     /** Uncomment to setting the app router and static folder. Should be placed before express.static */
     //app.use(compress({
     //    filter: function (req, res) {
@@ -170,7 +170,7 @@ module.exports = function () {
     app.use('/' + __config.admin_prefix + '/*', require('../core/middleware/modules-plugin.js'));
 
     /** Globbing backend route files */
-    let adminRoute = __config.getOverrideCorePath(__base + 'core/modules/*/backend/route.js', __base + 'app/modules/*/backend/route.js', 3);
+    let adminRoute = __.getOverrideCorePath(__base + 'core/modules/*/backend/route.js', __base + 'app/modules/*/backend/route.js', 3);
     for (let index in adminRoute) {
         if (adminRoute.hasOwnProperty(index)) {
             app.use('/' + __config.admin_prefix, require(path.resolve(adminRoute[index])));
@@ -186,7 +186,7 @@ module.exports = function () {
     });
 
     /** Globbing route frontend files */
-    let frontRoute = __config.getOverrideCorePath(__base + 'core/modules/*/frontend/route.js', __base + 'app/modules/*/frontend/route.js', 3);
+    let frontRoute = __.getOverrideCorePath(__base + 'core/modules/*/frontend/route.js', __base + 'app/modules/*/frontend/route.js', 3);
     for (let index in frontRoute) {
         if (frontRoute.hasOwnProperty(index)) {
             require(path.resolve(frontRoute[index]))(app);

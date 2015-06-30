@@ -26,13 +26,13 @@ class BaseWidget {
     getAllLayouts(alias) {
         let files = [];
 
-        __config.getGlobbedFiles(__base + "themes/frontend/" + __config.theme + '/_widgets/' + alias + '/*.html').forEach(function (path) {
+        __.getGlobbedFiles(__base + "themes/frontend/" + __config.theme + '/_widgets/' + alias + '/*.html').forEach(function (path) {
             let s = path.split('/');
             files.push(s[s.length - 1]);
         });
 
         if (files.length == 0) {
-            __config.getGlobbedFiles(__base + "themes/frontend/default/_widgets/" + alias + "/*.html").forEach(function (path) {
+            __.getGlobbedFiles(__base + "themes/frontend/default/_widgets/" + alias + "/*.html").forEach(function (path) {
                 let s = path.split('/');
                 files.push(s[s.length - 1]);
             });

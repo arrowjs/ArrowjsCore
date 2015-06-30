@@ -6,15 +6,14 @@
 let passport = require('passport'),
     url = require('url'),
     FacebookStrategy = require('passport-facebook').Strategy,
-    config = require('../config'),
     users = require(__base + 'core/modules/users/backend/controllers/index');
 
 module.exports = function () {
     // Use facebook strategy
     passport.use(new FacebookStrategy({
-            clientID: config.facebook.clientID,
-            clientSecret: config.facebook.clientSecret,
-            callbackURL: config.facebook.callbackURL,
+            clientID: __config.facebook.clientID,
+            clientSecret: __config.facebook.clientSecret,
+            callbackURL: __config.facebook.callbackURL,
             passReqToCallback: true
         },
         function (req, accessToken, refreshToken, profile, done) {

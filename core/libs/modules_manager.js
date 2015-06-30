@@ -14,7 +14,7 @@ module.exports.loadAllModules = function () {
     let module_tmp = {};
 
     // Load modules
-    let moduleList = __config.getOverrideCorePath(__base + 'core/modules/*/module.js', __base + 'app/modules/*/module.js', 2);
+    let moduleList =__.getOverrideCorePath(__base + 'core/modules/*/module.js', __base + 'app/modules/*/module.js', 2);
 
     for (let index in moduleList) {
         if (moduleList.hasOwnProperty(index)) {

@@ -6,16 +6,15 @@
 let passport = require('passport'),
 	url = require('url'),
 	GoogleStrategy = require('passport-google-oauth').OAuth2Strategy,
-	config = require('../config'),
 	users = require(__base + 'core/modules/users/backend/controllers/index');
 
 
 module.exports = function() {
 	// Use google strategy
 	passport.use(new GoogleStrategy({
-			clientID: config.google.clientID,
-			clientSecret: config.google.clientSecret,
-			callbackURL: config.google.callbackURL,
+			clientID: __config.google.clientID,
+			clientSecret: __config.google.clientSecret,
+			callbackURL: __config.google.callbackURL,
 			passReqToCallback: true
 		},
 		function(req, accessToken, refreshToken, profile, done) {

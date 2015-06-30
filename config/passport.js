@@ -5,9 +5,7 @@
  */
 let passport = require('passport'),
     path = require('path'),
-    redis = require('redis').createClient(),
-    config = require('./config');
-
+    redis = require('redis').createClient();
 /**
  * Module init function.
  */
@@ -19,7 +17,7 @@ module.exports = function () {
 
     // Deserialize sessions
     passport.deserializeUser(function (id, done) {
-        let key = config.redis_prefix + 'current-user-' + id;
+        let key = __config.redis_prefix + 'current-user-' + id;
 
         redis.get(key, function (err, result) {
             if (result != null) {
@@ -50,7 +48,7 @@ module.exports = function () {
     });
 
     // Initialize strategies
-    config.getGlobbedFiles('./config/strategies/**/*.js').forEach(function (strategy) {
+    __.getGlobbedFiles('./config/strategies/**/*.js').forEach(function (strategy) {
         require(path.resolve(strategy))();
     });
 };

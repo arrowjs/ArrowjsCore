@@ -5,18 +5,17 @@ let path = require("path");
 let Sequelize = require("sequelize");
 
 let env = process.env.NODE_ENV || "development";
-let config = require(__base + 'config/config.js');
-let sequelize = new Sequelize(config.db.database, config.db.username, config.db.password, config.db);
+let sequelize = new Sequelize(__config.db.database, __config.db.username, __config.db.password, __config.db);
 let db = {};
 
 /** Import models core */
-config.getGlobbedFiles(__base + 'core/modules/*/models/*.js').forEach(function (routePath) {
+__.getGlobbedFiles(__base + 'core/modules/*/models/*.js').forEach(function (routePath) {
     let model = sequelize["import"](path.resolve(routePath));
     db[model.name] = model;
 });
 
 /** Import models user created */
-config.getGlobbedFiles(__base + 'app/modules/*/models/*.js').forEach(function (routePath) {
+__.getGlobbedFiles(__base + 'app/modules/*/models/*.js').forEach(function (routePath) {
     let model = sequelize["import"](path.resolve(routePath));
     db[model.name] = model;
 });

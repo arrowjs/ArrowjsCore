@@ -6,16 +6,15 @@
 let passport = require('passport'),
 	url = require('url'),
 	LinkedInStrategy = require('passport-linkedin').Strategy,
-	config = require('../config'),
 	users = require(__base + 'core/modules/users/backend/controllers/index');
 
 
 module.exports = function() {
 	// Use linkedin strategy
 	passport.use(new LinkedInStrategy({
-			consumerKey: config.linkedin.clientID,
-			consumerSecret: config.linkedin.clientSecret,
-			callbackURL: config.linkedin.callbackURL,
+			consumerKey: __config.linkedin.clientID,
+			consumerSecret: __config.linkedin.clientSecret,
+			callbackURL: __config.linkedin.callbackURL,
 			passReqToCallback: true,
 			profileFields: ['id', 'first-name', 'last-name', 'email-address']
 		},

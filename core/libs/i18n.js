@@ -5,7 +5,7 @@ let path = require('path');
 module.exports = function () {
     let data = {};
 
-    __config.getGlobbedFiles(__base + '/lang/*.js').forEach(function (file) {
+    __.getGlobbedFiles(__base + '/lang/*.js').forEach(function (file) {
         data[path.basename(file, '.js')] = require(file);
     });
 

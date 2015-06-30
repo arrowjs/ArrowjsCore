@@ -3,7 +3,7 @@
 module.exports = function () {
     let w = [];
 
-    let widgets = __config.getOverrideCorePath(__base + "core/widgets/*/*.js", __base + "app/widgets/*/*.js", 2);
+    let widgets =__.getOverrideCorePath(__base + "core/widgets/*/*.js", __base + "app/widgets/*/*.js", 2);
 
     for (let index in widgets) {
         if (widgets.hasOwnProperty(index)) {

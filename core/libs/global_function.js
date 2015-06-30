@@ -1,6 +1,8 @@
 'use strict';
 
 let mailer = require('nodemailer'),
+    _ = require('lodash'),
+    glob = require('glob'),
     fs = require('fs'),
     util = require('util');
 
@@ -124,7 +126,7 @@ exports.createNewEnv = function (views) {
  * @returns {object}
  */
 exports.getAllCustomFilter = function (env) {
-    let custom_filters = __config.getOverrideCorePath(__base + 'core/custom_filters/*.js', __base + 'app/custom_filters/*.js', 1);
+    let custom_filters =__.getOverrideCorePath(__base + 'core/custom_filters/*.js', __base + 'app/custom_filters/*.js', 1);
 
     for (let index in custom_filters) {
         if (custom_filters.hasOwnProperty(index)) {
@@ -439,4 +441,97 @@ exports.t = function () {
     var args = Array.prototype.slice.call(arguments);
     args[0] = __lang[currentLang][args[0]];
     return util.format.apply(util, args);
+};
+
+
+/**
+ * Get files by glob patterns
+ */
+module.exports.getGlobbedFiles = function(globPatterns, removeRoot) {
+    // For context switching
+    let _this = this;
+
+    // URL paths regex
+    let urlRegex = new RegExp('^(?:[a-z]+:)?\/\/', 'i');
+
+    // The output array
+    let output = [];
+
+    // If glob pattern is array so we use each pattern in a recursive way, otherwise we use glob
+    if (_.isArray(globPatterns)) {
+        globPatterns.forEach(function(globPattern) {
+            output = _.union(output, _this.getGlobbedFiles(globPattern, removeRoot));
+        });
+    } else if (_.isString(globPatterns)) {
+        if (urlRegex.test(globPatterns)) {
+            output.push(globPatterns);
+        } else {
+            glob(globPatterns, {
+                sync: true
+            }, function(err, files) {
+                if (removeRoot) {
+                    files = files.map(function(file) {
+                        return file.replace(removeRoot, '');
+                    });
+                }
+
+                output = _.union(output, files);
+            });
+        }
+    }
+
+    return output;
+};
+
+/**
+ * Replace paths with same name in "checkIndex" position (calculate from end string when split with "/")
+ */
+module.exports.overrideCorePath = function(paths, routePath, checkIndex){
+    let arr_path = routePath.split('/');
+    let checkName = arr_path[arr_path.length - checkIndex];
+
+    let check_obj = {};
+    check_obj[checkName] = routePath;
+
+    _.assign(paths, check_obj);
+    return paths;
+};
+
+/**
+ * Replace core paths with app paths if they have same name in "checkIndex" position using overrideCorePath
+ */
+module.exports.getOverrideCorePath = function(corePath, appPath, checkIndex){
+    let paths = [];
+
+    __.getGlobbedFiles(corePath).forEach(function (routePath) {
+        paths = __.overrideCorePath(paths, routePath, checkIndex);
+    });
+
+    __.getGlobbedFiles(appPath).forEach(function (routePath) {
+        paths = __.overrideCorePath(paths, routePath, checkIndex);
+    });
+
+    return paths
+};
+
+/**
+ * Get the modules JavaScript files
+ */
+module.exports.getJavaScriptAssets = function(includeTests) {
+    let output = this.getGlobbedFiles(this.assets.lib.js.concat(this.assets.js), 'public/');
+
+    // To include tests
+    if (includeTests) {
+        output = _.union(output, this.getGlobbedFiles(this.assets.tests));
+    }
+
+    return output;
+};
+
+/**
+ * Get the modules CSS files
+ */
+module.exports.getCSSAssets = function() {
+    let output = this.getGlobbedFiles(this.assets.lib.css.concat(this.assets.css), 'public/');
+    return output;
 };

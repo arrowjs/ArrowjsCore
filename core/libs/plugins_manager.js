@@ -17,7 +17,7 @@ function PluginManager() {
             if (results != null) {
                 let arr_data = JSON.parse(results);
                 let index = 0;
-                let plugins = __config.getOverrideCorePath(__base + 'core/plugins/*/*.js', __base + 'app/plugins/*/*.js', 2);
+                let plugins =__.getOverrideCorePath(__base + 'core/plugins/*/*.js', __base + 'app/plugins/*/*.js', 2);
 
                 for (let i in plugins) {
                     if (plugins.hasOwnProperty(i)) {
@@ -31,7 +31,7 @@ function PluginManager() {
                     }
                 }
             } else {
-                let plugins = __config.getOverrideCorePath(__base + 'core/plugins/*/*.js', __base + 'app/plugins/*/*.js', 2);
+                let plugins =__.getOverrideCorePath(__base + 'core/plugins/*/*.js', __base + 'app/plugins/*/*.js', 2);
 
                 for (let i in plugins) {
                     if (plugins.hasOwnProperty(i)) {
@@ -48,7 +48,7 @@ function PluginManager() {
     self.reloadAllPlugins = function () {
         self.plugins = [];
 
-        let plugins = __config.getOverrideCorePath(__base + 'core/plugins/*/*.js', __base + 'app/plugins/*/*.js', 2);
+        let plugins =__.getOverrideCorePath(__base + 'core/plugins/*/*.js', __base + 'app/plugins/*/*.js', 2);
 
         for (let i in plugins) {
             if (plugins.hasOwnProperty(i)) {

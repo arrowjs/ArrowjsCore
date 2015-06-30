@@ -90,6 +90,7 @@ _module.save = function (req, res) {
  * Update a category
  */
 _module.update = function (req, res) {
+    console.log('aaaa');
     res.locals.deleteButton = __acl.addButton(req, route, 'category_delete');
     let data = req.body;
 
@@ -107,7 +108,7 @@ _module.update = function (req, res) {
             id: req.params.catId
         }
     }).then(function (cat) {
-        return cat.updateAttributes(data)
+        cat.updateAttributes(data)
     }).then(function () {
         let response = {
             type: 'success',

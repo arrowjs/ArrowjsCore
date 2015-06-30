@@ -6,16 +6,15 @@
 let passport = require('passport'),
 	url = require('url'),
 	GithubStrategy = require('passport-github').Strategy,
-	config = require('../config'),
 	users = require(__base + 'core/modules/users/backend/controllers/index');
 
 
 module.exports = function() {
 	// Use github strategy
 	passport.use(new GithubStrategy({
-			clientID: config.github.clientID,
-			clientSecret: config.github.clientSecret,
-			callbackURL: config.github.callbackURL,
+			clientID: __config.github.clientID,
+			clientSecret: __config.github.clientSecret,
+			callbackURL: __config.github.callbackURL,
 			passReqToCallback: true
 		},
 		function(req, accessToken, refreshToken, profile, done) {

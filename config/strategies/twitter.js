@@ -6,16 +6,15 @@
 let passport = require('passport'),
 	url = require('url'),
 	TwitterStrategy = require('passport-twitter').Strategy,
-	config = require('../config'),
 	users = require(__base + 'core/modules/users/backend/controllers/index');
 
 
 module.exports = function() {
 	// Use twitter strategy
 	passport.use(new TwitterStrategy({
-			consumerKey: config.twitter.clientID,
-			consumerSecret: config.twitter.clientSecret,
-			callbackURL: config.twitter.callbackURL,
+			consumerKey: __config.twitter.clientID,
+			consumerSecret: __config.twitter.clientSecret,
+			callbackURL: __config.twitter.callbackURL,
 			passReqToCallback: true
 		},
 		function(req, token, tokenSecret, profile, done) {

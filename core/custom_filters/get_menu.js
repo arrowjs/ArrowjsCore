@@ -1,6 +1,5 @@
 "use strict";
 
-let config = require(__base + 'config/config');
 
 module.exports = function (env) {
     env.addFilter('get_menu', function (menu_name, route, cb) {
@@ -19,7 +18,7 @@ module.exports = function (env) {
                 // Get menu order
                 let menu_order = JSON.parse(menu.menu_order);
 
-                env.render(config.themes + '/_menus/main_menu.html', {
+                env.render(__config.themes + '/_menus/main_menu.html', {
                         route: route,
                         _menus: menu_order,
                         _menus_data: menu_details
