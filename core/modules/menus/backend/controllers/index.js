@@ -30,11 +30,6 @@ _module.index = function (req, res) {
             header: "Name",
             link: '/admin/menus/update/{id}',
             acl: 'users.update'
-        },
-        {
-            column: "status",
-            width: '15%',
-            header: "Status"
         }
     ]);
 
@@ -191,7 +186,7 @@ _module.menuById = function (req, res, next, id) {
     }).then(function (menu_details) {
         res.locals.menu_details = JSON.stringify(menu_details);
         next();
-    }).catch(function (err) {
+    }).catch(function (error) {
         req.flash.error('Name: ' + error.name + '<br />' + 'Message: ' + error.message);
         next();
     });

@@ -1,13 +1,9 @@
 'use strict';
-/**
- * Created by thanhnv on 1/26/15.
- */
+
 let express = require('express');
 let router = express.Router();
 let controller = require('./controllers/index.js');
 let moduleName = 'users';
-
-//console.log(controller);
 
 router.get('/users/signout', controller.signout);
 router.get('/users/change-pass', __acl.isAllow(moduleName, 'update_profile'), controller.changePass);

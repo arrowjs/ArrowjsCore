@@ -22,34 +22,32 @@ _module.list = function (req, res) {
     let page = req.params.page || 1;
     let column = req.params.sort || 'id';
     let order = req.params.order || 'asc';
-    //config columns
+
     res.locals.root_link = '/admin/users/page/' + page + '/sort';
     let filter = __.createFilter(req, res, route, '/admin/users', column, order, [
         {
             column: "id",
             width: '8%',
-            header: "Id",
+            header: "ID",
             filter: {
                 model: 'user',
                 data_type: 'number'
             }
-
         },
         {
             column: "display_name",
             width: '15%',
-            header: "Full Name",
+            header: __.t('m_users_full_name'),
             link: '/admin/users/{id}',
             acl: 'users.update',
             filter: {
                 data_type: 'string'
             }
-
         },
         {
             column: "user_login",
             width: '15%',
-            header: "UserName",
+            header: __.t('m_users_user_name'),
             filter: {
                 data_type: 'string'
             }
@@ -84,14 +82,6 @@ _module.list = function (req, res) {
             }
         },
         {
-            column: "",
-            link: "#",
-            alias: "Chi tiết",
-            width: '10%',
-            header: "Registered course",
-            onclick: 'viewCourse(\'{user_email}\');',
-        },
-        {
             column: "user_status",
             width: '10%',
             header: "Status",
@@ -111,8 +101,6 @@ _module.list = function (req, res) {
             }
         }
     ]);
-
-    // console.log(filter.attributes);
 
     // List users
     __models.user.findAndCountAll({
@@ -193,6 +181,7 @@ _module.course_of = function (req, res) {
 _module.update = function (req, res, next) {
     let edit_user = null;
     let data = req.body;
+
     // Get user by id
     __models.user.find({
         where: {

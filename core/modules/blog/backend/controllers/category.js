@@ -37,8 +37,8 @@ _module.list = function (req, res) {
             }
         },
         {
-            column: 'slug',
-            header: 'Slug',
+            column: 'alias',
+            header: 'Alias',
             width: '40%',
             link: '/admin/blog/categories/{id}',
             acl: 'update',

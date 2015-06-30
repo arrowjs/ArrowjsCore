@@ -3,7 +3,6 @@
 let express = require('express');
 let router = express.Router();
 let controller = require('./controllers/index.js');
-
 let moduleName = 'plugins';
 
 router.route('/plugins').get(__acl.isAllow(moduleName, 'index'), controller.index);

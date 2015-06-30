@@ -1,7 +1,5 @@
-'use strict'
-/**
- * Created by thanhnv on 1/26/15.
- */
+'use strict';
+
 let express = require('express');
 let router = express.Router();
 let controller = require('./controllers/index.js');

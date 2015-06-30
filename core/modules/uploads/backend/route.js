@@ -1,12 +1,9 @@
-'use strict'
-/**
- * Created by thanhnv on 2/2/15.
- */
+'use strict';
+
 let express = require('express');
 let router = express.Router();
 let upload = require('./controllers/index');
 
-//Books Routes
 router.route('/uploads/dirtree').post(upload.dirtree);
 router.route('/uploads/createdir').post(upload.createdir);
 router.route('/uploads/deletedir').post(upload.deletedir);
