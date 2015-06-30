@@ -40,7 +40,7 @@ _module.list = function (req, res) {
         {
             column: 'alias',
             width: '25%',
-            header: 'Slug',
+            header: 'Alias',
             filter: {
                 data_type: 'string'
             }

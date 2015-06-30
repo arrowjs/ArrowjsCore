@@ -4,7 +4,6 @@ let express = require('express');
 let router = express.Router();
 let index = require('./controllers/index.js');
 let themes = require('./controllers/themes.js');
-
 let moduleName = 'configurations';
 
 router.route('/configurations/site-info').get(__acl.isAllow(moduleName, 'update_info'), index.index);
