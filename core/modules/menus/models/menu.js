@@ -3,7 +3,6 @@
 module.exports = function (sequelize, DataTypes) {
     let Menu = sequelize.define("menus", {
         name: DataTypes.STRING,
-        status: DataTypes.STRING,
         menu_order: DataTypes.STRING,
         created_at: DataTypes.DATE,
         created_by: DataTypes.INTEGER,
