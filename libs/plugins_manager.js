@@ -4,7 +4,6 @@ var _ = require('lodash'),
     redis = require('redis').createClient(),
     Promise = require('bluebird');
 
-redis.debug_mode = true;
 
 function PluginManager() {
     let self = this;

@@ -88,7 +88,7 @@ exports.sortMenus = function (menus) {
  * @returns {object}
  */
 exports.getWidget = function (alias) {
-    let widgets = require(__base + 'core/libs/widgets_manager')();
+    let widgets = require(__dirname + '/widgets_manager')();
 
     for (let i in widgets) {
         if (widgets.hasOwnProperty(i)) {

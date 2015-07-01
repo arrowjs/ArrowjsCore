@@ -11,7 +11,7 @@ module.exports = function () {
 
 module.exports.loadAllModules = function () {
 
-    let menuManager = require(__base + 'core/libs/menus_manager');
+    let menuManager = require(__dirname + '/menus_manager');
     let module_tmp = {};
     // Load modules
     let moduleList =__.getOverrideCorePath(__base + 'core/modules/*/module.js', __base + 'app/modules/*/module.js', 2);

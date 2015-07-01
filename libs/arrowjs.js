@@ -17,7 +17,11 @@ let fs = require('fs'),
     helmet = require('helmet'),
     nunjucks = require('nunjucks'),
     _ = require('lodash'),
-    Promise = require('bluebird');
+    Promise = require('bluebird'),
+    libFolder = __dirname;
+let session = require('express-session'),
+    redis = require("redis").createClient(),
+    RedisStore = require('connect-redis')(session);
 
 
 class ArrowApplication {
@@ -33,29 +37,7 @@ class ArrowApplication {
                 this[func] = self[func]
             }
         }
-        let stack = callsite();
-        let requester = stack[1].getFileName();
 
-        /**
-         * Main application entry file.
-         * Please note that the order of loading is important.
-         */
-        global.__base = path.dirname(requester) + '/';
-        global.__config = require(path.resolve('./libs/config_manager.js'));
-        global.__ = require(path.resolve('./libs/global_function'));
-        global.__lang = require(path.resolve('./libs/i18n.js'))();
-        global.__utils = require(path.resolve('./libs/utils'));
-        global.__acl = require(path.resolve('./libs/acl'));
-        global.__models = require(path.resolve('./libs/models_manager'));
-        global.__pluginManager = require(path.resolve('./libs/plugins_manager'));
-        global.__menus = require(path.resolve('./libs/menus_manager'))();
-        global.__modules = require(path.resolve('./libs/modules_manager'))();
-        global.__cache = require(path.resolve('./libs/arr_caching'))();
-        global.__messages = [];
-        global.__setting_menu_module = [];
-        global.BackModule = require(path.resolve('./libs/BackModule'));
-        global.BaseWidget = require(path.resolve('./libs/BaseWidget'));
-        global.FrontModule = require(path.resolve('./libs/FrontModule'));
 
     }
 
@@ -70,8 +52,36 @@ class ArrowApplication {
     }
 
     config() {
+
+        let stack = callsite();
+        let requester = stack[1].getFileName();
+
+        /**
+         * Main application entry file.
+         * Please note that the order of loading is important.
+         */
+
+        global.__base = path.dirname(requester) + '/';
+        global.__config = require(libFolder + '/config_manager.js');
+        global.__ = require(libFolder + '/global_function');
+        global.__lang = require(libFolder + '/i18n.js')();
+        global.__utils = require(libFolder + '/utils');
+        global.__dataformatter = require(libFolder + '/dateformatter');
+        global.__acl = require(libFolder + '/acl');
+        global.__models = require(libFolder + '/models_manager');
+        global.__pluginManager = require(libFolder + '/plugins_manager');
+        global.__menus = require(libFolder + '/menus_manager')();
+        global.__modules = require(libFolder + '/modules_manager')();
+        global.__cache = require(libFolder + '/arr_caching')();
+        global.__event = require(libFolder + '/event_manager');
+        global.__messages = [];
+        global.__setting_menu_module = [];
+        global.BackModule = require(libFolder + '/BackModule');
+        global.BaseWidget = require(libFolder + '/BaseWidget');
+        global.FrontModule = require(libFolder + '/FrontModule');
+
         /** Init widgets */
-        require(__base + 'core/libs/widgets_manager')();
+        require(libFolder + '/widgets_manager')();
 
         /** Init plugins */
         __pluginManager.loadAllPlugins();
@@ -168,12 +178,30 @@ function makeApp(app,beforeFunc) {
     /** CookieParser should be above session */
     app.use(cookieParser());
 
+    /** Express session storage */
+    let secret = "hjjhdsu465aklsdjfhasdasdf342ehsf09kljlasdf";
+    let middleSession = session({
+        store: new RedisStore({host: __config.redis.host, port: __config.redis.port, client: redis}),
+        secret: secret,
+        key: 'sid',
+        resave: true,
+        saveUninitialized: true
+    });
+    app.use(middleSession);
+    app.use(function (req, res, next) {
+        if (!req.session) {
+            return next(new Error('Session destroy')); // handle error
+        }
+        next(); // otherwise continue
+    });
+
+
     /** Use passport session */
     app.use(passport.initialize());
     app.use(passport.session());
 
     /** Flash messages */
-    app.use(require('../middleware/flash-plugin.js'));
+    app.use(require(path.resolve(libFolder,'..','middleware/flash-plugin.js')));
 
     /** Use helmet to secure Express headers */
     app.use(helmet.xframe());
@@ -205,7 +233,7 @@ function makeApp(app,beforeFunc) {
     //            else console.log('Backend menus is not defined!!!');
     //        });
     //    } else {
-    let md = require('../libs/modules_manager.js');
+    let md = require(libFolder + '/modules_manager.js');
     md.loadAllModules();
     //    }
     //});
@@ -216,7 +244,7 @@ function makeApp(app,beforeFunc) {
             beforeFunc[k](app);
         }
     }
-    app.use('/' + __config.admin_prefix + '/*', require('../middleware/modules-plugin.js'));
+    app.use('/' + __config.admin_prefix + '/*', require(path.resolve(libFolder,'..','middleware/modules-plugin.js')));
 
     /** Globbing backend route files */
     let adminRoute = __.getOverrideCorePath(__base + 'core/modules/*/backend/route.js', __base + 'app/modules/*/backend/route.js', 3);

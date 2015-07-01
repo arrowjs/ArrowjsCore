@@ -32,13 +32,17 @@ function init() {
         }
     });
     if(!fs.existsSync(__base + 'config/env/all.js')) {
-        fsEx.copySync(path.resolve(__dirname,'..','./demo/all.js'),__base + 'config/env/all.js');
+        fsEx.copySync(path.resolve(__dirname,'..','demo/all.js'),__base + 'config/env/all.js');
         _.assign(conf,require(__base + 'config/env/all.js'));
     } else {
         _.assign(conf,require(__base + 'config/env/all.js'));
     }
     if(fs.existsSync(__base + 'config/env/' + process.env.NODE_ENV +'.js')) {
         _.assign(conf,require(__base + 'config/env/' + process.env.NODE_ENV));
+
+    } else {
+        _.assign(conf,require(__base + 'config/env/' + process.env.NODE_ENV));
+
     }
 };
 
