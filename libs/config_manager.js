@@ -41,8 +41,8 @@ function init() {
         _.assign(conf,require(__base + 'config/env/' + process.env.NODE_ENV));
 
     } else {
+        fsEx.copySync(path.resolve(__dirname,'..','demo/'+ process.env.NODE_ENV + '.js'),__base + 'config/env/'+ process.env.NODE_ENV + '.js');
         _.assign(conf,require(__base + 'config/env/' + process.env.NODE_ENV));
-
     }
 };
 

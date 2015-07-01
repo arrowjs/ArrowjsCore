@@ -66,7 +66,7 @@ class ArrowApplication {
         global.__ = require(libFolder + '/global_function');
         global.__lang = require(libFolder + '/i18n.js')();
         global.__utils = require(libFolder + '/utils');
-        global.__dataformatter = require(libFolder + '/dateformatter');
+        global.__dateformatter = require(libFolder + '/dateformatter');
         global.__acl = require(libFolder + '/acl');
         global.__models = require(libFolder + '/models_manager');
         global.__pluginManager = require(libFolder + '/plugins_manager');
@@ -197,8 +197,10 @@ function makeApp(app,beforeFunc) {
 
 
     /** Use passport session */
-    app.use(passport.initialize());
-    app.use(passport.session());
+    if(fs.existsSync(__base + 'config/passport.js')){
+        app.use(passport.initialize());
+        app.use(passport.session());
+    }
 
     /** Flash messages */
     app.use(require(path.resolve(libFolder,'..','middleware/flash-plugin.js')));
@@ -219,10 +221,8 @@ function makeApp(app,beforeFunc) {
         if (req.user) {
             res.locals.__user = req.user;
         }
-
         next();
     });
-
     ///** Store module status (active|unactive) in Redis */
     //redis.get(__config.redis_prefix + 'all_modules', function (err, results) {
     //    if (results != null) {
