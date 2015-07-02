@@ -93,13 +93,13 @@ class ArrowApplication {
         __utils.createDirectory('app/plugins');
         __utils.createDirectory('app/widgets');
 
-        /** Init the express application */
-        makeApp(this.appEx,this.beforeFunction);
-
         /** Bootstrap passport config */
         if(fs.existsSync(__base + 'config/passport.js')){
-            require(__base + 'config/passport')();
+            require(__base + 'config/passport')(passport);
         }
+
+        /** Init the express application */
+        makeApp(this.appEx,this.beforeFunction);
     }
     before(func) {
         if(typeof func == "function") {
