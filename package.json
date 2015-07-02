@@ -10,7 +10,7 @@
     "type": "git",
     "url": "http://trquoccuong@jira:7990/scm/~trquoccuong/arrowjsframework.git"
   },
-  "author": "Techmaster",
+  "author": "Tran Quoc Cuong <trquoccuong@gmail.com>",
   "license": "MIT",
   "dependencies": {
     "bluebird": "^2.9.30",
