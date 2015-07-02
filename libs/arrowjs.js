@@ -74,6 +74,7 @@ class ArrowApplication {
         global.__modules = require(libFolder + '/modules_manager')();
         global.__cache = require(libFolder + '/arr_caching')();
         global.__event = require(libFolder + '/event_manager');
+        global.__widget = require(libFolder + '/widgets_manager');
         global.__messages = [];
         global.__setting_menu_module = [];
         global.BackModule = require(libFolder + '/BackModule');
