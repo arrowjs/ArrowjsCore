@@ -2,10 +2,14 @@
 
 let BaseModule = require('./BaseModule.js');
 let _ = require('lodash');
+let callsite = require('callsite');
 
 class BackModule extends BaseModule {
-    constructor(path) {
-        super(path);
+    constructor() {
+        let stack = callsite();
+        let i = stack[1].getFileName().split('/');
+        let g = i[i.length - 4];
+        super(g);
         this.env = __.createNewEnv([__base + 'app/modules/', __base + 'core/modules/', __base + 'themes/backend/default/']);
     }
 
