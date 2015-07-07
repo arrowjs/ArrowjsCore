@@ -17,21 +17,20 @@ function PluginManager() {
                 let arr_data = JSON.parse(results);
                 let index = 0;
                 let plugins =__.getOverrideCorePath(__base + 'core/plugins/*/*.js', __base + 'app/plugins/*/*.js', 2);
-
                 for (let i in plugins) {
                     if (plugins.hasOwnProperty(i)) {
                         let plugin = require(plugins[i]);
-
                         // Assign options from Redis, other properties form file
-                        console.log("************************",arr_data[index++]);
-                        if(arr_data[index++]) {
-                            _.assign(plugin.options, arr_data[index++].options);
-                            _.assign(arr_data[index++], plugin);
+                        let k = arr_data[index++];
+                        if(k) {
+                            _.assign(plugin.options, k.options);
+                            _.assign(k, plugin);
                         }
                         self.plugins.push(plugin);
                     }
                 }
             } else {
+                console.log("ajskdhjksahdjkasdjkdas");
                 let plugins =__.getOverrideCorePath(__base + 'core/plugins/*/*.js', __base + 'app/plugins/*/*.js', 2);
 
                 for (let i in plugins) {
