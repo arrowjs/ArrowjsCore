@@ -2,6 +2,10 @@
 
 module.exports = function () {
     let w = [];
+    let cache = __cache.get('arrWidgets')
+    if(cache){
+        return cache;
+    }
 
     let widgets =__.getOverrideCorePath(__base + "core/widgets/*/*.js", __base + "app/widgets/*/*.js", 2);
 
@@ -11,6 +15,6 @@ module.exports = function () {
             w.push(new Widget());
         }
     }
-
+    __cache.set('arrWidgets', w);
     return w;
 };
