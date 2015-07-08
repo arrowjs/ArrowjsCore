@@ -17,16 +17,15 @@ module.exports.loadAllModules = function () {
     let moduleList =__.getOverrideCorePath(__base + 'core/modules/*/module.js', __base + 'app/modules/*/module.js', 2);
 
     for (let index in moduleList) {
-        require(moduleList[index])(module_tmp)[index].system = true;
-        //if (moduleList.hasOwnProperty(index)) {
-        //    if (moduleList[index].indexOf(__base + 'core/modules') > -1) {
-        //        // System modules
-        //        require(moduleList[index])(module_tmp)[index].system = false;
-        //    } else {
-        //        // App modules
-        //        require(moduleList[index])(module_tmp)[index].system = true;
-        //    }
-        //}
+        if (moduleList.hasOwnProperty(index)) {
+            if (moduleList[index].indexOf(__base + 'core/modules') > -1) {
+                // System modules
+                require(moduleList[index])(module_tmp)[index].system = true;
+            } else {
+                // App modules
+                require(moduleList[index])(module_tmp)[index].system = false;
+            }
+        }
     }
 
     // Add new module

@@ -30,7 +30,6 @@ function PluginManager() {
                     }
                 }
             } else {
-                console.log("ajskdhjksahdjkasdjkdas");
                 let plugins =__.getOverrideCorePath(__base + 'core/plugins/*/*.js', __base + 'app/plugins/*/*.js', 2);
 
                 for (let i in plugins) {
