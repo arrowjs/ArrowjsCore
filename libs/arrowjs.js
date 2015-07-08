@@ -27,7 +27,7 @@ let session = require('express-session'),
 class ArrowApplication {
     constructor() {
         this.modules = [];
-        this.beforeFunction =[];
+        this.beforeFunction = [];
         this.appEx = express();
         let self = this.appEx
         for (let func in self) {
@@ -37,8 +37,11 @@ class ArrowApplication {
                 this[func] = self[func]
             }
         }
-
-
+        let stack = callsite();
+        let requester = stack[1].getFileName();
+        global.__base = path.dirname(requester) + '/';
+        global.__ = require(libFolder + '/global_function');
+        global.__utils = require(libFolder + '/utils');
     }
 
     addModule(modulePath) {
@@ -53,19 +56,14 @@ class ArrowApplication {
 
     config() {
 
-        let stack = callsite();
-        let requester = stack[1].getFileName();
-
         /**
          * Main application entry file.
          * Please note that the order of loading is important.
          */
 
-        global.__base = path.dirname(requester) + '/';
         global.__config = require(libFolder + '/config_manager.js');
         global.__ = require(libFolder + '/global_function');
         global.__lang = require(libFolder + '/i18n.js')();
-        global.__utils = require(libFolder + '/utils');
         global.__dateformatter = require(libFolder + '/dateformatter');
         global.__acl = require(libFolder + '/acl');
         global.__models = require(libFolder + '/models_manager');
@@ -81,7 +79,6 @@ class ArrowApplication {
         global.BackModule = require(libFolder + '/BackModule');
         global.BaseWidget = require(libFolder + '/BaseWidget');
         global.FrontModule = require(libFolder + '/FrontModule');
-
         /** Init widgets */
         require(libFolder + '/widgets_manager')();
 
@@ -96,15 +93,14 @@ class ArrowApplication {
         __utils.createDirectory('app/widgets');
 
         /** Bootstrap passport config */
-        if(fs.existsSync(__base + 'config/passport.js')){
-            require(__base + 'config/passport')(passport);
+        if (fs.existsSync(__base + 'config/passport.js')) {
+            require(__base + 'config/passport.js')(passport);
         }
-
         /** Init the express application */
-        makeApp(this.appEx,this.beforeFunction);
+        makeApp(this.appEx, this.beforeFunction);
     }
     before(func) {
-        if(typeof func == "function") {
+        if (typeof func == "function") {
             this.beforeFunction.push(func);
         }
     }
@@ -116,7 +112,7 @@ class ArrowApplication {
  */
 
 
-function makeApp(app,beforeFunc) {
+function makeApp(app, beforeFunc) {
 
 
     app.use(express.static(path.resolve(__base + __config.resource.path), __config.resource.option));
@@ -199,13 +195,12 @@ function makeApp(app,beforeFunc) {
 
 
     /** Use passport session */
-    if(fs.existsSync(__base + 'config/passport.js')){
+    if (fs.existsSync(__base + 'config/passport.js')) {
         app.use(passport.initialize());
         app.use(passport.session());
     }
-
     /** Flash messages */
-    app.use(require(path.resolve(libFolder,'..','middleware/flash-plugin.js')));
+    app.use(require(path.resolve(libFolder, '..', 'middleware/flash-plugin.js')));
 
     /** Use helmet to secure Express headers */
     app.use(helmet.xframe());
@@ -241,12 +236,12 @@ function makeApp(app,beforeFunc) {
     //});
 
     /** Module manager */
-    if(beforeFunc.length > 0 ){
-        for(let k in beforeFunc){
+    if (beforeFunc.length > 0) {
+        for (let k in beforeFunc) {
             beforeFunc[k](app);
         }
     }
-    app.use('/' + __config.admin_prefix + '/*', require(path.resolve(libFolder,'..','middleware/modules-plugin.js')));
+    app.use('/' + __config.admin_prefix + '/*', require(path.resolve(libFolder, '..', 'middleware/modules-plugin.js')));
 
     /** Globbing backend route files */
     let adminRoute = __.getOverrideCorePath(__base + 'core/modules/*/backend/route.js', __base + 'app/modules/*/backend/route.js', 3);

@@ -4,6 +4,8 @@ let BaseModule = require('./BaseModule.js');
 let fs = require('fs'),
     _ = require('lodash');
 let callsite = require('callsite');
+let frontEnv = __.createNewEnv([__base + 'app/modules/', __base + 'core/modules/', __base + 'themes/frontend/']);
+
 
 class FrontModule extends BaseModule {
     constructor() {
@@ -11,7 +13,6 @@ class FrontModule extends BaseModule {
         let i = stack[1].getFileName().split('/');
         let g = i[i.length - 4];
         super(g);
-        this.env = __.createNewEnv([__base + 'app/modules/', __base + 'core/modules/', __base + 'themes/frontend/']);
     }
 
     render(req, res, view, options, fn) {
@@ -30,10 +31,10 @@ class FrontModule extends BaseModule {
         let tmp = __config.theme + '/_modules' + self.path + '/' + view;
 
         if (fs.existsSync(__base + 'themes/frontend/' + tmp)) {
-            this.env.loaders[0].searchPaths = [__base + 'themes/frontend' ];
+            frontEnv.loaders[0].searchPaths = [__base + 'themes/frontend' ];
             view = __config.theme + '/_modules' + self.path + '/' + view;
         } else {
-            this.env.loaders[0].searchPaths = [__base + 'app/modules', __base + 'core/modules', __base + 'themes/frontend', __base + 'themes/frontend/' + __config.theme];
+            frontEnv.loaders[0].searchPaths = [__base + 'app/modules', __base + 'core/modules', __base + 'themes/frontend', __base + 'themes/frontend/' + __config.theme];
 
             if (self.path.indexOf('/') == 0) {
                 view = self.path.substring(1) + '/frontend/views/' + view;
@@ -43,9 +44,9 @@ class FrontModule extends BaseModule {
         }
 
         if (fn) {
-            this.env.render(view, _.assign(res.locals, options), fn);
+            frontEnv.render(view, _.assign(res.locals, options), fn);
         } else {
-            this.env.render(view, _.assign(res.locals, options), function (err, re) {
+            frontEnv.render(view, _.assign(res.locals, options), function (err, re) {
                 if (err) {
                     res.send(err.stack);
                 } else {
@@ -66,9 +67,9 @@ class FrontModule extends BaseModule {
             view += '.html';
         }
 
-        this.env.loaders[0].searchPaths = [__base + '/themes/frontend/', __base + '/themes/frontend/' + __config.theme];
+        frontEnv.loaders[0].searchPaths = [__base + '/themes/frontend/', __base + '/themes/frontend/' + __config.theme];
 
-        this.env.render(view, _.assign(res.locals, {}), function (err, re) {
+        frontEnv.render(view, _.assign(res.locals, {}), function (err, re) {
             res.send(re);
         });
     }

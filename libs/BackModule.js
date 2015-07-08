@@ -3,6 +3,8 @@
 let BaseModule = require('./BaseModule.js');
 let _ = require('lodash');
 let callsite = require('callsite');
+let backEnv = __.createNewEnv([__base + 'app/modules/', __base + 'core/modules/', __base + 'themes/backend/default/']);
+
 
 class BackModule extends BaseModule {
     constructor() {
@@ -10,7 +12,6 @@ class BackModule extends BaseModule {
         let i = stack[1].getFileName().split('/');
         let g = i[i.length - 4];
         super(g);
-        this.env = __.createNewEnv([__base + 'app/modules/', __base + 'core/modules/', __base + 'themes/backend/default/']);
     }
 
     render(req, res, view, options, fn) {
@@ -32,12 +33,13 @@ class BackModule extends BaseModule {
         }
 
         if (fn) {
-            this.env.render(view, _.assign(res.locals, options), fn);
+            backEnv.render(view, _.assign(res.locals, options), fn);
         } else {
-            this.env.render(view, _.assign(res.locals, options), function (err, re) {
+            backEnv.render(view, _.assign(res.locals, options), function (err, re) {
                 if (err) {
                     res.send(err.stack);
                 }else{
+                    //console.log(Date.now() - req.timeout);
                     res.send(re);
                 }
             });
@@ -54,9 +56,9 @@ class BackModule extends BaseModule {
             view += '.html';
         }
 
-        this.env.loaders[0].searchPaths = [__base + 'themes/backend/default'];
+        backEnv.loaders[0].searchPaths = [__base + 'themes/backend/default'];
 
-        this.env.render(view, _.assign(res.locals, {}), function (err, re) {
+        backEnv.render(view, _.assign(res.locals, {}), function (err, re) {
             res.send(re);
         });
     }
