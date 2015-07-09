@@ -2,7 +2,7 @@
 
 module.exports = function () {
     let w = [];
-    let cache = __cache.get('arrWidgets')
+    let cache = __cache.get('arrWidgets');
     if(cache){
         return cache;
     }

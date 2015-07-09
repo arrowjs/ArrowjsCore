@@ -10,7 +10,6 @@ module.exports = function () {
 };
 
 module.exports.loadAllModules = function () {
-
     let menuManager = require(__dirname + '/menus_manager');
     let module_tmp = {};
     // Load modules
@@ -20,10 +19,14 @@ module.exports.loadAllModules = function () {
         if (moduleList.hasOwnProperty(index)) {
             if (moduleList[index].indexOf(__base + 'core/modules') > -1) {
                 // System modules
-                require(moduleList[index])(module_tmp)[index].system = true;
+                let sysModule =  require(moduleList[index])(module_tmp)[index];
+                sysModule.system = true;
+                sysModule.active = true;
             } else {
                 // App modules
-                require(moduleList[index])(module_tmp)[index].system = false;
+                let appModule = require(moduleList[index])(module_tmp)[index]
+                appModule.system = false;
+                appModule.active = false;
             }
         }
     }
@@ -47,7 +50,6 @@ module.exports.loadAllModules = function () {
             delete __modules[i];
         }
     }
-
     redis.set(__config.redis_prefix + 'all_modules', JSON.stringify(__modules), redis.print);
     redis.set(__config.redis_prefix + 'backend_menus', JSON.stringify(__menus), redis.print);
 };

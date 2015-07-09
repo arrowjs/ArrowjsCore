@@ -28,11 +28,11 @@ module.exports = function () {
 
 module.exports.addMenu = function (module) {
     if (__modules[module].hasOwnProperty('backend_menu')) {
-        if (!__modules[module].system) {
+        if (!__modules[module].system  && __modules[module].active) {
             __menus.sorting.default.push(module);
             __menus.default.modules[module] = __modules[module].backend_menu;
         }
-        else {
+        if(__modules[module].system) {
             __menus.sorting.systems.push(module);
             __menus.systems.modules[module] = __modules[module].backend_menu;
         }
@@ -41,9 +41,10 @@ module.exports.addMenu = function (module) {
 
 module.exports.modifyMenu = function (module) {
     let _ = require('lodash');
-    if (!__modules[module].system) {
+    if (!__modules[module].system  && __modules[module].active) {
         _.assign(__menus.default.modules[module], __modules[module].backend_menu);
-    } else {
+    }
+    if(__modules[module].system) {
         _.assign(__menus.systems.modules[module], __modules[module].backend_menu);
     }
 };

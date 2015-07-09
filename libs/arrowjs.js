@@ -69,6 +69,7 @@ class ArrowApplication {
         global.__models = require(libFolder + '/models_manager');
         global.__pluginManager = require(libFolder + '/plugins_manager');
         global.__menus = require(libFolder + '/menus_manager')();
+        global.__menuManager = require(libFolder + '/menus_manager');
         global.__modules = require(libFolder + '/modules_manager')();
         global.__moduleManager = require(libFolder + '/modules_manager');
         global.__cache = require(libFolder + '/arr_caching')();
@@ -221,19 +222,19 @@ function makeApp(app, beforeFunc) {
         next();
     });
     ///** Store module status (active|unactive) in Redis */
-    //redis.get(__config.redis_prefix + 'all_modules', function (err, results) {
-    //    if (results != null) {
-    //        global.__modules = JSON.parse(results);
-    //
-    //        redis.get(__config.redis_prefix + 'backend_menus', function (err, menus) {
-    //            if (menus != null) global.__menus = JSON.parse(menus);
-    //            else console.log('Backend menus is not defined!!!');
-    //        });
-    //    } else {
-    let md = require(libFolder + '/modules_manager.js');
-    md.loadAllModules();
-    //    }
-    //});
+    redis.get(__config.redis_prefix + 'all_modules', function (err, results) {
+        if (results != null) {
+            global.__modules = JSON.parse(results);
+
+            redis.get(__config.redis_prefix + 'backend_menus', function (err, menus) {
+                if (menus != null) global.__menus = JSON.parse(menus);
+                else console.log('Backend menus is not defined!!!');
+            });
+        } else {
+            let md = require(libFolder + '/modules_manager.js');
+            md.loadAllModules();
+        }
+    });
 
     /** Module manager */
     if (beforeFunc.length > 0) {
