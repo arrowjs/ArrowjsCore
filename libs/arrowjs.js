@@ -100,6 +100,7 @@ class ArrowApplication {
         /** Init the express application */
         makeApp(this.appEx, this.beforeFunction);
     }
+
     before(func) {
         if (typeof func == "function") {
             this.beforeFunction.push(func);
@@ -222,6 +223,7 @@ function makeApp(app, beforeFunc) {
         next();
     });
     ///** Store module status (active|unactive) in Redis */
+    let md = require(libFolder + '/modules_manager.js');
     redis.get(__config.redis_prefix + 'all_modules', function (err, results) {
         if (results != null) {
             global.__modules = JSON.parse(results);
@@ -231,40 +233,62 @@ function makeApp(app, beforeFunc) {
                 else console.log('Backend menus is not defined!!!');
             });
         } else {
-            let md = require(libFolder + '/modules_manager.js');
             md.loadAllModules();
         }
     });
-
     /** Module manager */
     if (beforeFunc.length > 0) {
         for (let k in beforeFunc) {
             beforeFunc[k](app);
         }
     }
+
+    /** Check authenticate in backend */
+
     app.use('/' + __config.admin_prefix + '/*', require(path.resolve(libFolder, '..', 'middleware/modules-plugin.js')));
 
     /** Globbing backend route files */
+
     let adminRoute = __.getOverrideCorePath(__base + 'core/modules/*/backend/route.js', __base + 'app/modules/*/backend/route.js', 3);
     for (let index in adminRoute) {
         if (adminRoute.hasOwnProperty(index)) {
-            app.use('/' + __config.admin_prefix, require(path.resolve(adminRoute[index])));
+            let myRoute = require(path.resolve(adminRoute[index]));
+            if (myRoute.name === 'router') {
+                app.use('/' + __config.admin_prefix, myRoute);
+            } else {
+                myRoute(app);
+            }
         }
     }
 
-    /** Check authenticate in backend */
-    app.use('/' + __config.admin_prefix + '/*', function (req, res, next) {
-        if (!req.isAuthenticated()) {
-            return res.redirect('/' + __config.admin_prefix + '/login');
-        }
-        next();
-    });
 
     /** Globbing route frontend files */
+
+    //for(let i in __modules) {
+    //    if(__modules.hasOwnProperty(i)){
+    //        if (__modules[i].system || __modules[i].active) {
+    //            let myRoute = __modules[i].frontRoute;
+    //            if(myRoute) {
+    //                if (myRoute.name === 'router') {
+    //                    app.use('/', myRoute);
+    //                } else {
+    //                    myRoute(app);
+    //                }
+    //
+    //            }
+    //        }
+    //    }
+    //}
+    //
     let frontRoute = __.getOverrideCorePath(__base + 'core/modules/*/frontend/route.js', __base + 'app/modules/*/frontend/route.js', 3);
     for (let index in frontRoute) {
         if (frontRoute.hasOwnProperty(index)) {
-            require(path.resolve(frontRoute[index]))(app);
+            let myRoute = require(path.resolve(frontRoute[index]));
+            if (myRoute.name === 'router') {
+                app.use('/', myRoute);
+            } else {
+                myRoute(app);
+            }
         }
     }
 

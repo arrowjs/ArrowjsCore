@@ -16,6 +16,9 @@ module.exports = function (req, res, next) {
 
     let moduleName = module.replace('-', '_');
     if (moduleName == 'login' || moduleName == 'uploads' || moduleName == 'err') return next();
+    if (!req.isAuthenticated()) {
+        return res.redirect('/' + __config.admin_prefix + '/login');
+    }
     if (__modules[moduleName] != undefined && (__modules[moduleName].system || __modules[moduleName].active)) {
         next();
     } else {

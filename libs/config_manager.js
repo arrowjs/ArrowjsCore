@@ -31,6 +31,7 @@ function init() {
             console.log(chalk.black.bgWhite('Application loaded using the "' + process.env.NODE_ENV + '" environment configuration'));
         }
     });
+
     if(!fs.existsSync(__base + 'config/env/all.js')) {
         fsEx.copySync(path.resolve(__dirname,'..','demo/all.js'),__base + 'config/env/all.js');
         _.assign(conf,require(__base + 'config/env/all.js'));
