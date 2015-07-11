@@ -116,7 +116,6 @@ class ArrowApplication {
 
 function makeApp(app, beforeFunc) {
 
-
     app.use(express.static(path.resolve(__base + __config.resource.path), __config.resource.option));
 
     /**
@@ -227,14 +226,13 @@ function makeApp(app, beforeFunc) {
     redis.get(__config.redis_prefix + 'all_modules', function (err, results) {
         if (results != null) {
             global.__modules = JSON.parse(results);
-
-            redis.get(__config.redis_prefix + 'backend_menus', function (err, menus) {
-                if (menus != null) global.__menus = JSON.parse(menus);
-                else console.log('Backend menus is not defined!!!');
-            });
+            md.makeMenu(__modules);
         } else {
             md.loadAllModules();
         }
+        let menus = __cache.get(__config.redis_prefix + 'backend_menus')
+        if (menus != null) global.__menus = JSON.parse(menus);
+        else console.log('Backend menus is not defined!!!');
     });
     /** Module manager */
     if (beforeFunc.length > 0) {
