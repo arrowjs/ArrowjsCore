@@ -259,6 +259,10 @@ function makeApp(app, beforeFunc) {
         }
     }
 
+    // Globbing routing admin files
+    __.getGlobbedFiles(__base +'app/frontend/modules/*/settings/*.js').forEach(function (routePath) {
+        __setting_menu_module.push(require(path.resolve(routePath))(app, __config));
+    });
 
     /** Globbing route frontend files */
 
