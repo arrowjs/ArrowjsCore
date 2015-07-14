@@ -62,7 +62,8 @@ class BaseWidget {
                     widget_type: data.widget,
                     sidebar: data.sidebar,
                     data: json_data,
-                    ordering: data.ordering
+                    ordering: data.ordering,
+                    created_by: data.created_by
                 }).then(function (widget) {
                     done(widget.id);
                 });
