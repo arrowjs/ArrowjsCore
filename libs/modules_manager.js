@@ -57,8 +57,22 @@ module.exports.loadAllModules = function () {
         }
     }
     redis.set(__config.redis_prefix + 'all_modules', JSON.stringify(__modules), redis.print);
-    redis.set(__config.redis_prefix + 'backend_menus', JSON.stringify(__menus), redis.print);
+    __cache.set(__config.redis_prefix + 'backend_menus', JSON.stringify(__menus));
 };
+
+module.exports.makeMenu = function (myModule) {
+    let menuManager = require(__dirname + '/menus_manager');
+
+    for (let i in myModule) {
+        menuManager.addMenu(i);
+    }
+
+    __cache.set(__config.redis_prefix + 'backend_menus', JSON.stringify(__menus));
+}
+
+
+
+
 
 function makeRoute(m){
     let moduleFolder = path.resolve(m.path,'..');

@@ -10,6 +10,7 @@ let _ = require('lodash'),
     fsEx = require('fs-extra'),
     fs = require('fs'),
     conf = {};
+let redis = require('redis').createClient();
 
 
 function init() {
@@ -44,6 +45,14 @@ function init() {
     } else {
         _.assign(conf,require(__base + 'config/env/' + process.env.NODE_ENV));
     }
+
+    redis.get('config.app', function (err,con) {
+        if(con != null) {
+            let userConfig = JSON.parse(con);
+            _.assign(conf.app,userConfig);
+        }
+    });
+
 };
 
 init();
