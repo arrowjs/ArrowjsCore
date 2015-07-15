@@ -1,4 +1,5 @@
-'use strict'
+'use strict';
+
 /**
  * Module dependencies.
  */
@@ -18,11 +19,10 @@ let fs = require('fs'),
     nunjucks = require('nunjucks'),
     _ = require('lodash'),
     Promise = require('bluebird'),
-    libFolder = __dirname;
-let session = require('express-session'),
+    libFolder = __dirname,
+    session = require('express-session'),
     redis = require("redis").createClient(),
     RedisStore = require('connect-redis')(session);
-
 
 class ArrowApplication {
     constructor() {
@@ -37,8 +37,10 @@ class ArrowApplication {
                 this[func] = self[func]
             }
         }
+
         let stack = callsite();
         let requester = stack[1].getFileName();
+
         global.__base = path.dirname(requester) + '/';
         global.__ = require(libFolder + '/global_function');
         global.__utils = require(libFolder + '/utils');
@@ -55,12 +57,10 @@ class ArrowApplication {
     }
 
     config() {
-
         /**
          * Main application entry file.
          * Please note that the order of loading is important.
          */
-
         global.__config = require(libFolder + '/config_manager.js');
         global.__ = require(libFolder + '/global_function');
         global.__lang = require(libFolder + '/i18n.js')();
@@ -80,6 +80,7 @@ class ArrowApplication {
         global.BackModule = require(libFolder + '/BackModule');
         global.BaseWidget = require(libFolder + '/BaseWidget');
         global.FrontModule = require(libFolder + '/FrontModule');
+
         /** Init widgets */
         require(libFolder + '/widgets_manager')();
 
@@ -112,15 +113,12 @@ class ArrowApplication {
  *
  * Support function
  */
-
-
 function makeApp(app, beforeFunc) {
     app.use(express.static(path.resolve(__base + __config.resource.path), __config.resource.option));
 
     /**
-     *    Set local variable
+     * Set local variable
      */
-
     app.locals.title = __config.app.title;
     app.locals.description = __config.app.description;
     app.locals.keywords = __config.app.keywords;
@@ -193,12 +191,12 @@ function makeApp(app, beforeFunc) {
         next(); // otherwise continue
     });
 
-
     /** Use passport session */
     if (fs.existsSync(__base + 'config/passport.js')) {
         app.use(passport.initialize());
         app.use(passport.session());
     }
+
     /** Flash messages */
     app.use(require(path.resolve(libFolder, '..', 'middleware/flash-plugin.js')));
 
@@ -220,7 +218,8 @@ function makeApp(app, beforeFunc) {
         }
         next();
     });
-    ///** Store module status (active|unactive) in Redis */
+
+    /** Store module status (active|unactive) in Redis */
     let md = require(libFolder + '/modules_manager.js');
     redis.get(__config.redis_prefix + 'all_modules', function (err, results) {
         if (results != null) {
@@ -233,6 +232,7 @@ function makeApp(app, beforeFunc) {
         if (menus != null) global.__menus = JSON.parse(menus);
         else console.log('Backend menus is not defined!!!');
     });
+
     /** Module manager */
     if (beforeFunc.length > 0) {
         for (let k in beforeFunc) {
@@ -241,11 +241,9 @@ function makeApp(app, beforeFunc) {
     }
 
     /** Check authenticate in backend */
-
     app.use('/' + __config.admin_prefix + '/*', require(path.resolve(libFolder, '..', 'middleware/modules-plugin.js')));
 
     /** Globbing backend route files */
-
     let adminRoute = __.getOverrideCorePath(__base + 'core/modules/*/backend/route.js', __base + 'app/modules/*/backend/route.js', 3);
     for (let index in adminRoute) {
         if (adminRoute.hasOwnProperty(index)) {
@@ -258,13 +256,15 @@ function makeApp(app, beforeFunc) {
         }
     }
 
-    // Globbing routing admin files
-    __.getGlobbedFiles(__base +'app/frontend/modules/*/settings/*.js').forEach(function (routePath) {
-        __setting_menu_module.push(require(path.resolve(routePath))(app, __config));
-    });
+    /** Globbing menu frontend source */
+    let settings = __.getOverrideCorePath(__base + 'core/modules/*/frontend/settings/*.js', __base + 'app/modules/*/frontend/settings/*.js', 4);
+    for (let index in settings) {
+        if (settings.hasOwnProperty(index)) {
+            __setting_menu_module.push(require(path.resolve(settings[index]))(app, __config));
+        }
+    }
 
     /** Globbing route frontend files */
-
     //for(let i in __modules) {
     //    if(__modules.hasOwnProperty(i)){
     //        if (__modules[i].system || __modules[i].active) {
@@ -280,14 +280,15 @@ function makeApp(app, beforeFunc) {
     //        }
     //    }
     //}
-    //
+
     let frontRoute = __.getOverrideCorePath(__base + 'core/modules/*/frontend/route.js', __base + 'app/modules/*/frontend/route.js', 3);
-    var frontPath = []
+    let frontPath = [];
     for (let index in frontRoute) {
         if (frontRoute.hasOwnProperty(index)) {
             frontPath.push(frontRoute[index]);
         }
     }
+
     frontPath.sort().forEach(function (routePath) {
         let myRoute = require(path.resolve(routePath));
         if (myRoute.name === 'router') {
@@ -295,13 +296,14 @@ function makeApp(app, beforeFunc) {
         } else {
             myRoute(app);
         }
-    })
-    let coreModule = new FrontModule;
-    app.get('/404(.html)?', function (req,res) {
-        coreModule.render404(req,res);
-    })
+    });
 
-    return app
-};
+    let coreModule = new FrontModule;
+    app.get('/404(.html)?', function (req, res) {
+        coreModule.render404(req, res);
+    });
+
+    return app;
+}
 
 module.exports = ArrowApplication;

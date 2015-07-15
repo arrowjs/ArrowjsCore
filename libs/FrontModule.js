@@ -69,7 +69,7 @@ class FrontModule extends BaseModule {
         }
 
         frontEnv.loaders[0].searchPaths = [__base + 'themes/frontend/' + __config.theme, __base + 'themes/frontend/'];
-        console.log('*************', frontEnv.loaders, view);
+        //console.log('*************', frontEnv.loaders, view);
         frontEnv.render(view, _.assign(res.locals, {}), function (err, re) {
             res.send(re);
         });
