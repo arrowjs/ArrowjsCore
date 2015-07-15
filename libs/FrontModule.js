@@ -31,7 +31,7 @@ class FrontModule extends BaseModule {
         let tmp = __config.theme + '/_modules' + self.path + '/' + view;
 
         if (fs.existsSync(__base + 'themes/frontend/' + tmp)) {
-            frontEnv.loaders[0].searchPaths = [__base + 'themes/frontend' ];
+            frontEnv.loaders[0].searchPaths = [__base + 'themes/frontend'];
             view = __config.theme + '/_modules' + self.path + '/' + view;
         } else {
             frontEnv.loaders[0].searchPaths = [__base + 'app/modules', __base + 'core/modules', __base + 'themes/frontend', __base + 'themes/frontend/' + __config.theme];
@@ -67,7 +67,7 @@ class FrontModule extends BaseModule {
             view += '.html';
         }
 
-        frontEnv.loaders[0].searchPaths = [__base + '/themes/frontend/', __base + '/themes/frontend/' + __config.theme];
+        frontEnv.loaders[0].searchPaths = [__base + '/themes/frontend/' + __config.theme, __base + '/themes/frontend/'];
 
         frontEnv.render(view, _.assign(res.locals, {}), function (err, re) {
             res.send(re);
