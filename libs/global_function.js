@@ -250,75 +250,67 @@ exports.parseValue = function (value, col) {
  * @param {string} customCondition - Custom conditions
  * @returns {object}
  */
-exports.createFilter = function (req, res, route, reset_link, current_column, current_order, columns, customCondition) {
-    // Add button Search
+exports.createFilter = function (req, res, route, reset_link, current_column, order, columns, customCondition, type) {
+    //Add button Search
     if (route != '') {
         res.locals.searchButton = __acl.customButton(route);
         res.locals.resetFilterButton = __acl.customButton(reset_link);
     }
-
     let conditions = [];
     let values = [];
     let attributes = [];
-    values.push('');
-
-    // Get column by name
+    values.push('command');
     let getColumn = function (name) {
         for (let i in columns) {
-            if (columns.hasOwnProperty(i) && columns[i].column == name) {
+
+            if (columns[i].column == name) {
                 return columns[i];
             }
         }
         return {filter: {}};
     };
-
-    // Get values
     for (let i in req.query) {
-        if (req.query.hasOwnProperty(i) && req.query[i] != '') {
+        if (req.query[i] != '') {
             let col = getColumn(i);
             if (!col) continue;
-
             if (col.query) {
                 conditions.push(col.query);
-            } else {
+            }
+            else {
                 conditions.push(__.parseCondition(i, req.query[i], col));
             }
 
             let value = __.parseValue(req.query[i], col);
+            //console.log(value);
             if (Array.isArray(value)) {
                 for (let y in value) {
                     values.push(value[y].trim());
                 }
 
-            } else {
+            }
+            else {
                 values.push(value);
             }
+
         }
     }
-
-    // Get attributes
     for (let i in columns) {
-        if (columns.hasOwnProperty(i) && columns[i].column != '')
+        if (columns[i].column != '')
             attributes.push(columns[i].column);
     }
-
     let tmp = conditions.length > 0 ? "(" + conditions.join(" AND ") + ")" : " 1=1 ";
-    values[0] = tmp + (customCondition ? customCondition : '');
-
-    // Set local variables
+    let stCondition = tmp + (customCondition ? customCondition : '');
+    values[0] = stCondition;
     res.locals.table_columns = columns;
     res.locals.currentColumn = current_column;
-    res.locals.currentOrder = current_order;
+    res.locals.currentOrder = order;
     res.locals.filters = req.query;
-
-    // Wrap column name by double quotes to prevent error when query
     if (current_column.indexOf('.') > -1)
         current_column = current_column.replace(/(.*)\.(.*)/, '"$1"."$2"');
-
     return {
         values: values,
         attributes: attributes,
-        sort: current_column + " " + current_order
+        sort: current_column + " " + order
     };
 };
 

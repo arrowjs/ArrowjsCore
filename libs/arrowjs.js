@@ -297,9 +297,10 @@ function makeApp(app, beforeFunc) {
         }
     })
     let coreModule = new FrontModule;
-    app.get('/404', function (req,res) {
+    app.get('/404(.html)?', function (req,res) {
         coreModule.render404(req,res);
     })
+
     return app
 };
 
