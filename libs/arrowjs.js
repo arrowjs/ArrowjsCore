@@ -283,16 +283,20 @@ function makeApp(app, beforeFunc) {
     //}
     //
     let frontRoute = __.getOverrideCorePath(__base + 'core/modules/*/frontend/route.js', __base + 'app/modules/*/frontend/route.js', 3);
+    var frontPath = []
     for (let index in frontRoute) {
         if (frontRoute.hasOwnProperty(index)) {
-            let myRoute = require(path.resolve(frontRoute[index]));
-            if (myRoute.name === 'router') {
-                app.use('/', myRoute);
-            } else {
-                myRoute(app);
-            }
+            frontPath.push(frontRoute[index]);
         }
     }
+    frontPath.sort().forEach(function (routePath) {
+        let myRoute = require(path.resolve(routePath));
+        if (myRoute.name === 'router') {
+            app.use('/', myRoute);
+        } else {
+            myRoute(app);
+        }
+    })
 
     return app
 };
