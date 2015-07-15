@@ -57,6 +57,7 @@ class FrontModule extends BaseModule {
     }
 
     render_error(req, res, view) {
+        console.log(req.url);
         // Get messages from session
         res.locals.messages = req.session.messages;
 

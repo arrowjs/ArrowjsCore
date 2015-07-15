@@ -115,7 +115,6 @@ class ArrowApplication {
 
 
 function makeApp(app, beforeFunc) {
-
     app.use(express.static(path.resolve(__base + __config.resource.path), __config.resource.option));
 
     /**
@@ -297,7 +296,10 @@ function makeApp(app, beforeFunc) {
             myRoute(app);
         }
     })
-
+    let coreModule = new FrontModule;
+    app.get('/404', function (req,res) {
+        coreModule.render404(req,res);
+    })
     return app
 };
 
