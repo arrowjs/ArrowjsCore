@@ -257,10 +257,26 @@ function makeApp(app, beforeFunc) {
     }
 
     /** Globbing menu frontend source */
-    let settings = __.getOverrideCorePath(__base + 'core/modules/*/frontend/settings/*.js', __base + 'app/modules/*/frontend/settings/*.js', 4);
+    let core_settings = {};
+    __.getGlobbedFiles(__base + 'core/modules/*/frontend/settings/*.js').forEach(function (path) {
+        core_settings = __.mergePath(core_settings, path, 4);
+    });
+
+    let app_settings = {};
+    __.getGlobbedFiles(__base + 'app/modules/*/frontend/settings/*.js').forEach(function (path) {
+        app_settings = __.mergePath(app_settings, path, 4);
+    });
+
+    let settings = _.assign(core_settings, app_settings);
     for (let index in settings) {
         if (settings.hasOwnProperty(index)) {
-            __setting_menu_module.push(require(path.resolve(settings[index]))(app, __config));
+            if (Array.isArray(settings[index])) {
+                settings[index].forEach(function (routePath) {
+                    __setting_menu_module.push(require(path.resolve(routePath))(app, __config));
+                });
+            } else {
+                __setting_menu_module.push(require(path.resolve(settings[index]))(app, __config));
+            }
         }
     }
 

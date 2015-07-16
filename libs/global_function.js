@@ -507,6 +507,22 @@ module.exports.getOverrideCorePath = function(corePath, appPath, checkIndex){
 };
 
 /**
+ * Merge all path in same directory
+ */
+module.exports.mergePath = function(paths, routePath, checkIndex){
+    let arr_path = routePath.split('/');
+    let checkName = arr_path[arr_path.length - checkIndex];
+
+    if(paths.hasOwnProperty(checkName)){
+        paths[checkName].push(routePath);
+    }else{
+        paths[checkName] = [routePath];
+    }
+
+    return paths;
+};
+
+/**
  * Get the modules JavaScript files
  */
 module.exports.getJavaScriptAssets = function(includeTests) {
