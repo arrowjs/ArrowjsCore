@@ -4,6 +4,8 @@ let Promise = require('bluebird'),
     fs = require('fs'),
     _ = require('lodash');
 
+let env = __.createNewEnv([__base + 'app/widgets/', __base + 'core/widgets/', __base + "themes/frontend/"]);
+
 class BaseWidget {
     constructor(config) {
         this.config = {
@@ -20,7 +22,7 @@ class BaseWidget {
             }
         };
 
-        this.env = __.createNewEnv([__base + 'app/widgets/', __base + 'core/widgets/', __base + "themes/frontend/"]);
+        this.env = env;
     }
 
     getAllLayouts(alias) {
@@ -100,7 +102,7 @@ class BaseWidget {
             if (!fs.existsSync(widgetFilePath)) {
                 widgetFilePath = __base + 'themes/frontend/default/_widgets/' + widgetFile;
             } else {
-                widgetFilePath = __base + 'themes/frontend/' +__config.theme + '/_widgets/' + widgetFile;
+                widgetFilePath = __base + 'themes/frontend/' + __config.theme + '/_widgets/' + widgetFile;
             }
 
             if (widgetFilePath.indexOf('.html') === -1) {
