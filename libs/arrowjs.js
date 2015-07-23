@@ -221,16 +221,21 @@ function makeApp(app, beforeFunc) {
 
     /** Store module status (active|unactive) in Redis */
     let md = require(libFolder + '/modules_manager.js');
-    redis.get(__config.redis_prefix + 'all_modules', function (err, results) {
+    redis.get(__config.redis_prefix + 'all_modules', function (error, results) {
         if (results != null) {
             global.__modules = JSON.parse(results);
             md.makeMenu(__modules);
         } else {
             md.loadAllModules();
         }
-        let menus = __cache.get(__config.redis_prefix + 'backend_menus')
-        if (menus != null) global.__menus = JSON.parse(menus);
-        else console.log('Backend menus is not defined!!!');
+
+        redis.get(__config.redis_prefix + 'backend_menus', function (err, result) {
+            if (result != null) {
+                global.__menus = JSON.parse(result);
+            } else {
+                console.log('Backend menus is not defined!!!');
+            }
+        });
     });
 
     /** Module manager */
