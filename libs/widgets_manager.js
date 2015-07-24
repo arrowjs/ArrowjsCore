@@ -1,20 +1,48 @@
 'use strict';
 
-module.exports = function () {
-    let w = [];
-    let cache = __cache.get('arrWidgets');
-    if(cache){
-        return cache;
-    }
+let redis = require('redis').createClient();
+let promise = require('bluebird');
+//let getRedis = promise.promisify(redis.get);
 
-    let widgets =__.getOverrideCorePath(__base + "core/widgets/*/*.js", __base + "app/widgets/*/*.js", 2);
+//function() {
+//        let w;
+//        return redis.get('arrWidgets', function (err, result) {
+//            if (err || result == null || result == undefined) {
+//                let widgets = __.getOverrideCorePath(__base + "core/widgets/*/*.js", __base + "app/widgets/*/*.js", 2);
+//                w = [];
+//                for (let index in widgets) {
+//                    if (widgets.hasOwnProperty(index)) {
+//                        let Widget = require(widgets[index]);
+//                        w.push(new Widget());
+//                    }
+//                }
+//                //console.log(JSON.stringify(w));
+//                redis.set('arrWidgets', JSON.stringify(w), redis.print);
+//                return w
+//            } else {
+//                return (JSON.parse(result));
+//            }
+//        });
+//}
 
-    for (let index in widgets) {
-        if (widgets.hasOwnProperty(index)) {
-            let Widget = require(widgets[index]);
-            w.push(new Widget());
-        }
-    }
-    __cache.set('arrWidgets', w);
-    return w;
-};
+module.exports = function getData() {
+    let w;
+    //redis.get('arrWidgets', function (err, result) {
+    //    if (err || result == null || result == undefined) {
+            let widgets = __.getOverrideCorePath(__base + "core/widgets/*/*.js", __base + "app/widgets/*/*.js", 2);
+            w = [];
+            for (let index in widgets) {
+                if (widgets.hasOwnProperty(index)) {
+                    let Widget = require(widgets[index]);
+                    w.push(new Widget());
+                }
+            }
+            return w
+            //console.log(JSON.stringify(w));
+    //        redis.set('arrWidgets', JSON.stringify(w), redis.print);
+    //        cb(w)
+    //    } else {
+    //        cb(JSON.parse(result));
+    //    }
+    //})
+}
