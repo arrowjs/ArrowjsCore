@@ -62,13 +62,12 @@ module.exports.loadAllModules = function () {
 
 module.exports.makeMenu = function (myModule) {
     let menuManager = require(__dirname + '/menus_manager');
-
     for (let i in myModule) {
         menuManager.addMenu(i);
     }
 
     redis.set(__config.redis_prefix + 'backend_menus', JSON.stringify(__menus), redis.print);
-};
+}
 
 
 

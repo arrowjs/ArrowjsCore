@@ -3,8 +3,9 @@
  * Created by thanhnv on 2/23/15.
  */
 let menus = {};
+let redis = require("redis").createClient();
 
-module.exports = function () {
+module.exports = function (fn) {
     // Main Navigation group
     menus.default = {
         title: 'Main Navigation',
@@ -29,22 +30,28 @@ module.exports = function () {
 module.exports.addMenu = function (module) {
     if (__modules[module].hasOwnProperty('backend_menu')) {
         if (!__modules[module].system  && __modules[module].active) {
-            __menus.sorting.default.push(module);
-            __menus.default.modules[module] = __modules[module].backend_menu;
+            if(!__menus.default.modules.hasOwnProperty(module))
+            {
+                __menus.sorting.default.push(module);
+                __menus.default.modules[module] = __modules[module].backend_menu;
+            }
         }
         if(__modules[module].system) {
-            __menus.sorting.systems.push(module);
-            __menus.systems.modules[module] = __modules[module].backend_menu;
+            if(!__menus.systems.modules.hasOwnProperty(module))
+            {
+                __menus.sorting.systems.push(module);
+                __menus.systems.modules[module] = __modules[module].backend_menu;
+            }
         }
     }
 };
 
 module.exports.modifyMenu = function (module) {
     let _ = require('lodash');
-    if (!__modules[module].system  && __modules[module].active) {
+    if (!__modules[module].system && __modules[module].active) {
         _.assign(__menus.default.modules[module], __modules[module].backend_menu);
     }
-    if(__modules[module].system) {
+    if (__modules[module].system) {
         _.assign(__menus.systems.modules[module], __modules[module].backend_menu);
     }
 };
