@@ -20,7 +20,7 @@ function init() {
      */
     glob(__base + 'config/env/' + process.env.NODE_ENV + '.js', {
         sync: true
-    }, function(err, environmentFiles) {
+    }, function (err, environmentFiles) {
         if (!environmentFiles.length) {
             if (process.env.NODE_ENV) {
                 console.error(chalk.red('No configuration file found for "' + process.env.NODE_ENV + '" environment using development instead'));
@@ -33,23 +33,22 @@ function init() {
         }
     });
 
-    if(!fs.existsSync(__base + 'config/env/all.js')) {
-        fsEx.copySync(path.resolve(__dirname,'..','demo/all.js'),__base + 'config/env/all.js');
-        _.assign(conf,require(__base + 'config/env/all.js'));
+    if (!fs.existsSync(__base + 'config/env/all.js')) {
+        fsEx.copySync(path.resolve(__dirname, '..', 'demo/all.js'), __base + 'config/env/all.js');
+        _.assign(conf, require(__base + 'config/env/all.js'));
     } else {
-        _.assign(conf,require(__base + 'config/env/all.js'));
+        _.assign(conf, require(__base + 'config/env/all.js'));
     }
-    if(fs.existsSync(__base + 'config/env/' + process.env.NODE_ENV +'.js')) {
-        _.assign(conf,require(__base + 'config/env/' + process.env.NODE_ENV));
+    if (fs.existsSync(__base + 'config/env/' + process.env.NODE_ENV + '.js')) {
+        _.assign(conf, require(__base + 'config/env/' + process.env.NODE_ENV));
 
     } else {
-        _.assign(conf,require(__base + 'config/env/' + process.env.NODE_ENV));
+        _.assign(conf, require(__base + 'config/env/' + process.env.NODE_ENV));
     }
-
-    redis.get('config.app', function (err,con) {
-        if(con != null) {
+    redis.get('config.app', function (err, con) {
+        if (con != null) {
             let userConfig = JSON.parse(con);
-            _.assign(conf.app,userConfig);
+            _.assign(conf.app, userConfig);
         }
     });
 

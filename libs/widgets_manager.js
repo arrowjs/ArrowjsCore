@@ -37,7 +37,8 @@ module.exports = function getData() {
                     w.push(new Widget());
                 }
             }
-            return w
+            global.__widget = w;
+            return w;
             //console.log(JSON.stringify(w));
     //        redis.set('arrWidgets', JSON.stringify(w), redis.print);
     //        cb(w)

@@ -1,24 +1,34 @@
 "use strict";
 
-let LRU = require("lru-cache"),
-    cache = LRU({
-        maxAge: 1000 * 60 * 60
-    });
+let redis = require('redis').createClient();
 
 module.exports = function () {
     let arr_cache = {};
-
-    arr_cache.set = function (key, data) {
-        return cache.set(key, data);
+    let valid_data = function (data) {
+        if (typeof data != "string") {
+            data = JSON.stringify(data);
+        }
+        return data;
     };
-
+    arr_cache.set = function (key, data) {
+        return redis.set(key, valid_data(data), redis.print);
+    };
+    arr_cache.setex = function (key, timeout, data) {
+        return redis.setex(key, timeout, valid_data(data));
+    };
     arr_cache.get = function (key) {
-        return cache.get(key);
-
+        return new Promise(function (done, reject) {
+            redis.get(key, function (err, result) {
+                if (err != null) {
+                    return reject(err);
+                }
+                done(result);
+            })
+        });
     };
 
     arr_cache.del = function (key) {
-        return cache.del(key);
+        return redis.del(key);
     };
 
     arr_cache.keys = function () {
@@ -42,7 +52,7 @@ module.exports = function () {
     };
 
     arr_cache.config = function (options) {
-        cache = LRU(options);
+        //cache = LRU(options);
     };
 
     return arr_cache;

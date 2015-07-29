@@ -56,8 +56,8 @@ module.exports.loadAllModules = function () {
             delete __modules[i];
         }
     }
-    redis.set(__config.redis_prefix + 'all_modules', JSON.stringify(__modules), redis.print);
-    redis.set(__config.redis_prefix + 'backend_menus', JSON.stringify(__menus), redis.print);
+    __cache.set(__config.redis_prefix + 'all_modules', JSON.stringify(__modules));
+    __cache.set(__config.redis_prefix + 'backend_menus', JSON.stringify(__menus));
 };
 
 module.exports.makeMenu = function (myModule) {
@@ -65,8 +65,7 @@ module.exports.makeMenu = function (myModule) {
     for (let i in myModule) {
         menuManager.addMenu(i);
     }
-
-    redis.set(__config.redis_prefix + 'backend_menus', JSON.stringify(__menus), redis.print);
+    __cache.set(__config.redis_prefix + 'backend_menus', JSON.stringify(__menus));
 }
 
 

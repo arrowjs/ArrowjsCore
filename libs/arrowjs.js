@@ -199,7 +199,7 @@ function makeApp(app, beforeFunc) {
 
     /** Flash messages */
     app.use(require(path.resolve(libFolder, '..', 'middleware/flash-plugin.js')));
-
+    app.use(require('../middleware/global_loading'));
     /** Use helmet to secure Express headers */
     app.use(helmet.xframe());
     app.use(helmet.xssFilter());
@@ -235,9 +235,12 @@ function makeApp(app, beforeFunc) {
         } else {
             md.loadAllModules();
         }
-        md.makeMenu(__modules);
-    });
+        let menus = __cache.get(__config.redis_prefix + 'backend_menus').then(function (menus) {
+            if (menus != null) global.__menus = JSON.parse(menus);
+            else console.log('Backend menus is not defined!!!');
+        });
 
+    });
 
     /** Module manager */
     if (beforeFunc.length > 0) {
