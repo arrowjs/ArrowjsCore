@@ -21,6 +21,10 @@ module.exports = function (req, res, next) {
             .catch(function (err) {
                 console.log('***********', err.stack);
             });
+        __cache.get(__config.redis_prefix + __config.key).then(function (config) {
+            if(config != null) global.__config = JSON.parse(config);
+            else console.log('Config is not defined!!!')
+        })
 
     });
     next();
