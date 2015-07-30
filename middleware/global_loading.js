@@ -23,7 +23,9 @@ module.exports = function (req, res, next) {
             });
         __cache.get(__config.redis_prefix + __config.key).then(function (config) {
             if(config != null) global.__config = JSON.parse(config);
-            else console.log('Config is not defined!!!')
+            else {
+                global.__config = require('../libs/config_manager.js');
+            }
         }).catch(function (err) {
             console.log('***********', err.stack);
         });
