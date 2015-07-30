@@ -8,7 +8,6 @@ module.exports = function (req, res, next) {
     __cache.get(__config.redis_prefix + 'all_modules').then(function (results) {
 
         if (results != null) {
-            console.log('$$$$$$$$');
             global.__modules = JSON.parse(results);
         } else {
             md.loadAllModules();
