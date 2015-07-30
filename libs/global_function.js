@@ -89,7 +89,7 @@ exports.sortMenus = function (menus) {
  */
 exports.getWidget = function (alias) {
     let widgets = __widget;//require(__dirname + '/widgets_manager')();
-    console.log(widgets);
+    //console.log(widgets);
     for (let i in widgets) {
         if (widgets.hasOwnProperty(i)) {
             if (widgets[i].config && widgets[i].config.alias == alias) {
