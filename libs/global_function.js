@@ -89,7 +89,6 @@ exports.sortMenus = function (menus) {
  */
 exports.getWidget = function (alias) {
     let widgets = __widget;//require(__dirname + '/widgets_manager')();
-    //console.log(widgets);
     for (let i in widgets) {
         if (widgets.hasOwnProperty(i)) {
             if (widgets[i].config && widgets[i].config.alias == alias) {
@@ -126,7 +125,7 @@ exports.createNewEnv = function (views) {
  * @returns {object}
  */
 exports.getAllCustomFilter = function (env) {
-    let custom_filters =__.getOverrideCorePath(__base + 'core/custom_filters/*.js', __base + 'app/custom_filters/*.js', 1);
+    let custom_filters = __.getOverrideCorePath(__base + 'core/custom_filters/*.js', __base + 'app/custom_filters/*.js', 1);
 
     for (let index in custom_filters) {
         if (custom_filters.hasOwnProperty(index)) {
@@ -281,32 +280,35 @@ exports.createFilter = function (req, res, route, reset_link, current_column, or
             }
 
             let value = __.parseValue(req.query[i], col);
-            //console.log(value);
+
             if (Array.isArray(value)) {
                 for (let y in value) {
                     values.push(value[y].trim());
                 }
-
-            }
-            else {
+            } else {
                 values.push(value);
             }
 
         }
     }
+
     for (let i in columns) {
         if (columns[i].column != '')
             attributes.push(columns[i].column);
     }
+
     let tmp = conditions.length > 0 ? "(" + conditions.join(" AND ") + ")" : " 1=1 ";
     let stCondition = tmp + (customCondition ? customCondition : '');
     values[0] = stCondition;
+
     res.locals.table_columns = columns;
     res.locals.currentColumn = current_column;
     res.locals.currentOrder = order;
     res.locals.filters = req.query;
+
     if (current_column.indexOf('.') > -1)
         current_column = current_column.replace(/(.*)\.(.*)/, '"$1"."$2"');
+
     return {
         values: values,
         attributes: attributes,
@@ -439,7 +441,7 @@ exports.t = function () {
 /**
  * Get files by glob patterns
  */
-module.exports.getGlobbedFiles = function(globPatterns, removeRoot) {
+module.exports.getGlobbedFiles = function (globPatterns, removeRoot) {
     // For context switching
     let _this = this;
 
@@ -451,7 +453,7 @@ module.exports.getGlobbedFiles = function(globPatterns, removeRoot) {
 
     // If glob pattern is array so we use each pattern in a recursive way, otherwise we use glob
     if (_.isArray(globPatterns)) {
-        globPatterns.forEach(function(globPattern) {
+        globPatterns.forEach(function (globPattern) {
             output = _.union(output, _this.getGlobbedFiles(globPattern, removeRoot));
         });
     } else if (_.isString(globPatterns)) {
@@ -460,9 +462,9 @@ module.exports.getGlobbedFiles = function(globPatterns, removeRoot) {
         } else {
             glob(globPatterns, {
                 sync: true
-            }, function(err, files) {
+            }, function (err, files) {
                 if (removeRoot) {
-                    files = files.map(function(file) {
+                    files = files.map(function (file) {
                         return file.replace(removeRoot, '');
                     });
                 }
@@ -478,7 +480,7 @@ module.exports.getGlobbedFiles = function(globPatterns, removeRoot) {
 /**
  * Replace paths with same name in "checkIndex" position (calculate from end string when split with "/")
  */
-module.exports.overrideCorePath = function(paths, routePath, checkIndex){
+module.exports.overrideCorePath = function (paths, routePath, checkIndex) {
     let arr_path = routePath.split('/');
     let checkName = arr_path[arr_path.length - checkIndex];
 
@@ -492,7 +494,7 @@ module.exports.overrideCorePath = function(paths, routePath, checkIndex){
 /**
  * Replace core paths with app paths if they have same name in "checkIndex" position using overrideCorePath
  */
-module.exports.getOverrideCorePath = function(corePath, appPath, checkIndex){
+module.exports.getOverrideCorePath = function (corePath, appPath, checkIndex) {
     let paths = [];
 
     __.getGlobbedFiles(corePath).forEach(function (routePath) {
@@ -509,13 +511,13 @@ module.exports.getOverrideCorePath = function(corePath, appPath, checkIndex){
 /**
  * Merge all path in same directory
  */
-module.exports.mergePath = function(paths, routePath, checkIndex){
+module.exports.mergePath = function (paths, routePath, checkIndex) {
     let arr_path = routePath.split('/');
     let checkName = arr_path[arr_path.length - checkIndex];
 
-    if(paths.hasOwnProperty(checkName)){
+    if (paths.hasOwnProperty(checkName)) {
         paths[checkName].push(routePath);
-    }else{
+    } else {
         paths[checkName] = [routePath];
     }
 
@@ -525,7 +527,7 @@ module.exports.mergePath = function(paths, routePath, checkIndex){
 /**
  * Get the modules JavaScript files
  */
-module.exports.getJavaScriptAssets = function(includeTests) {
+module.exports.getJavaScriptAssets = function (includeTests) {
     let output = this.getGlobbedFiles(this.assets.lib.js.concat(this.assets.js), 'public/');
 
     // To include tests
@@ -539,7 +541,7 @@ module.exports.getJavaScriptAssets = function(includeTests) {
 /**
  * Get the modules CSS files
  */
-module.exports.getCSSAssets = function() {
+module.exports.getCSSAssets = function () {
     let output = this.getGlobbedFiles(this.assets.lib.css.concat(this.assets.css), 'public/');
     return output;
 };

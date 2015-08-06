@@ -13,11 +13,6 @@ if(__config.db) {
 let db = {};
 
 /** Import models core */
-//__.getOverrideCorePath(__base + 'core/modules/*/models/*.js', __base + 'app/modules/*/models/*.js', 3).forEach(function (routePath) {
-//    console.log(routePath);
-//    //let model = sequelize["import"](path.resolve(routePath));
-//    //db[model.name] = model;
-//});
 __.getGlobbedFiles(__base + 'core/modules/*/models/*.js').forEach(function (routePath) {
     let model = sequelize["import"](path.resolve(routePath));
     db[model.name] = model;
