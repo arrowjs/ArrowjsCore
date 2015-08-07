@@ -1,16 +1,12 @@
 {
   "name": "arrowjs",
   "version": "0.0.1",
-  "description": "Arrowjs framework",
+  "description": "ArrowJS framework",
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },
-  "repository": {
-    "type": "git",
-    "url": "http://trquoccuong@jira:7990/scm/~trquoccuong/arrowjsframework.git"
-  },
-  "author": "Tran Quoc Cuong <trquoccuong@gmail.com>",
+  "author": "Techmaster Vietnam <cuong@techmaster.vn>",
   "license": "MIT",
   "dependencies": {
     "bluebird": "^2.9.30",

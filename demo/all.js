@@ -26,15 +26,15 @@ module.exports = {
             user: 'test@gmail.com',
             pass: 'secret'
         },
-        mailer_from: "Techmaster <support@techmaster.vn>",
-        mailer_to: "admin@techmaster.vn"
+        mailer_from: "Techmaster <test@techmaster.vn>",
+        mailer_to: "test@techmaster.vn"
     },
     pagination: {
         number_item: 20
     },
     port: process.env.PORT || 3333,
     templateEngine: 'nunjucks',
-    sessionSecret: 'GREEN',
+    sessionSecret: 'ARROWJS',
     sessionCollection: 'sessions',
     theme: 'default',
     assets: {

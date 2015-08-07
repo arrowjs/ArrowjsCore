@@ -4,10 +4,10 @@ module.exports = {
     db: {
         host: 'localhost',
         port: '5432',
-        database: 'coretechmaster',
-        username: 'postgres',
-        password: '',
-        dialect: 'postgres',
+        database: 'db_name',
+        username: 'db_username',
+        password: 'db_password',
+        dialect: 'db_type',
         logging: false
     },
     redis: {
@@ -23,8 +23,8 @@ module.exports = {
         }
     },
     facebook: {
-        clientID: process.env.FACEBOOK_ID || '290270177727593',
-        clientSecret: process.env.FACEBOOK_SECRET || 'd49fccd3d02c70d720f9cc73d3bdf8e7',
+        clientID: process.env.FACEBOOK_ID || 'APP_ID',
+        clientSecret: process.env.FACEBOOK_SECRET || 'APP_SECRET',
         callbackURL: 'http://techmaster.vn/auth/facebook/callback'
     },
     twitter: {
@@ -33,8 +33,8 @@ module.exports = {
         callbackURL: '/auth/twitter/callback'
     },
     google: {
-        clientID: process.env.GOOGLE_ID || '107775395827-g1f2ls3j25edhsec8ahrmknoo9a70ofr.apps.googleusercontent.com',
-        clientSecret: process.env.GOOGLE_SECRET || 'Xlawr7Rn2Tua3ldPqpPRRfBf',
+        clientID: process.env.GOOGLE_ID || 'CONSUMER_KEY',
+        clientSecret: process.env.GOOGLE_SECRET || 'CONSUMER_SECRET',
         callbackURL: 'http://techmaster.vn/auth/google/callback'
     },
     linkedin: {
