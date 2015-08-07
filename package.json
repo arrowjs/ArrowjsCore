@@ -1,6 +1,6 @@
 {
   "name": "arrowjs",
-  "version": "0.0.2",
+  "version": "0.0.3",
   "description": "ArrowJS framework for Node.js",
   "main": "index.js",
   "scripts": {
