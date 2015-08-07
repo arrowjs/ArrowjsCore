@@ -1,7 +1,5 @@
-/**
- * Created by vhchung on 6/24/15.
- */
 'use strict';
+
 let md = require('../libs/modules_manager');
 let _ = require('lodash');
 

@@ -1,4 +1,4 @@
-SEO.js for Node.js
+ArrowJS for Node.js
 ==================
 
 Welcome to ArrowJS for Node.js! ArrowJS is framework base on Express.js, it helps you build your web application easier.

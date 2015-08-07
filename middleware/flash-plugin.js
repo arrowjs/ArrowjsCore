@@ -1,7 +1,5 @@
-'use strict'
-/**
- * Created by thanhnv on 3/2/15.
- */
+'use strict';
+
 module.exports = function (req, res, next) {
     if (!req.session.messages) {
         req.session.messages = [];

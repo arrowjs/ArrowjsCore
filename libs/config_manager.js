@@ -39,25 +39,25 @@ function init() {
     } else {
         _.assign(conf, require(__base + 'config/env/all.js'));
     }
+
     if (fs.existsSync(__base + 'config/env/' + process.env.NODE_ENV + '.js')) {
         _.assign(conf, require(__base + 'config/env/' + process.env.NODE_ENV));
 
     } else {
         _.assign(conf, require(__base + 'config/env/' + process.env.NODE_ENV));
     }
+
     redis.get('config.app', function (err, con) {
         if (con != null) {
             let userConfig = JSON.parse(con);
             _.assign(conf.app, userConfig);
         }
     });
-
-};
+}
 
 init();
 /**
  * Load app configurations
  */
 
-
-module.exports = conf
+module.exports = conf;

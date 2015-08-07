@@ -141,7 +141,6 @@ exports.getAllCustomFilter = function (env) {
  * @param {object} env - Environment to add global variable
  * @returns {object}
  */
-//todo: hoi anh thanh
 exports.getAllGlobalVariable = function (env) {
     env.addGlobal('create_link', function (module_name, link) {
         return module_name + '/' + link;

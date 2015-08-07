@@ -290,22 +290,6 @@ function makeApp(app, beforeFunc) {
     }
 
     /** Globbing route frontend files */
-    //for(let i in __modules) {
-    //    if(__modules.hasOwnProperty(i)){
-    //        if (__modules[i].system || __modules[i].active) {
-    //            let myRoute = __modules[i].frontRoute;
-    //            if(myRoute) {
-    //                if (myRoute.name === 'router') {
-    //                    app.use('/', myRoute);
-    //                } else {
-    //                    myRoute(app);
-    //                }
-    //
-    //            }
-    //        }
-    //    }
-    //}
-
     let frontRoute = __.getOverrideCorePath(__base + 'core/modules/*/frontend/route.js', __base + 'app/modules/*/frontend/route.js', 3);
     let frontPath = [];
     for (let index in frontRoute) {

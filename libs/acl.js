@@ -1,5 +1,7 @@
 'use strict';
+
 let callsite = require('callsite');
+
 /**
  * Check permission of users.
  * @param {string} route - Route which user access.
@@ -8,14 +10,12 @@ let callsite = require('callsite');
  * @param {boolean} hasAuthorize - Authorize of user.
  * @return  Redirect to error page with flash message.
  */
-
-exports.isAllow = function  (action, orAction, hasAuthorize) {
+exports.isAllow = function (action, orAction, hasAuthorize) {
     let stack = callsite();
     let i = stack[1].getFileName().split('/');
     let g = i[i.length - 3];
     let route = g
     return function (req, res, next) {
-
         // Check module active
         if (__modules[route] != undefined && (__modules[route].system || __modules[route].active)) {
             // Check acl

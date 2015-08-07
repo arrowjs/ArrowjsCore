@@ -1,7 +1,5 @@
 'use strict';
-/**
- * Created by thanhnv on 2/23/15.
- */
+
 let menus = {};
 let redis = require("redis").createClient();
 
@@ -36,6 +34,7 @@ module.exports.addMenu = function (module) {
                 __menus.default.modules[module] = __modules[module].backend_menu;
             }
         }
+
         if(__modules[module].system) {
             if(!__menus.systems.modules.hasOwnProperty(module))
             {

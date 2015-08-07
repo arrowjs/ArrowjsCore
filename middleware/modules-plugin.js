@@ -1,6 +1,5 @@
 'use strict';
 
-
 module.exports = function (req, res, next) {
     // Check if is using admin view
     let pre_fix = '';

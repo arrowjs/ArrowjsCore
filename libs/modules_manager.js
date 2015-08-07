@@ -66,11 +66,7 @@ module.exports.makeMenu = function (myModule) {
         menuManager.addMenu(i);
     }
     __cache.set(__config.redis_prefix + 'backend_menus', JSON.stringify(__menus));
-}
-
-
-
-
+};
 
 function makeRoute(m){
     let moduleFolder = path.resolve(m.path,'..');
