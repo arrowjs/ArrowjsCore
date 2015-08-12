@@ -40,10 +40,12 @@ function init() {
         _.assign(conf, require(__base + 'config/env/all.js'));
     }
 
+    process.env.NODE_ENV = process.env.NODE_ENV || 'development';
+
     if (fs.existsSync(__base + 'config/env/' + process.env.NODE_ENV + '.js')) {
         _.assign(conf, require(__base + 'config/env/' + process.env.NODE_ENV));
-
     } else {
+        fsEx.copySync(path.resolve(__dirname, '..', 'demo/development.js'), __base + 'config/env/' + process.env.NODE_ENV + '.js');
         _.assign(conf, require(__base + 'config/env/' + process.env.NODE_ENV));
     }
 

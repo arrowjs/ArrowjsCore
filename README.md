@@ -3,6 +3,19 @@ ArrowJS for Node.js
 
 Welcome to ArrowJS for Node.js! ArrowJS is framework base on Express.js, it helps you build your web application easier.
 
+```javascript
+    var Arrowjs = require('arrowjs');
+        
+    var app = new Arrowjs;
+    app.config();
+    
+    app.get('/', function (req, res) {
+        res.send('Hello ArrowJS');
+    })
+    
+    app.listen(3333);
+```
+
 ## Installation
 
 To get started with arrowjs install the ```arrowjs``` package:

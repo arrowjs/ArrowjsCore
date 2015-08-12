@@ -207,7 +207,6 @@ exports.parseValue = function (value, col) {
         value = "%" + value + "%";
     } else if (col.filter.data_type == 'bytes') {
         let match = /([0-9]+)\s*(.*)/g.exec(value);
-
         if (match) {
             let unit = match[2];
             value = match[1];
@@ -243,21 +242,22 @@ exports.parseValue = function (value, col) {
  * @param {route} route - Module name
  * @param {string} reset_link - Link to create button reset filter
  * @param {string} current_column - Current column used to sorting
- * @param {string} current_order - Current "order by" used to sorting
+ * @param {string} order - Current "order by" used to sorting
  * @param {string} columns - List of columns which display in table
  * @param {string} customCondition - Custom conditions
  * @returns {object}
  */
-exports.createFilter = function (req, res, route, reset_link, current_column, order, columns, customCondition, type) {
-    //Add button Search
+exports.createFilter = function (req, res, route, reset_link, current_column, order, columns, customCondition) {
     if (route != '') {
         res.locals.searchButton = __acl.customButton(route);
         res.locals.resetFilterButton = __acl.customButton(reset_link);
     }
+
     let conditions = [];
     let values = [];
     let attributes = [];
     values.push('command');
+
     let getColumn = function (name) {
         for (let i in columns) {
 
@@ -267,18 +267,25 @@ exports.createFilter = function (req, res, route, reset_link, current_column, or
         }
         return {filter: {}};
     };
+
     for (let i in req.query) {
         if (req.query[i] != '') {
             let col = getColumn(i);
             if (!col) continue;
             if (col.query) {
                 conditions.push(col.query);
-            }
-            else {
+            } else {
                 conditions.push(__.parseCondition(i, req.query[i], col));
             }
 
-            let value = __.parseValue(req.query[i], col);
+            let filterType = col.filter.data_type;
+            let isDateRange = req.query[i].match(/^[0-9]{4}-[0-9]{2}-[0-9]{2} - [0-9]{4}-[0-9]{2}-[0-9]{2}$/);
+            let value = null;
+            if (filterType != 'datetime' || (filterType == 'datetime' && isDateRange != null)) {
+                value = __.parseValue(req.query[i], col);
+            } else {
+                value = __.parseValue('1970-01-01 - 1970-01-01', col);
+            }
 
             if (Array.isArray(value)) {
                 for (let y in value) {
@@ -287,26 +294,22 @@ exports.createFilter = function (req, res, route, reset_link, current_column, or
             } else {
                 values.push(value);
             }
-
         }
     }
 
     for (let i in columns) {
-        if (columns[i].column != '')
-            attributes.push(columns[i].column);
+        if (columns[i].column != '') attributes.push(columns[i].column);
     }
 
     let tmp = conditions.length > 0 ? "(" + conditions.join(" AND ") + ")" : " 1=1 ";
-    let stCondition = tmp + (customCondition ? customCondition : '');
-    values[0] = stCondition;
+    values[0] = tmp + (customCondition ? customCondition : '');
 
     res.locals.table_columns = columns;
     res.locals.currentColumn = current_column;
     res.locals.currentOrder = order;
     res.locals.filters = req.query;
 
-    if (current_column.indexOf('.') > -1)
-        current_column = current_column.replace(/(.*)\.(.*)/, '"$1"."$2"');
+    if (current_column.indexOf('.') > -1) current_column = current_column.replace(/(.*)\.(.*)/, '"$1"."$2"');
 
     return {
         values: values,
@@ -317,7 +320,7 @@ exports.createFilter = function (req, res, route, reset_link, current_column, or
 
 /**
  * Convert filter values to String (use in raw query)
- * @param {array} filterValues - Values of filter which created by createFilter
+ * @param {Array} filterValues - Values of filter which created by createFilter
  * @returns {string}
  */
 exports.toRawFilter = function (filterValues) {
@@ -374,7 +377,6 @@ exports.checkFileSecurity = function (file_path) {
         "readFileSync"
     ];
     let fileCheckRegex = new RegExp(fileCheck.join('|'), 'g');
-
     if (content.match(fileCheckRegex) != null) {
         result.file_activities = "Read files";
     }
@@ -384,7 +386,6 @@ exports.checkFileSecurity = function (file_path) {
         "__models"
     ];
     let databaseCheckRegex = new RegExp(databaseCheck.join('|'), 'g');
-
     if (content.match(databaseCheckRegex) != null) {
         result.database_activities = "Connect database";
     }
@@ -400,7 +401,7 @@ exports.checkFileSecurity = function (file_path) {
 /**
  * Check security of all file in directory
  * @param {string} path
- * @param {array} result
+ * @param {Array} result
  * @returns {boolean}
  */
 exports.checkDirectorySecurity = function (path, result) {
