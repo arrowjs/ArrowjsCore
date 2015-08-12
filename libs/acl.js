@@ -4,7 +4,6 @@ let callsite = require('callsite');
 
 /**
  * Check permission of users.
- * @param {string} route - Route which user access.
  * @param {string} action - Action which user access.
  * @param {string} orAction - Alternative action to check.
  * @param {boolean} hasAuthorize - Authorize of user.
@@ -13,8 +12,8 @@ let callsite = require('callsite');
 exports.isAllow = function (action, orAction, hasAuthorize) {
     let stack = callsite();
     let i = stack[1].getFileName().split('/');
-    let g = i[i.length - 3];
-    let route = g
+    let route = i[i.length - 3];
+
     return function (req, res, next) {
         // Check module active
         if (__modules[route] != undefined && (__modules[route].system || __modules[route].active)) {
@@ -67,7 +66,7 @@ exports.addButton = function (req, route, action, url) {
                     if (url === undefined) {
                         return route.replace('_', '-');
                     } else {
-                        return url.replace('_', '-');
+                        return url;
                     }
                 }
             }
