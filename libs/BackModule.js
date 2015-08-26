@@ -12,6 +12,7 @@ class BackModule extends BaseModule {
         let i = stack[1].getFileName().split('/');
         let g = i[i.length - 4];
         super(g);
+        this.fullPath = stack[1].getFileName();
     }
 
     render(req, res, view, options, fn) {
@@ -25,11 +26,12 @@ class BackModule extends BaseModule {
         if (view.indexOf('.html') == -1) {
             view += '.html';
         }
-
-        if (self.path.indexOf('/') == 0) {
-            view = self.path.substring(1) + '/backend/views/' + view;
-        } else {
-            view = self.path + '/backend/views/' + view;
+        if (self.fullPath.indexOf('modules') > -1 ) {
+            if (self.path.indexOf('/') == 0) {
+                view = self.path.substring(1) + '/backend/views/' + view;
+            } else {
+                view = self.path + '/backend/views/' + view;
+            }
         }
 
         if (fn) {
