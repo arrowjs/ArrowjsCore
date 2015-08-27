@@ -1,26 +1,52 @@
 'use strict';
 
 let redis = require('redis').createClient();
+let sub = require('redis').createClient();
 let path = require('path');
 let _ = require('lodash');
 let fs = require('fs');
-let modules = {};
+let Promise = require('bluebird');
+let menuManager = require(__dirname + '/menus_manager');
 
-module.exports = function () {
-    return modules;
+
+sub.on("message", function (a) {
+    getModule().then(function (modules) {
+        menuManager().then(function (menus) {
+            global.__modules = modules;
+            global.__menus = menus;
+        })
+    })
+});
+
+sub.subscribe('moduleUpdate');
+
+module.exports = getModule;
+
+function getModule() {
+    return new Promise(function (fulfill, reject) {
+        return redis.get(__config.redis_prefix + 'all_modules', function (err, result) {
+            if (err) reject(err);
+            if (result) {
+                fulfill(JSON.parse(result));
+            } else {
+                let m = {};
+                fulfill(m);
+            }
+        });
+    })
+
 };
 
 module.exports.loadAllModules = function () {
-    let menuManager = require(__dirname + '/menus_manager');
     let module_tmp = {};
     // Load modules
-    let moduleList =__.getOverrideCorePath(__base + 'core/modules/*/module.js', __base + 'app/modules/*/module.js', 2);
+    let moduleList = __.getOverrideCorePath(__base + 'core/modules/*/module.js', __base + 'app/modules/*/module.js', 2);
 
     for (let index in moduleList) {
         if (moduleList.hasOwnProperty(index)) {
             if (moduleList[index].indexOf(__base + 'core/modules') > -1) {
                 // System modules
-                let sysModule =  require(moduleList[index])(module_tmp)[index];
+                let sysModule = require(moduleList[index])(module_tmp)[index];
                 sysModule.path = moduleList[index];
                 sysModule.system = true;
                 sysModule.active = true;
@@ -36,7 +62,6 @@ module.exports.loadAllModules = function () {
             }
         }
     }
-
     // Add new module
     for (let i in module_tmp) {
         if (__modules[i] == undefined) {
@@ -56,8 +81,17 @@ module.exports.loadAllModules = function () {
             delete __modules[i];
         }
     }
-    __cache.set(__config.redis_prefix + 'all_modules', JSON.stringify(__modules));
-    __cache.set(__config.redis_prefix + 'backend_menus', JSON.stringify(__menus));
+    return new Promise(function (fulfill, reject) {
+        return redis.set(__config.redis_prefix + 'all_modules', JSON.stringify(__modules), function (err) {
+            if (err) reject(err);
+            return redis.set(__config.redis_prefix + 'backend_menus', JSON.stringify(__menus), function (err) {
+                if (err) reject(err);
+                redis.publish('moduleUpdate', 'I update');
+                fulfill(true)
+            });
+        });
+    })
+
 };
 
 module.exports.makeMenu = function (myModule) {
@@ -65,15 +99,15 @@ module.exports.makeMenu = function (myModule) {
     for (let i in myModule) {
         menuManager.addMenu(i);
     }
-    __cache.set(__config.redis_prefix + 'backend_menus', JSON.stringify(__menus));
+    redis.set(__config.redis_prefix + 'backend_menus', JSON.stringify(__menus));
 };
 
-function makeRoute(m){
-    let moduleFolder = path.resolve(m.path,'..');
-    if(fs.existsSync(moduleFolder+'/backend/route.js')){
-        m.adminRoute = require(moduleFolder+'/backend/route.js');
+function makeRoute(m) {
+    let moduleFolder = path.resolve(m.path, '..');
+    if (fs.existsSync(moduleFolder + '/backend/route.js')) {
+        m.adminRoute = require(moduleFolder + '/backend/route.js');
     }
-    if(fs.existsSync(moduleFolder+'/frontend/route.js')){
+    if (fs.existsSync(moduleFolder + '/frontend/route.js')) {
         m.frontRoute = require(moduleFolder + '/frontend/route.js');
     }
     return m

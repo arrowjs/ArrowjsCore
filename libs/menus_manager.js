@@ -1,43 +1,50 @@
 'use strict';
 
-let menus = {};
-let redis = require("redis").createClient();
+var redis = require('redis').createClient();
 
-module.exports = function (fn) {
-    // Main Navigation group
-    menus.default = {
-        title: 'Main Navigation',
-        sort: 1,
-        modules: {}
-    };
+module.exports = function () {
+    return new Promise(function (fulfill, reject) {
+        return redis.get(__config.redis_prefix + 'backend_menus', function (err, result) {
+            if (err) reject(err);
+            if (result) {
+                return fulfill(JSON.parse(result));
+            } else {
+                let menus = {};
+                // Main Navigation group
+                menus.default = {
+                    title: 'Main Navigation',
+                    sort: 1,
+                    modules: {}
+                };
 
-    // System group
-    menus.systems = {
-        title: 'Systems',
-        sort: 2,
-        modules: {}
-    };
+                // System group
+                menus.systems = {
+                    title: 'Systems',
+                    sort: 2,
+                    modules: {}
+                };
 
-    // Sorting menu
-    menus.sorting = {};
-    menus.sorting.default = [];
-    menus.sorting.systems = [];
-    return menus;
+                // Sorting menu
+                menus.sorting = {};
+                menus.sorting.default = [];
+                menus.sorting.systems = [];
+                return fulfill(menus);
+            }
+        });
+    })
 };
 
 module.exports.addMenu = function (module) {
     if (__modules[module].hasOwnProperty('backend_menu')) {
-        if (!__modules[module].system  && __modules[module].active) {
-            if(!__menus.default.modules.hasOwnProperty(module))
-            {
+        if (!__modules[module].system && __modules[module].active) {
+            if (!__menus.default.modules.hasOwnProperty(module)) {
                 __menus.sorting.default.push(module);
                 __menus.default.modules[module] = __modules[module].backend_menu;
             }
         }
 
-        if(__modules[module].system) {
-            if(!__menus.systems.modules.hasOwnProperty(module))
-            {
+        if (__modules[module].system) {
+            if (!__menus.systems.modules.hasOwnProperty(module)) {
                 __menus.sorting.systems.push(module);
                 __menus.systems.modules[module] = __modules[module].backend_menu;
             }
