@@ -20,7 +20,8 @@ let fs = require('fs'),
     _ = require('lodash'),
     Promise = require('bluebird'),
     libFolder = __dirname,
-    redis = require("redis").createClient();
+    redis = require("redis").createClient(),
+    pluginManager = require('./plugins_manager');
 
 class ArrowApplication {
     constructor() {
@@ -46,6 +47,10 @@ class ArrowApplication {
         global.BaseWidget = require(libFolder + '/BaseWidget');
         global.FrontModule = require(libFolder + '/FrontModule');
         global.__cache = require(libFolder + '/arr_caching')();
+        require(libFolder + '/config_manager.js')().then(function () {
+            return null;
+        });
+        global.__models = require(libFolder + '/models_manager');
     }
 
     addModule(modulePath) {
@@ -64,30 +69,19 @@ class ArrowApplication {
          * Main application entry file.
          * Please note that the order of loading is important.
          */
-        require(libFolder + '/config_manager.js')().then(function () {
-            return null;
-        });
-        global.__configManager = require(libFolder + '/config_manager.js');
         global.__ = require(libFolder + '/global_function');
         global.__lang = require(libFolder + '/i18n.js')();
         global.__dateformatter = require(libFolder + '/dateformatter');
         global.__acl = require(libFolder + '/acl');
-        global.__models = require(libFolder + '/models_manager');
-        global.__pluginManager = require(libFolder + '/plugins_manager');
         global.__menus = {};
-        global.__menuManager = require(libFolder + '/menus_manager.js');
         global.__modules = {};
-        global.__moduleManager = require(libFolder + '/modules_manager');
-        global.__event = require(libFolder + '/event_manager');
-        global.__widget = require(libFolder + '/widgets_manager');
-        global.__messages = [];
         global.__setting_menu_module = [];
 
         /** Init widgets */
         require(libFolder + '/widgets_manager')();
 
         /** Init plugins */
-        __pluginManager.loadAllPlugins();
+        pluginManager.loadAllPlugins();
 
         /** Create app dir if not exist */
         __utils.createDirectory('app');

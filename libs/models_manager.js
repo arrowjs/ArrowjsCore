@@ -1,11 +1,11 @@
 "use strict";
 
-let fs = require("fs");
 let path = require("path");
 let Sequelize = require("sequelize");
 let sequelize;
 
-let env = process.env.NODE_ENV || "development";
+var __ =  require('./global_function');
+
 if(__config.db) {
     sequelize = new Sequelize(__config.db.database, __config.db.username, __config.db.password, __config.db);
 }

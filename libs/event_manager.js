@@ -1,6 +1,7 @@
 'use strict';
 
 let Promise = require('bluebird');
+let pluginManager = require('./plugins_manager');
 
 function EventManager() {
     this.fire_event = function (name, data, cb) {
@@ -10,9 +11,9 @@ function EventManager() {
         let syncData;
 
         // Check plugin will run with event
-        for (let i in __pluginManager.plugins) {
-            if (__pluginManager.plugins.hasOwnProperty(i)) {
-                let plugin = __pluginManager.plugins[i];
+        for (let i in pluginManager.plugins) {
+            if (pluginManager.plugins.hasOwnProperty(i)) {
+                let plugin = pluginManager.plugins[i];
                 let active = plugin.active;
 
                 if (active) {
