@@ -20,9 +20,7 @@ let fs = require('fs'),
     _ = require('lodash'),
     Promise = require('bluebird'),
     libFolder = __dirname,
-    session = require('express-session'),
-    redis = require("redis").createClient(),
-    RedisStore = require('connect-redis')(session);
+    redis = require("redis").createClient();
 
 class ArrowApplication {
     constructor() {
@@ -44,6 +42,9 @@ class ArrowApplication {
         global.__base = path.dirname(requester) + '/';
         global.__ = require(libFolder + '/global_function');
         global.__utils = require(libFolder + '/utils');
+        global.BackModule = require(libFolder + '/BackModule');
+        global.BaseWidget = require(libFolder + '/BaseWidget');
+        global.FrontModule = require(libFolder + '/FrontModule');
     }
 
     addModule(modulePath) {
@@ -77,9 +78,6 @@ class ArrowApplication {
         global.__widget = require(libFolder + '/widgets_manager');
         global.__messages = [];
         global.__setting_menu_module = [];
-        global.BackModule = require(libFolder + '/BackModule');
-        global.BaseWidget = require(libFolder + '/BaseWidget');
-        global.FrontModule = require(libFolder + '/FrontModule');
 
         /** Init widgets */
         require(libFolder + '/widgets_manager')();
@@ -127,23 +125,14 @@ function makeApp(app, beforeFunc) {
     /** Showing stack errors */
     app.set('showStackError', true);
 
-    /** Set nunjucks as the template engine */
-    let e = nunjucks.configure(__base + 'app/themes', {
-        autoescape: true,
-        express: app
-    });
-
     /** Set views path and view engine */
     app.set('view engine', 'html');
 
-    /** Initials custom filter */
-    __.getAllCustomFilter(e);
 
     /** Environment dependent middleware */
     if (process.env.NODE_ENV === 'development') {
         /** Uncomment to enable logger (morgan) */
-        //app.use(morgan('dev'));
-
+        app.use(morgan('dev'));
         /** Disable views cache */
         app.set('view cache', false);
     } else if (process.env.NODE_ENV === 'production') {
@@ -175,15 +164,8 @@ function makeApp(app, beforeFunc) {
     app.use(cookieParser());
 
     /** Express session storage */
-    let secret = "hjjhdsu465aklsdjfhasdasdf342ehsf09kljlasdf";
-    let middleSession = session({
-        store: new RedisStore({host: __config.redis.host, port: __config.redis.port, client: redis}),
-        secret: secret,
-        key: 'sid',
-        resave: true,
-        saveUninitialized: true
-    });
-    app.use(middleSession);
+    app.use(require(__base + 'config/session'));
+
     app.use(function (req, res, next) {
         if (!req.session) {
             return next(new Error('Session destroy')); // handle error
@@ -312,6 +294,35 @@ function makeApp(app, beforeFunc) {
         coreModule.render404(req, res);
     });
 
+    /** Assume 'not found' in the error msg is a 404.
+     * This is somewhat silly, but valid, you can do whatever you like, set properties, use instanceof etc.
+     */
+    app.use(function (err, req, res, next) {
+        // If the error object doesn't exists
+        if (!err) return next();
+
+        // Log it
+        console.error(err.stack);
+
+        // Error page
+        res.status(500).render('500', {
+            error: err.stack
+        });
+    });
+
+    /** Assume 404 since no middleware responded */
+    app.use(function (req, res) {
+        let h = req.header("Accept");
+        try {
+            if (h.indexOf('text/html') > -1) {
+                res.redirect('/404');
+            } else {
+                res.sendStatus(404);
+            }
+        } catch (err) {
+            res.sendStatus(404);
+        }
+    });
     return app;
 }
 
