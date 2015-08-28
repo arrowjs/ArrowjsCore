@@ -21,6 +21,7 @@ let fs = require('fs'),
     Promise = require('bluebird'),
     libFolder = __dirname,
     redis = require("redis").createClient(),
+    chalk = require('chalk'),
     pluginManager = require('./plugins_manager');
 
 class ArrowApplication {
@@ -93,6 +94,7 @@ class ArrowApplication {
         /** Init the express application */
         return new Promise(function (fulfill,reject) {
             makeApp(self.appEx, self.beforeFunction).then(function (app) {
+                console.log(chalk.black.bgWhite('Application loaded using the "' + process.env.NODE_ENV + '" environment configuration'));
                 fulfill(app)
             });
         })
