@@ -33,7 +33,7 @@ class BaseWidget {
         });
 
         if (files.length == 0) {
-            __.getGlobbedFiles(__base + "themes/frontend/default/_widgets/" + alias + "/*.html").forEach(function (path) {
+            __.getGlobbedFiles(__base + "themes/frontend/" + __config.theme + "/_widgets/" + alias + "/*.html").forEach(function (path) {
                 let s = path.split('/');
                 files.push(s[s.length - 1]);
             });
@@ -99,7 +99,7 @@ class BaseWidget {
             let widgetFilePath = __base + 'themes/frontend/' + __config.theme + '/_widgets/' + widgetFile;
 
             if (!fs.existsSync(widgetFilePath)) {
-                widgetFilePath = __base + 'themes/frontend/default/_widgets/' + widgetFile;
+                widgetFilePath = __base + 'themes/frontend/' + __config.theme + '/_widgets/' + widgetFile;
             } else {
                 widgetFilePath = __base + 'themes/frontend/' + __config.theme + '/_widgets/' + widgetFile;
             }
