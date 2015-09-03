@@ -49,7 +49,8 @@ class ArrowApplication {
         global.FrontModule = require(libFolder + '/FrontModule');
         global.__cache = require(libFolder + '/arr_caching')();
         require(libFolder + '/config_manager.js')().then(function () {
-            return null;
+            /** Init widgets */
+            require(libFolder + '/widgets_manager')();
         });
         global.__models = require(libFolder + '/models_manager');
     }
@@ -78,8 +79,7 @@ class ArrowApplication {
         global.__modules = {};
         global.__setting_menu_module = [];
 
-        /** Init widgets */
-        require(libFolder + '/widgets_manager')();
+
 
         /** Init plugins */
         pluginManager.loadAllPlugins();
