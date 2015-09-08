@@ -15,7 +15,6 @@ exports.isAllow = function (action, orAction, hasAuthorize) {
     let route = i[i.length - 3];
 
     return function (req, res, next) {
-        req.session.messages = [];
         // Check module active
         if (__modules[route] != undefined && (__modules[route].system || __modules[route].active)) {
             // Check acl
