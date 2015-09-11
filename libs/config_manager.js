@@ -17,7 +17,7 @@ sub.on("message", function (a) {
     getConfig();
 });
 
-sub.subscribe(__config.redis_prefix + 'configUpdate');
+sub.subscribe('configUpdate');
 
 function init() {
     /**
@@ -91,7 +91,7 @@ function reloadConfig() {
                 _.assign(global.__config, data);
             }
             fulfill(global.__config);
-            redis.publish(__config.redis_prefix + 'configUpdate','I update');
+            redis.publish('configUpdate','I update');
         })
     })
 };
