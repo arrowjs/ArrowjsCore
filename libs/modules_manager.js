@@ -18,7 +18,7 @@ sub.on("message", function (a) {
     })
 });
 
-sub.subscribe('moduleUpdate');
+sub.subscribe(__config.redis_prefix + 'moduleUpdate');
 
 module.exports = getModule;
 
@@ -86,7 +86,7 @@ module.exports.loadAllModules = function () {
             if (err) reject(err);
             return redis.set(__config.redis_prefix + 'backend_menus', JSON.stringify(__menus), function (err) {
                 if (err) reject(err);
-                redis.publish('moduleUpdate', 'I update');
+                redis.publish(__config.redis_prefix + 'moduleUpdate', 'I update');
                 fulfill(true)
             });
         });
