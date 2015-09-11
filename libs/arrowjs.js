@@ -4,7 +4,6 @@
  * Module dependencies.
  */
 let fs = require('fs'),
-    http = require('http'),
     https = require('https'),
     callsite = require('callsite'),
     path = require('path'),
@@ -12,7 +11,6 @@ let fs = require('fs'),
     morgan = require('morgan'),
     bodyParser = require('body-parser'),
     passport = require('passport'),
-    compress = require('compression'),
     methodOverride = require('method-override'),
     cookieParser = require('cookie-parser'),
     helmet = require('helmet'),
@@ -20,7 +18,6 @@ let fs = require('fs'),
     _ = require('lodash'),
     Promise = require('bluebird'),
     libFolder = __dirname,
-    redis = require("redis").createClient(),
     chalk = require('chalk'),
     pluginManager = require('./plugins_manager');
 
