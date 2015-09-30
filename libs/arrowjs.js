@@ -19,6 +19,8 @@ let fs = require('fs'),
     Promise = require('bluebird'),
     libFolder = __dirname,
     chalk = require('chalk'),
+    mailer = require('nodemailer'),
+    smtpPool = require('nodemailer-smtp-pool'),
     pluginManager = require('./plugins_manager');
 
 class ArrowApplication {
@@ -49,6 +51,8 @@ class ArrowApplication {
             /** Init widgets */
             require(libFolder + '/widgets_manager')();
         });
+        global.__mailSender = mailer.createTransport(smtpPool(__config.mailer_config));
+
         global.__models = require(libFolder + '/models_manager');
     }
 
@@ -163,6 +167,7 @@ function makeApp(app, beforeFunc) {
     app.use(require(__base + 'config/session'));
 
     app.use(function (req, res, next) {
+        res.locals.hasOwnProperty=  {}.hasOwnProperty
         if (!req.session) {
             return next(new Error('Session destroy')); // handle error
         }

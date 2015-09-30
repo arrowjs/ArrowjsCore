@@ -40,7 +40,7 @@ function PluginManager() {
                 }
             }
 
-            redis.set(__config.redis_prefix + self.redis_key, JSON.stringify(self.plugins), redis.print);
+            redis.set(__config.redis_prefix + self.redis_key, JSON.stringify(self.plugins));
         });
     };
 

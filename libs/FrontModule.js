@@ -57,7 +57,6 @@ class FrontModule extends BaseModule {
     }
 
     render_error(req, res, view) {
-        console.log(req.url);
         // Get messages from session
         res.locals.messages = req.session.messages;
 
@@ -69,7 +68,7 @@ class FrontModule extends BaseModule {
         }
 
         frontEnv.loaders[0].searchPaths = [__base + 'themes/frontend/' + __config.theme, __base + 'themes/frontend/'];
-        frontEnv.render(view, _.assign(res.locals, {}), function (err, re) {
+        frontEnv.render(view,res.locals , function (err, re) {
             res.send(re);
         });
     }

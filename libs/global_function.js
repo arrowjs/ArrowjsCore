@@ -1,7 +1,6 @@
 'use strict';
 
-let mailer = require('nodemailer'),
-    _ = require('lodash'),
+let  _ = require('lodash'),
     glob = require('glob'),
     fs = require('fs'),
     util = require('util');
@@ -351,9 +350,9 @@ exports.randomSalt = function (length) {
  */
 exports.sendMail = function (mailOptions) {
     return new Promise(function (fulfill, reject) {
-        let transporter = mailer.createTransport(__config.mailer_config);
-        transporter.sendMail(mailOptions, function (err, info) {
-            if (err !== null) {
+        __mailSender.sendMail(mailOptions, function (err, info) {
+
+            if (err) {
                 reject(err);
             } else {
                 fulfill(info);
