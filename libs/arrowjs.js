@@ -167,7 +167,7 @@ function makeApp(app, beforeFunc) {
     app.use(require(__base + 'config/session'));
 
     app.use(function (req, res, next) {
-        res.locals.hasOwnProperty=  {}.hasOwnProperty
+
         if (!req.session) {
             return next(new Error('Session destroy')); // handle error
         }
@@ -205,6 +205,7 @@ function makeApp(app, beforeFunc) {
 
     /** Passing the request url to environment locals */
     app.use(function (req, res, next) {
+        res.locals.hasOwnProperty = Object.hasOwnProperty
         res.locals.url = req.protocol + '://' + req.headers.host + req.url;
         res.locals.path = req.protocol + '://' + req.headers.host;
         res.locals.route = req.url;
