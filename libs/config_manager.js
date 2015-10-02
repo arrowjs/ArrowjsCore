@@ -25,7 +25,6 @@ function init() {
      * We'll Look for a valid NODE_ENV variable and if one cannot be found load the development NODE_ENV
      */
     var conf = {}
-    console.log(process.env.NODE_ENV);
     if (!fs.existsSync(__base + 'config/env/all.js')) {
         fsEx.copySync(path.resolve(__dirname, '..', 'demo/all.js'), __base + 'config/env/all.js');
         _.assign(conf, require(__base + 'config/env/all.js'));
@@ -66,7 +65,6 @@ function getConfig() {
     global.__config = init();
     return new Promise(function (fulfill, reject) {
         redis.del(__config.redis_prefix + __config.key, function (err,reply) {
-            console.log(err,reply);
             redis.get(__config.redis_prefix + __config.key, function (err, config) {
                 if (err) reject(err);
                 if (config) {
