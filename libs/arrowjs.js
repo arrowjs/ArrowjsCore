@@ -181,9 +181,10 @@ function makeApp(app, beforeFunc) {
         __.getGlobbedFiles(__base + 'config/strategies/**/*.js').forEach(function (strategy) {
             require(path.resolve(strategy))();
         });
+        require(__base + 'config/passport.js')(passport);
+
         app.use(passport.initialize());
         app.use(passport.session());
-        require(__base + 'config/passport.js')(passport);
     }
 
 
