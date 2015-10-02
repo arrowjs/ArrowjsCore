@@ -40,6 +40,8 @@ class ArrowApplication {
         let stack = callsite();
         let requester = stack[1].getFileName();
 
+        process.env.NODE_ENV = process.env.NODE_ENV || 'development';
+
         global.__base = path.dirname(requester) + '/';
         global.__ = require(libFolder + '/global_function');
         global.__utils = require(libFolder + '/utils');
