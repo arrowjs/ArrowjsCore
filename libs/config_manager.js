@@ -64,16 +64,18 @@ module.exports  = getConfig;
 function getConfig() {
     global.__config = init();
     return new Promise(function (fulfill, reject) {
-        redis.get(__config.redis_prefix + __config.key, function (err, config) {
-            if (err) reject(err);
-            if (config) {
-                let data = JSON.parse(config);
-                delete data.regExp;
-                _.assign(global.__config, data);
-                fulfill(global.__config);
-            } else {
-                fulfill(global.__config);
-            }
+        redis.del(__config.redis_prefix + __config.key, function () {
+            redis.get(__config.redis_prefix + __config.key, function (err, config) {
+                if (err) reject(err);
+                if (config) {
+                    let data = JSON.parse(config);
+                    delete data.regExp;
+                    _.assign(global.__config, data);
+                    fulfill(global.__config);
+                } else {
+                    fulfill(global.__config);
+                }
+            })
         })
     })
 }
