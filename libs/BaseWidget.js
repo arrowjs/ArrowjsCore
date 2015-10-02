@@ -82,10 +82,11 @@ class BaseWidget {
                     files: self.files
                 },
                 function (err, re) {
+                    if(err) {
+                        reject(err);
+                    }
                     done(re);
-                }).catch(function (err) {
-                    reject(err);
-                });
+                })
         });
     }
 
