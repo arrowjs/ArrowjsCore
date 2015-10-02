@@ -174,20 +174,19 @@ function makeApp(app, beforeFunc) {
         next(); // otherwise continue
     });
 
-    /** Bootstrap passport config */
+    /** Use passport session */
+
     if (!fs.accessSync(__base + 'config/passport.js')) {
         // Initialize strategies
         __.getGlobbedFiles(__base + 'config/strategies/**/*.js').forEach(function (strategy) {
             require(path.resolve(strategy))();
         });
         require(__base + 'config/passport.js')(passport);
-    }
 
-    /** Use passport session */
-    if (!fs.accessSync(__base + 'config/passport.js')) {
         app.use(passport.initialize());
         app.use(passport.session());
     }
+
 
     /** Flash messages */
 
