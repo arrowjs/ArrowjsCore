@@ -24,7 +24,7 @@ function init() {
      * Before we begin, lets set the environment variable
      * We'll Look for a valid NODE_ENV variable and if one cannot be found load the development NODE_ENV
      */
-    var conf = {}
+    let conf = {}
     if (!fs.existsSync(__base + 'config/env/all.js')) {
         fsEx.copySync(path.resolve(__dirname, '..', 'demo/all.js'), __base + 'config/env/all.js');
         _.assign(conf, require(__base + 'config/env/all.js'));
@@ -59,28 +59,27 @@ function init() {
  * Load app configurations
  */
 
-module.exports  = getConfig;
+module.exports = getConfig;
 
 function getConfig() {
     global.__config = init();
     return new Promise(function (fulfill, reject) {
-        redis.del(__config.redis_prefix + __config.key, function (err,reply) {
-            redis.get(__config.redis_prefix + __config.key, function (err, config) {
-                if (err) reject(err);
-                if (config) {
-                    let data = JSON.parse(config);
-                    delete data.regExp;
-                    _.assign(global.__config, data);
-                    fulfill(global.__config);
-                } else {
-                    fulfill(global.__config);
-                }
-            })
+        redis.get(__config.redis_prefix + __config.key, function (err, config) {
+            if (err) reject(err);
+            if (config) {
+                let data = JSON.parse(config);
+                delete data.regExp;
+                _.assign(global.__config, data);
+                fulfill(global.__config);
+            } else {
+                fulfill(global.__config);
+            }
         })
     })
 }
 
-module.exports.reloadConfig =  reloadConfig;
+
+module.exports.reloadConfig = reloadConfig;
 
 function reloadConfig() {
     return new Promise(function (fulfill, reject) {
@@ -92,7 +91,7 @@ function reloadConfig() {
                 _.assign(global.__config, data);
             }
             fulfill(global.__config);
-            redis.publish('configUpdate','I update');
+            redis.publish('configUpdate', 'I update');
         })
     })
 };

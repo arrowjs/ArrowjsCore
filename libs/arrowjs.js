@@ -28,7 +28,7 @@ class ArrowApplication {
         this.modules = [];
         this.beforeFunction = [];
         this.appEx = express();
-        let self = this.appEx
+        let self = this.appEx;
         for (let func in self) {
             if (typeof self[func] == 'function') {
                 this[func] = self[func].bind(self);
@@ -54,8 +54,7 @@ class ArrowApplication {
             require(libFolder + '/widgets_manager')();
         });
         global.__mailSender = mailer.createTransport(smtpPool(__config.mailer_config));
-
-        global.__models = require(libFolder + '/models_manager');
+        global.__models = require(libFolder + '/models_manager')();
     }
 
     addModule(modulePath) {
