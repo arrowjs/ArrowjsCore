@@ -28,6 +28,7 @@ let fs = require('fs'),
     WidgetManager = require("../manager/WidgetManager"),
     ModelManager = require("../manager/ModelManager"),
     LanguageManager = require("../manager/LanguageManager"),
+    ModuleManager = require("../manager/ModuleManager"),
     SystemLog = require("./SystemLog"),
     utils = require("./utils"),
     __ = require("./global_function");
@@ -110,6 +111,8 @@ class ArrowApplication {
         global.__models = this.models;
 
         global.__mailSender = mailer.createTransport(smtpPool(__config.mailer_config));
+
+        this.moduleManager = new ModuleManager(this);
 
 
     }
