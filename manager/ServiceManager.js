@@ -1,7 +1,7 @@
 "use strict";
 
 let SystemManager = require("./SystemManager");
-let  __ = require("./global_function");
+let  __ = require("./../libs/global_function");
 let  _  = require("lodash");
 let path = require("path");
 let Sequelize = require("sequelize");

@@ -4,7 +4,7 @@ let path = require("path");
 let Sequelize = require("sequelize");
 let sequelize;
 
-var __ = require('./global_function');
+var __ = require('./../libs/global_function');
 
 module.exports = function () {
     if (__config.db) {

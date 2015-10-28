@@ -3,7 +3,9 @@
 let  _ = require('lodash'),
     glob = require('glob'),
     fs = require('fs'),
-    util = require('util');
+    util = require('util'),
+    nunjucks = require('nunjucks');
+
 
 /**
  * Create breadcrumb
@@ -103,7 +105,7 @@ exports.getWidget = function (alias) {
  * @returns {object}
  */
 exports.createNewEnv = function (views) {
-    let nunjucks = require('nunjucks');
+    let self = this;
     let env;
 
     if (views) {
@@ -112,8 +114,8 @@ exports.createNewEnv = function (views) {
         env = new nunjucks.Environment(new nunjucks.FileSystemLoader([__base + 'core/widgets', __base + 'app/widgets', __base + 'themes/frontend']));
     }
 
-    env = __.getAllCustomFilter(env);
-    env = __.getAllGlobalVariable(env);
+    env = self.getAllCustomFilter(env);
+    env = self.getAllGlobalVariable(env);
 
     return env;
 };
@@ -124,14 +126,16 @@ exports.createNewEnv = function (views) {
  * @returns {object}
  */
 exports.getAllCustomFilter = function (env) {
-    let custom_filters = __.getOverrideCorePath(__base + 'core/custom_filters/*.js', __base + 'app/custom_filters/*.js', 1);
-
+    let self = this;
+    let custom_filters = self.getOverrideCorePath(__base + 'core/custom_filters/*.js', __base + 'app/custom_filters/*.js', 1);
     for (let index in custom_filters) {
         if (custom_filters.hasOwnProperty(index)) {
-            require(custom_filters[index])(env);
+            let cf = require(custom_filters[index]);
+            if(typeof cf === 'function') {
+                cf(env);
+            }
         }
     }
-
     return env;
 };
 
@@ -429,9 +433,10 @@ exports.checkDirectorySecurity = function (path, result) {
  * @returns {string} - Translated string or Undefined if translate key is not exists
  */
 exports.t = function () {
-    let currentLang = __config.app.language;
+    let self = this;
 
-    var args = Array.prototype.slice.call(arguments);
+    let currentLang = this._config.app.language;
+    let args = Array.prototype.slice.call(arguments);
     args[0] = __lang[currentLang][args[0]] || 'Undefined';
     return util.format.apply(util, args);
 };
@@ -492,13 +497,14 @@ module.exports.overrideCorePath = function (paths, routePath, checkIndex) {
  */
 module.exports.getOverrideCorePath = function (corePath, appPath, checkIndex) {
     let paths = [];
+    let self = this
 
-    __.getGlobbedFiles(corePath).forEach(function (routePath) {
-        paths = __.overrideCorePath(paths, routePath, checkIndex);
+    self.getGlobbedFiles(corePath).forEach(function (routePath) {
+        paths = self.overrideCorePath(paths, routePath, checkIndex);
     });
 
-    __.getGlobbedFiles(appPath).forEach(function (routePath) {
-        paths = __.overrideCorePath(paths, routePath, checkIndex);
+    self.getGlobbedFiles(appPath).forEach(function (routePath) {
+        paths = self.overrideCorePath(paths, routePath, checkIndex);
     });
 
     return paths

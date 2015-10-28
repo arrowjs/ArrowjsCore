@@ -1,7 +1,7 @@
 "use strict";
 
 let SystemManager = require('./SystemManager');
-let __ = require('./global_function');
+let __ = require('./../libs/global_function');
 let _ = require('lodash');
 
 class ConfigManager extends SystemManager {
@@ -18,9 +18,10 @@ class ConfigManager extends SystemManager {
             self.getConfig();
         })
     }
+
     getConfig(){
         var self = this._config;
-        this.publisher.getAsync(self.redis_prefix + self.key)
+        return this.publisher.getAsync(self.redis_prefix + self.key)
             .then(function (data) {
                 let conf = JSON.parse(data);
                 if(self.raw_config || self.raw_config.length > 0) {
@@ -33,13 +34,14 @@ class ConfigManager extends SystemManager {
                 _.assign(this._config,conf);
             }.bind(this))
             .catch(function (err) {
-                console.log("Config Manager Class: ",err);
+                this.log("Config Manager Class: ",err);
                 return err
-            })
+            }.bind(this))
     }
+
     reloadConfig(){
         var self = this._config;
-        this.publisher.getAsync(self.redis_prefix + self.key)
+        return this.publisher.getAsync(self.redis_prefix + self.key)
             .then(function (data) {
                 let conf = JSON.parse(data);
                 if(self.raw_config || self.raw_config.length > 0) {
@@ -53,9 +55,9 @@ class ConfigManager extends SystemManager {
                 this.publisher.publish(self.redis_prefix + "config_update","Update config")
             }.bind(this))
             .catch(function (err) {
-                console.log("Config Manager Class: ",err);
+                this.log("Config Manager Class: ",err);
                 return err
-            })
+            }.bind(this))
     }
 }
 

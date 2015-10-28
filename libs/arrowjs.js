@@ -22,11 +22,15 @@ let fs = require('fs'),
     mailer = require('nodemailer'),
     smtpPool = require('nodemailer-smtp-pool'),
     pluginManager = require('./plugins_manager'),
-    ServiceManager = require("./ServiceManager"),
-    ConfigManager = require("./ConfigManager"),
+    ServiceManager = require("../manager/ServiceManager"),
+    ConfigManager = require("../manager/ConfigManager"),
     RedisCache = require("./RedisCache"),
+    WidgetManager = require("../manager/WidgetManager"),
+    ModelManager = require("../manager/ModelManager"),
+    LanguageManager = require("../manager/LanguageManager"),
+    SystemLog = require("./SystemLog"),
+    utils = require("./utils"),
     __ = require("./global_function");
-
 
 class ArrowApplication {
     constructor() {
@@ -50,6 +54,9 @@ class ArrowApplication {
         global.__base = path.dirname(requester) + '/';
         this._config = __.getRawConfig();
 
+        //make system log
+        this.log = SystemLog;
+
         //Make redis cache
         let redisConfig = this._config.redis || {};
         this.RedisCache = RedisCache.bind(null,redisConfig);
@@ -57,24 +64,54 @@ class ArrowApplication {
 
         this.serviceManager = new ServiceManager(this);
         this.services = this.serviceManager._services;
+        global.__services = this.services;
 
         this.configManager = new ConfigManager(this);
-        this.configManager.reloadConfig();
+        this.configManager.getConfig();
+        global.__configManager = this.configManager;
+        this._config = this.configManager._config;
+        global.__config = this._config;
 
 
-        global.__ = require(libFolder + '/global_function');
-        global.__utils = require(libFolder + '/utils');
-        global.BackModule = require(libFolder + '/BackModule');
-        global.BaseWidget = require(libFolder + '/BaseWidget');
-        global.FrontModule = require(libFolder + '/FrontModule');
-        require(libFolder + '/config_manager.js')().then(function () {
-            /** Init widgets */
-            require(libFolder + '/widgets_manager')();
-        });
-        //Loading services;
+        global.__ = __;
+        global.__.t = __.t.bind(this);
+
+        this.languageManager = new LanguageManager();
+        this.langs = this.languageManager._langs;
+        global.__lang = this.langs;
+
+        global.__utils = utils;
+
+        /** Create app dir if not exist */
+        utils.createDirectory('app');
+        utils.createDirectory('app/custom_filters');
+        utils.createDirectory('app/modules');
+        utils.createDirectory('app/plugins');
+        utils.createDirectory('app/widgets');
+
+
+        global.BackModule = require('./BackModule');
+        global.FrontModule = require('./FrontModule');
+
+        require('./BaseWidget')(this);
+        global.BaseWidget = require('./BaseWidget').BaseWidget;
+
+        this.widgetManager = new WidgetManager(this);
+        this.widgets = this.widgetManager._widgets;
+        global.__widget = this.widgets;
+
+        //require(libFolder + '/config_manager.js')().then(function () {
+        //    /** Init widgets */
+        //    require(libFolder + '/widgets_manager')();
+        //});
+
+        this.modelManager = new ModelManager(this);
+        this.models = this.modelManager._databases;
+        global.__models = this.models;
 
         global.__mailSender = mailer.createTransport(smtpPool(__config.mailer_config));
-        global.__models = require(libFolder + '/models_manager')();
+
+
     }
 
     addModule(modulePath) {
@@ -88,30 +125,19 @@ class ArrowApplication {
     }
 
     config() {
-        var self = this;
+        let self = this;
         /**
          * Main application entry file.
          * Please note that the order of loading is important.
          */
-        global.__ = require(libFolder + '/global_function');
-        global.__lang = require(libFolder + '/i18n.js')();
-        global.__dateformatter = require(libFolder + '/dateformatter');
         global.__acl = require(libFolder + '/acl');
         global.__menus = {};
         global.__modules = {};
         global.__setting_menu_module = [];
 
 
-
         /** Init plugins */
         pluginManager.loadAllPlugins();
-
-        /** Create app dir if not exist */
-        __utils.createDirectory('app');
-        __utils.createDirectory('app/custom_filters');
-        __utils.createDirectory('app/modules');
-        __utils.createDirectory('app/plugins');
-        __utils.createDirectory('app/widgets');
 
         /** Init the express application */
         return new Promise(function (fulfill,reject) {
@@ -213,8 +239,6 @@ function makeApp(app, beforeFunc) {
 
     app.use(require('../middleware/flash-plugin.js'));
 
-    //app.use(require('../middleware/global_loading'));
-
 
     /** Use helmet to secure Express headers */
     app.use(helmet.xframe());
@@ -236,16 +260,6 @@ function makeApp(app, beforeFunc) {
         next();
     });
     /** Store module status (active|unactive) in Redis */
-    //redis.get(__config.redis_prefix + 'backend_menus', function (err, result) {
-    //    if (result != null) {
-    //        global.__menus = JSON.parse(result);
-    //    } else {
-    //        console.log('Backend menus is not defined!!!');
-    //    }
-    //    console.log('ending load backend Menu');
-    //
-    //});
-    //console.log('starting load  module');
     return new Promise(function (fulfill,reject) {
         loadMenuAndModule().then(function () {
             /** Module manager */
@@ -351,20 +365,6 @@ function makeApp(app, beforeFunc) {
             fulfill(app);
         })
     })
-
-
-    //redis.get(__config.redis_prefix + 'all_modules', function (error, results) {
-    //    if (results != null) {
-    //        global.__modules = JSON.parse(results);
-    //    } else {
-    //        md.loadAllModules();
-    //    }
-    //    let menus = __cache.get(__config.redis_prefix + 'backend_menus').then(function (menus) {
-    //        if (menus != null) global.__menus = JSON.parse(menus);
-    //        else console.log('Backend menus is not defined!!!');
-    //    });
-    //
-    //});
 }
 
 function loadMenuAndModule() {
