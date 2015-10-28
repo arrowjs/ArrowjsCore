@@ -1,6 +1,6 @@
 'use strict';
 
-let callsite = require('callsite');
+let callsite = require('./ArrStack');
 
 /**
  * Check permission of users.
@@ -10,8 +10,8 @@ let callsite = require('callsite');
  * @return  Redirect to error page with flash message.
  */
 exports.isAllow = function (action, orAction, hasAuthorize) {
-    let stack = callsite();
-    let i = stack[1].getFileName().split('/');
+    let stack = callsite(2);
+    let i = stack.split('/');
     let route = i[i.length - 3];
 
     return function (req, res, next) {

@@ -5,7 +5,7 @@
  */
 let fs = require('fs'),
     https = require('https'),
-    callsite = require('callsite'),
+    callsite = require('./ArrStack'),
     path = require('path'),
     express = require('express'),
     morgan = require('morgan'),
@@ -21,14 +21,24 @@ let fs = require('fs'),
     chalk = require('chalk'),
     mailer = require('nodemailer'),
     smtpPool = require('nodemailer-smtp-pool'),
-    pluginManager = require('./plugins_manager');
+    pluginManager = require('./plugins_manager'),
+    ServiceManager = require("./ServiceManager"),
+    ConfigManager = require("./ConfigManager"),
+    RedisCache = require("./RedisCache"),
+    __ = require("./global_function");
+
 
 class ArrowApplication {
     constructor() {
+
+        process.env.NODE_ENV = process.env.NODE_ENV || 'development';
+
         this.modules = [];
         this.beforeFunction = [];
-        this.appEx = express();
-        let self = this.appEx;
+        this._expressApplication = express();
+
+
+        let self = this._expressApplication;
         for (let func in self) {
             if (typeof self[func] == 'function') {
                 this[func] = self[func].bind(self);
@@ -36,23 +46,33 @@ class ArrowApplication {
                 this[func] = self[func]
             }
         }
-
-        let stack = callsite();
-        let requester = stack[1].getFileName();
-
-        process.env.NODE_ENV = process.env.NODE_ENV || 'development';
-
+        let requester = callsite(2);
         global.__base = path.dirname(requester) + '/';
+        this._config = __.getRawConfig();
+
+        //Make redis cache
+        let redisConfig = this._config.redis || {};
+        this.RedisCache = RedisCache.bind(null,redisConfig);
+        this.redisCache = RedisCache(redisConfig);
+
+        this.serviceManager = new ServiceManager(this);
+        this.services = this.serviceManager._services;
+
+        this.configManager = new ConfigManager(this);
+        this.configManager.reloadConfig();
+
+
         global.__ = require(libFolder + '/global_function');
         global.__utils = require(libFolder + '/utils');
         global.BackModule = require(libFolder + '/BackModule');
         global.BaseWidget = require(libFolder + '/BaseWidget');
         global.FrontModule = require(libFolder + '/FrontModule');
-        global.__cache = require(libFolder + '/arr_caching')();
         require(libFolder + '/config_manager.js')().then(function () {
             /** Init widgets */
             require(libFolder + '/widgets_manager')();
         });
+        //Loading services;
+
         global.__mailSender = mailer.createTransport(smtpPool(__config.mailer_config));
         global.__models = require(libFolder + '/models_manager')();
     }
@@ -68,7 +88,7 @@ class ArrowApplication {
     }
 
     config() {
-        var self = this
+        var self = this;
         /**
          * Main application entry file.
          * Please note that the order of loading is important.
@@ -95,7 +115,7 @@ class ArrowApplication {
 
         /** Init the express application */
         return new Promise(function (fulfill,reject) {
-            makeApp(self.appEx, self.beforeFunction).then(function (app) {
+            makeApp(self._expressApplication, self.beforeFunction).then(function (app) {
                 console.log(chalk.black.bgWhite('Application loaded using the "' + process.env.NODE_ENV + '" environment configuration'));
                 fulfill(app)
             });

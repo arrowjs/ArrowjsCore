@@ -3,14 +3,14 @@
 let BaseModule = require('./BaseModule.js');
 let fs = require('fs'),
     _ = require('lodash');
-let callsite = require('callsite');
+let callsite = require('./ArrStack');
 let frontEnv = __.createNewEnv([__base + 'app/modules/', __base + 'core/modules/', __base + 'themes/frontend/']);
 
 
 class FrontModule extends BaseModule {
     constructor() {
-        let stack = callsite();
-        let i = stack[1].getFileName().split('/');
+        let stack = callsite(2);
+        let i = stack.split('/');
         let g = i[i.length - 4];
         super(g);
     }

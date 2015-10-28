@@ -459,17 +459,14 @@ module.exports.getGlobbedFiles = function (globPatterns, removeRoot) {
         if (urlRegex.test(globPatterns)) {
             output.push(globPatterns);
         } else {
-            glob(globPatterns, {
-                sync: true
-            }, function (err, files) {
-                if (removeRoot) {
-                    files = files.map(function (file) {
-                        return file.replace(removeRoot, '');
-                    });
-                }
+            var files = glob.sync(globPatterns);
+            if (removeRoot) {
+                files = files.map(function (file) {
+                    return file.replace(removeRoot, '');
+                })
+            }
 
-                output = _.union(output, files);
-            });
+            output = _.union(output, files);
         }
     }
 
@@ -544,3 +541,25 @@ module.exports.getCSSAssets = function () {
     let output = this.getGlobbedFiles(this.assets.lib.css.concat(this.assets.css), 'public/');
     return output;
 };
+
+/**
+ * Get raw config file
+ */
+
+module.exports.getRawConfig = function() {
+    let conf = {}
+    if (!fs.existsSync(__base + 'config/env/all.js')) {
+        fsEx.copySync(path.resolve(__dirname, '..', 'demo/all.js'), __base + 'config/env/all.js');
+        _.assign(conf, require(__base + 'config/env/all.js'));
+    } else {
+        _.assign(conf, require(__base + 'config/env/all.js'));
+    }
+
+    if (fs.existsSync(__base + 'config/env/' + process.env.NODE_ENV + '.js')) {
+        _.assign(conf, require(__base + 'config/env/' + process.env.NODE_ENV));
+    } else {
+        fsEx.copySync(path.resolve(__dirname, '..', 'demo/development.js'), __base + 'config/env/' + process.env.NODE_ENV + '.js');
+        _.assign(conf, require(__base + 'config/env/' + process.env.NODE_ENV));
+    }
+    return conf
+}

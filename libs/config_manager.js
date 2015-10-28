@@ -4,8 +4,6 @@
  * Module dependencies.
  */
 let _ = require('lodash'),
-    glob = require('glob'),
-    chalk = require('chalk'),
     path = require('path'),
     fsEx = require('fs-extra'),
     fs = require('fs')

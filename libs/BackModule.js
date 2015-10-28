@@ -2,17 +2,17 @@
 
 let BaseModule = require('./BaseModule.js');
 let _ = require('lodash');
-let callsite = require('callsite');
+let callsite = require('./ArrStack');
 let backEnv = __.createNewEnv([__base + 'app/modules/', __base + 'core/modules/', __base + 'themes/backend/default/']);
 
 
 class BackModule extends BaseModule {
     constructor() {
-        let stack = callsite();
-        let i = stack[1].getFileName().split('/');
+        let stack = callsite(2);
+        let i = stack.split('/');
         let g = i[i.length - 4];
         super(g);
-        this.fullPath = stack[1].getFileName();
+        this.fullPath = stack;
     }
 
     render(req, res, view, options, fn) {
