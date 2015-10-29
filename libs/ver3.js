@@ -8,12 +8,6 @@ let fs = require('fs'),
     callsite = require('./ArrStack'),
     path = require('path'),
     express = require('express'),
-    morgan = require('morgan'),
-    bodyParser = require('body-parser'),
-    passport = require('passport'),
-    methodOverride = require('method-override'),
-    cookieParser = require('cookie-parser'),
-    helmet = require('helmet'),
     nunjucks = require('nunjucks'),
     _ = require('lodash'),
     Promise = require('bluebird'),
@@ -70,24 +64,25 @@ class ArrowApplication {
         this.serviceManager = new ServiceManager(this);
         this.serviceManager.eventHook(eventEmitter);
         this.services = this.serviceManager._services;
-        //global.__services = this.services;
+        global.__services = this.services;
 
         this.configManager = new ConfigManager(this);
         this.configManager.eventHook(eventEmitter);
-        //global.__configManager = this.configManager;
+        global.__configManager = this.configManager;
         this._config = this.configManager._config;
-        //global.__config = this._config;
+        global.__config = this._config;
+
+        buildStructure();
 
         global.__ = __;
         global.__.t = __.t.bind(this);
-        global.__utils = utils;
-
 
         this.languageManager = new LanguageManager();
         this.languageManager.eventHook(eventEmitter);
         this.langs = this.languageManager._langs;
         global.__lang = this.langs;
 
+        global.__utils = utils;
 
         global.BackModule = require('./BackModule');
         global.FrontModule = require('./FrontModule');
@@ -98,25 +93,33 @@ class ArrowApplication {
         this.widgetManager = new WidgetManager(this);
         this.widgetManager.eventHook(eventEmitter);
         this.widgets = this.widgetManager._widgets;
-        //global.__widget = this.widgets;
+        global.__widget = this.widgets;
 
 
         this.modelManager = new ModelManager(this);
         this.modelManager.eventHook(eventEmitter);
         this.models = this.modelManager._databases;
-        //global.__models = this.models;
+        global.__models = this.models;
 
         this.moduleManager = new ModuleManager(this);
         //this.moduleManager.getCache();
         this.moduleManager.eventHook(eventEmitter);
         this.modules = this.moduleManager._modules;
-        //global.__modules = this.modules;
+        global.__modules = this.modules;
 
         this.menuManager = new MenuManager(this);
         //this.menuManager.makeMenu();
         this.menuManager.eventHook(eventEmitter);
         this.menus = this.menuManager._menus;
-        //global.__menus = this.menus;
+        global.__menus = this.menus;
+
+        let arr = this;
+        arr.configManager.getCache()
+            .then(arr.moduleManager.getCache())
+            .then(arr.menuManager.makeMenu())
+            .then(arr.menuManager.setCache());
+
+        global.__mailSender = mailer.createTransport(smtpPool(__config.mailer_config));
     }
 
     addModule(modulePath) {
@@ -130,44 +133,25 @@ class ArrowApplication {
     }
 
     config() {
-
-        buildStructure();
-
         let self = this;
-        /**
-         * Main application entry file.
-         * Please note that the order of loading is important.
-         */
+
         global.__acl = require(libFolder + '/acl');
         global.__menus = {};
         global.__modules = {};
         global.__setting_menu_module = [];
 
-
-        /** Init plugins */
-            //pluginManager.loadAllPlugins();
-
+        pluginManager.loadAllPlugins();
         self._expressApplication.baseFolder = self.baseFolder;
         self._expressApplication._appConfig = self._config;
-        /** Init the express application */
-        return new Promise(function (fulfill, reject) {
-            self.configManager.getCache()
-                .then(self.moduleManager.getCache())
-                .then(self.menuManager.makeMenu())
-                .then(self.menuManager.setCache())
-                .then(makeGlobalVariables(self))
-                .then(loadMenuAndModule())
-                .then(expressMe(self._expressApplication))
-                .then(loadingRouter(self))
-                .then(function (app) {
-                    console.log(chalk.black.bgWhite('Application loaded using the "' + process.env.NODE_ENV + '" environment configuration'));
-                    fulfill(app)
-                })
-                .catch(function (err) {
-                    reject(err);
-                    console.log(err)
-                });
-        })
+        expressMe(self._expressApplication)
+            .then(makeApp(self._expressApplication, self.beforeFunction))
+            .then(function () {
+                console.log(chalk.black.bgWhite('Application loaded using the "' + process.env.NODE_ENV + '" environment configuration'));
+            })
+            .catch(function (err) {
+                console.log(err)
+            });
+
     }
 
     before(func) {
@@ -181,9 +165,7 @@ class ArrowApplication {
  *
  * Support function
  */
-function loadingRouter(arrowApp) {
-    let app = arrowApp._expressApplication;
-    let beforeFunc = arrowApp.beforeFunction;
+function makeApp(app, beforeFunc) {
     /** Store module status (active|unactive) in Redis */
     return new Promise(function (fulfill, reject) {
         /** Module manager */
@@ -290,28 +272,6 @@ function loadingRouter(arrowApp) {
     })
 }
 
-function loadMenuAndModule() {
-    let md = require('../deprecated/modules_manager.js');
-
-    let mn = require('../deprecated/menus_manager.js');
-
-    return new Promise(function (fulfill, reject) {
-        return mn().then(function (menus) {
-            global.__menus = menus;
-            return md().then(function (modules) {
-                if (Object.keys(modules).length === 0) {
-                    return md.loadAllModules().then(function () {
-                        fulfill(true);
-                    });
-                } else {
-                    global.__modules = modules;
-                    fulfill(true);
-                }
-            });
-        })
-    })
-
-}
 
 function buildStructure() {
     /** Create app dir if not exist */
@@ -330,7 +290,6 @@ function buildStructure() {
 }
 
 function expressMe(app) {
-
     return new Promise(function (fulfill, reject) {
         return fs.access(app.baseFolder + "config/express.js", function (err, data) {
             let expressFunction;
@@ -339,23 +298,8 @@ function expressMe(app) {
             } else {
                 expressFunction = require(app.baseFolder + "config/express");
             }
-            expressFunction(app);
-            fulfill(app)
+            fulfill(expressFunction(app))
         });
     });
-}
-
-function makeGlobalVariables(arrowApp) {
-    return new Promise(function (fulfill, reject) {
-        global.__services = arrowApp.services;
-        global.__configManager = arrowApp.configManager;
-        global.__config = arrowApp._config;
-        global.__widget = arrowApp.widgets;
-        global.__models = arrowApp.models;
-        global.__modules = arrowApp.modules;
-        global.__menus = arrowApp.menus;
-        global.__mailSender = mailer.createTransport(smtpPool(__config.mailer_config));
-        fulfill(true)
-    })
 }
 module.exports = ArrowApplication;

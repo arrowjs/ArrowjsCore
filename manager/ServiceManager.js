@@ -1,10 +1,10 @@
 "use strict";
 
 let SystemManager = require("./SystemManager");
-let  __ = require("./../libs/global_function");
+let  __ = require("../libs/global_function");
 let  _  = require("lodash");
 let path = require("path");
-let Sequelize = require("sequelize");
+let Database = require('../libs/database');
 
 class ServiceManager extends SystemManager {
     constructor(app) {
@@ -27,13 +27,12 @@ class ServiceManager extends SystemManager {
                 let serviceConfig = Object.create(null);
                 _.assign(serviceConfig,self._config,serviceInfo.config);
 
-                //TODO : Need wrap database here;
                 //loading models
-                let sequelize =  new Sequelize(serviceConfig.db.database, serviceConfig.db.username, serviceConfig.db.password, serviceConfig.db);
+                let database =  new Database(serviceConfig.db.database, serviceConfig.db.username, serviceConfig.db.password, serviceConfig.db);
 
                 services[serviceInfo.name].models = {};
                 __.getGlobbedFiles(serviceFolder + '/models/*.js').forEach(function (modelPath) {
-                    let model = sequelize["import"](path.resolve(modelPath));
+                    let model = database.import(path.resolve(modelPath));
                     services[serviceInfo.name].models[model.name] = model;
                 });
 

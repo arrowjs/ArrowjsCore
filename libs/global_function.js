@@ -4,6 +4,8 @@ let  _ = require('lodash'),
     glob = require('glob'),
     fs = require('fs'),
     util = require('util'),
+    fsEx = require('fs-extra'),
+    path = require('path'),
     nunjucks = require('nunjucks');
 
 

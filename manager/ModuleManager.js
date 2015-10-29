@@ -1,7 +1,7 @@
 "use strict";
 
 let SystemManager = require('./SystemManager');
-let __ = require('./../libs/global_function');
+let __ = require('../libs/global_function');
 let _ = require('lodash');
 
 class ModuleManager extends SystemManager {
@@ -26,25 +26,43 @@ class ModuleManager extends SystemManager {
                 } else {
                     let sysModule = rModule(module_tmp)[index];
                     sysModule.path = moduleList[index];
-                    sysModule.system = true;
-                    sysModule.active = true;
+                    sysModule.system = false;
+                    sysModule.active = false;
                 }
             }
         });
 
+        let self = this;
+
+        this.subscriber.subscribe(self._config.redis_prefix + "module_update");
+
+        this.subscriber.on("message", function (demo) {
+            self.getModule();
+        });
+
         this._modules = module_tmp;
     }
-    getModule() {
-        var self = this._config;
-        return this.publisher.getAsync(__config.redis_prefix + 'arrow_modules')
+    getCache() {
+        let self = this._config;
+        return this.publisher.getAsync(self.redis_prefix + 'arrow_modules')
             .then(function (data) {
                 let m = JSON.parse(data);
                 _.assign(this._modules,m);
             }.bind(this))
             .catch(function (err) {
-                this.log("Module Manager Class: ",err);
+                log("Module Manager Class: ",err);
                 return err
             }.bind(this))
+    }
+    reload(){
+        let self = this;
+        this.getModule().then(function () {
+            self.publisher.publish(self._config.redis_prefix + "module_update","Update modules")
+        })
+    }
+    setCache() {
+        let self = this;
+        return this.publisher.setAsync(self.redis_prefix + 'arrow_modules',JSON.stringify(self._modules))
     }
 }
 

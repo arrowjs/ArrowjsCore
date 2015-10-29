@@ -1,7 +1,7 @@
 "use strict";
 
 let SystemManager = require('./SystemManager');
-let __ = require('./../libs/global_function');
+let __ = require('../libs/global_function');
 
 class WidgetManager extends SystemManager {
     constructor(app) {

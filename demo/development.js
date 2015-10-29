@@ -14,18 +14,10 @@ module.exports = {
         host: 'localhost',
         port: '6379'
     },
-    assets: {
-        lib: {
-            css: [
-                'public/lib/bootstrap/dist/css/bootstrap.min.css',
-                'public/lib/bootstrap/dist/css/bootstrap-theme.min.css'
-            ]
-        }
-    },
     facebook: {
         clientID: process.env.FACEBOOK_ID || 'APP_ID',
         clientSecret: process.env.FACEBOOK_SECRET || 'APP_SECRET',
-        callbackURL: 'http://techmaster.vn/auth/facebook/callback'
+        callbackURL: '/auth/facebook/callback'
     },
     twitter: {
         clientID: process.env.TWITTER_KEY || 'CONSUMER_KEY',
