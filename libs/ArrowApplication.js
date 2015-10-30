@@ -10,8 +10,8 @@ let fs = require('fs'),
     _ = require('lodash'),
     Promise = require('bluebird'),
     chalk = require('chalk'),
-    mailer = require('nodemailer'),
-    smtpPool = require('nodemailer-smtp-pool'),
+    mailer = require('nodemailer'), //Todo: We should move SMTP to external optional module.
+    smtpPool = require('nodemailer-smtp-pool'),   //Todo: We should move SMTP to external optional module.
     RedisCache = require("./RedisCache"),
     SystemLog = require("./SystemLog"),
     utils = require("./utils"),
@@ -52,13 +52,16 @@ class ArrowApplication {
 
         let requester = arrowStack(2);  //Why arrowStack(2)?
         this.baseFolder = path.dirname(requester) + '/';
+
+
         global.__base = this.baseFolder;
         this._config = __.getRawConfig();
 
         this._expressApplication.baseFolder = this.baseFolder;
         this._expressApplication._appConfig = this._config;
 
-        //make system log
+        //TODO: Cuong Tran, will this better way to use Winston Log?
+        //http://thottingal.in/blog/2014/04/06/winston-nodejs-logging/
         global.log = SystemLog;
 
         //Make redis cache
@@ -164,10 +167,9 @@ class ArrowApplication {
  */
 
 /**
- *
+ * Create app dir if not exist
  */
 function buildStructure() {
-    /** Create app dir if not exist */
     utils.createDirectory('app');
     utils.createDirectory('app/custom_filters');
     utils.createDirectory('app/modules');
@@ -181,7 +183,11 @@ function buildStructure() {
     utils.createDirectory('core/plugins');
     utils.createDirectory('core/widgets');
 }
-
+/**
+ *
+ * @param arrowApp
+ * @returns {boolean}
+ */
 function makeGlobalVariables(arrowApp) {
     global.__acl = require('./acl');
     global.__services = arrowApp.services;
@@ -195,7 +201,11 @@ function makeGlobalVariables(arrowApp) {
     global.__mailSender = mailer.createTransport(smtpPool(__config.mailer_config));
     return true
 }
-
+/**
+ *
+ * @param app
+ * @returns {*}
+ */
 function expressApp(app) {
     return new Promise(function (fulfill, reject) {
         let expressFunction
@@ -208,7 +218,12 @@ function expressApp(app) {
     });
 }
 
-
+/**
+ *
+ * @param app
+ * @param beforeFunc
+ * @returns {*}
+ */
 function loadPreFunc(app, beforeFunc) {
     return new Promise(function (fulfill, reject) {
         beforeFunc.map(function (func) {
@@ -218,7 +233,10 @@ function loadPreFunc(app, beforeFunc) {
         fulfill(app)
     })
 }
-
+/**
+ *
+ * @param app
+ */
 function loadRouteBackend(app) {
 
     /** Check module active/system in backend */
@@ -238,7 +256,10 @@ function loadRouteBackend(app) {
         }
     }
 }
-
+/**
+ *
+ * @param app
+ */
 function loadSettingMenu(app) {
     /** Globbing menu frontend source */
     let core_settings = {};
@@ -265,7 +286,10 @@ function loadSettingMenu(app) {
         }
     }
 }
-
+/**
+ *
+ * @param app
+ */
 function loadRouteFrontend(app) {
     /** Globbing route frontend files */
     let frontRoute = __.getOverrideCorePath(__base + 'core/modules/*/frontend/route.js', __base + 'app/modules/*/frontend/route.js', 3);
@@ -285,7 +309,10 @@ function loadRouteFrontend(app) {
         }
     });
 }
-
+/**
+ *
+ * @param app
+ */
 function handleError(app){
     let coreModule = new FrontModule;
     app.get('/404(.html)?', function (req, res) {

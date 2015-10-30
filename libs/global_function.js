@@ -586,4 +586,4 @@ module.exports.getRawConfig = function() {
     }
 
     return conf
-}
+};
