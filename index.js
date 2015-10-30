@@ -1,6 +1,6 @@
 'use strict'
 
-var Arrow = require('./libs/arrowjs');
+var Arrow = require('./libs/ArrowApplication');
 module.exports = Arrow;
 //module.exports.configManager = require('./libs/config_manager');
 module.exports.acl = require('./libs/acl');
