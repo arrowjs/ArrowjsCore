@@ -11,7 +11,7 @@ class ConfigManager extends SystemManager {
         this.pub = app.redisCache;
         this.sub = app.RedisCache();
         let self = this;
-        this.sub.subscribe(self._config.redis_prefix + "config_update");
+        this.sub.subscribe(self._config.redis_prefix + self._config.redis_event.update_config);
 
         this.sub.on("message", function (demo) {
             self.getConfig();
@@ -19,8 +19,8 @@ class ConfigManager extends SystemManager {
     }
 
     getCache(){
-        var self = this._config;
-        return this.pub.getAsync(self.redis_prefix + self.key)
+        let self = this._config;
+        return this.pub.getAsync(self.redis_prefix + self.redis_key.configs)
             .then(function (data) {
                 if(data) {
                     let conf = JSON.parse(data);
@@ -43,12 +43,12 @@ class ConfigManager extends SystemManager {
     reload(){
         let self = this;
         this.getConfig.then(function () {
-            self.pub.publish(self._config.redis_prefix + "config_update","Update config")
+            self.pub.publish(self._config.redis_prefix + self._config.redis_event.update_config,"Update config")
         })
     }
     setCache() {
         let self = this;
-        return this.publisher.setAsync(self.redis_prefix + self.key,JSON.stringify(self._config))
+        return this.pub.setAsync(self.redis_prefix + self.redis_key.configs,JSON.stringify(self._config))
     }
 }
 
