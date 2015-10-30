@@ -4,7 +4,7 @@
   "description": "ArrowJS framework for Node.js",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "./node_modules/.bin/mocha -u bdd -R spec -t 500 --recursive"
   },
   "author": "Techmaster Vietnam <cuong@techmaster.vn>",
   "license": "MIT",
@@ -25,6 +25,7 @@
     "helmet": "~0.12.0",
     "lodash": "^3.10.1",
     "method-override": "^2.3.5",
+    "mockery": "^1.4.0",
     "morgan": "~1.6.1",
     "nodemailer": "^1.5.0",
     "nodemailer-smtp-pool": "^1.1.1",

@@ -555,19 +555,35 @@ module.exports.getCSSAssets = function () {
  */
 
 module.exports.getRawConfig = function() {
-    let conf = {}
-    if (!fs.existsSync(__base + 'config/env/all.js')) {
-        fsEx.copySync(path.resolve(__dirname, '..', 'demo/all.js'), __base + 'config/env/all.js');
-        _.assign(conf, require(__base + 'config/env/all.js'));
-    } else {
-        _.assign(conf, require(__base + 'config/env/all.js'));
+    let conf = {};
+
+    //get config.js
+    try {
+        fs.accessSync(__base + 'config/config.js');
+        _.assign(conf, require(__base + 'config/config'));
+    } catch(err) {
+        fsEx.copySync(path.resolve(__dirname, '..', 'config/config.js'), __base + 'config/config.js');
+        _.assign(conf, require(__base + 'config/config'));
     }
 
-    if (fs.existsSync(__base + 'config/env/' + process.env.NODE_ENV + '.js')) {
-        _.assign(conf, require(__base + 'config/env/' + process.env.NODE_ENV));
-    } else {
-        fsEx.copySync(path.resolve(__dirname, '..', 'demo/development.js'), __base + 'config/env/' + process.env.NODE_ENV + '.js');
-        _.assign(conf, require(__base + 'config/env/' + process.env.NODE_ENV));
+    //get default config
+    try {
+        fs.accessSync(__base + 'config/env/default.js');
+        _.assign(conf, require(__base + 'config/env/default'));
+    } catch(err) {
+        fsEx.copySync(path.resolve(__dirname, '..', 'config/env/default.js'), __base + 'config/env/default.js');
+        _.assign(conf, require(__base + 'config/env/default'));
     }
+
+    //get ENV config
+    let env = process.env.NODE_ENV || "development";
+    try {
+        fs.accessSync(__base + 'config/env/' + env);
+        _.assign(conf, require(__base + 'config/env/' + env));
+    } catch(err) {
+        fsEx.copySync(path.resolve(__dirname, '..', 'config/env/development.js'), __base + 'config/env/' + env + '.js');
+        _.assign(conf, require(__base + 'config/env/' + env));
+    }
+
     return conf
 }
