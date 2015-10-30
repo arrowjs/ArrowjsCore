@@ -31,9 +31,10 @@ class BackendMenuManager extends SystemManager {
         menus.sorting.systems = [];
         this._menus = menus;
     }
+
     getCache(){
         var self = this._config;
-        return this.pub.getAsync(self.redis_prefix + "backend_menus")
+        return this.pub.getAsync(self.redis_prefix + self.redis_key.backend_menus)
             .then(function (data) {
                 if(data) {
                     let menu = JSON.parse(data);
@@ -45,10 +46,12 @@ class BackendMenuManager extends SystemManager {
                 return err
             }.bind(this));
     }
+
     setCache(){
         let self = this;
-        return this.pub.setAsync(self.redis_prefix + "backend_menus", JSON.stringify(self._menus))
+        return this.pub.setAsync(self._config.redis_prefix + self._config.redis_key.backend_menus, JSON.stringify(self._menus))
     }
+
     makeMenu(){
         let self = this;
         Object.keys(self._modules).map(function (mName) {

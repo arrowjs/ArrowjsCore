@@ -4,16 +4,9 @@
  * Module dependencies.
  */
 let fs = require('fs'),
-    https = require('https'),
     callsite = require('./ArrStack'),
     path = require('path'),
     express = require('express'),
-    morgan = require('morgan'),
-    bodyParser = require('body-parser'),
-    passport = require('passport'),
-    methodOverride = require('method-override'),
-    cookieParser = require('cookie-parser'),
-    helmet = require('helmet'),
     nunjucks = require('nunjucks'),
     _ = require('lodash'),
     Promise = require('bluebird'),
@@ -31,6 +24,7 @@ let fs = require('fs'),
     LanguageManager = require("../manager/LanguageManager"),
     ModuleManager = require("../manager/ModuleManager"),
     MenuManager = require("../manager/MenuManager"),
+    PluginManager = require("../manager/PluginManager"),
     SystemLog = require("./SystemLog"),
     utils = require("./utils"),
     __ = require("./global_function");
@@ -59,6 +53,9 @@ class ArrowApplication {
         global.__base = this.baseFolder;
         this._config = __.getRawConfig();
 
+        this._expressApplication.baseFolder = this.baseFolder;
+        this._expressApplication._appConfig = this._config;
+
         //make system log
         global.log = SystemLog;
 
@@ -70,13 +67,10 @@ class ArrowApplication {
         this.serviceManager = new ServiceManager(this);
         this.serviceManager.eventHook(eventEmitter);
         this.services = this.serviceManager._services;
-        //global.__services = this.services;
 
         this.configManager = new ConfigManager(this);
         this.configManager.eventHook(eventEmitter);
-        //global.__configManager = this.configManager;
         this._config = this.configManager._config;
-        //global.__config = this._config;
 
         global.__ = __;
         global.__.t = __.t.bind(this);
@@ -98,25 +92,25 @@ class ArrowApplication {
         this.widgetManager = new WidgetManager(this);
         this.widgetManager.eventHook(eventEmitter);
         this.widgets = this.widgetManager._widgets;
-        //global.__widget = this.widgets;
 
 
         this.modelManager = new ModelManager(this);
         this.modelManager.eventHook(eventEmitter);
         this.models = this.modelManager._databases;
-        //global.__models = this.models;
 
         this.moduleManager = new ModuleManager(this);
-        //this.moduleManager.getCache();
         this.moduleManager.eventHook(eventEmitter);
         this.modules = this.moduleManager._modules;
-        //global.__modules = this.modules;
 
         this.menuManager = new MenuManager(this);
-        //this.menuManager.makeMenu();
         this.menuManager.eventHook(eventEmitter);
         this.menus = this.menuManager._menus;
-        //global.__menus = this.menus;
+
+
+        this.pluginManager = new PluginManager(this);
+        this.pluginManager.eventHook(PluginManager);
+        this.plugins = this.pluginManager._plugins;
+
     }
 
     addModule(modulePath) {
@@ -130,9 +124,6 @@ class ArrowApplication {
     }
 
     config() {
-
-        buildStructure();
-
         let self = this;
         /**
          * Main application entry file.
@@ -144,30 +135,19 @@ class ArrowApplication {
         global.__setting_menu_module = [];
 
 
-        /** Init plugins */
-            //pluginManager.loadAllPlugins();
-
-        self._expressApplication.baseFolder = self.baseFolder;
-        self._expressApplication._appConfig = self._config;
         /** Init the express application */
-        return new Promise(function (fulfill, reject) {
-            self.configManager.getCache()
-                .then(self.moduleManager.getCache())
-                .then(self.menuManager.makeMenu())
-                .then(self.menuManager.setCache())
-                .then(makeGlobalVariables(self))
-                .then(loadMenuAndModule())
-                .then(expressMe(self._expressApplication))
-                .then(loadingRouter(self))
-                .then(function (app) {
-                    console.log(chalk.black.bgWhite('Application loaded using the "' + process.env.NODE_ENV + '" environment configuration'));
-                    fulfill(app)
-                })
-                .catch(function (err) {
-                    reject(err);
-                    console.log(err)
-                });
-        })
+        return self.configManager.getCache()
+            .then(self.moduleManager.getCache())
+            .then(self.menuManager.makeMenu())
+            .then(self.menuManager.setCache())
+            .then(self.pluginManager.getCache())
+            .then(makeGlobalVariables(self))
+            .then(expressApp(self._expressApplication))
+            .then(loadingRouter(self._expressApplication, self.beforeFunction))
+            .then(function (app) {
+                console.log(chalk.black.bgWhite('Application loaded using the "' + process.env.NODE_ENV + '" environment configuration'));
+                return app
+            })
     }
 
     before(func) {
@@ -181,20 +161,16 @@ class ArrowApplication {
  *
  * Support function
  */
-function loadingRouter(arrowApp) {
-    let app = arrowApp._expressApplication;
-    let beforeFunc = arrowApp.beforeFunction;
-    /** Store module status (active|unactive) in Redis */
+function loadingRouter(app, beforeFunc) {
     return new Promise(function (fulfill, reject) {
         /** Module manager */
-        if (beforeFunc.length > 0) {
-            for (let k in beforeFunc) {
-                beforeFunc[k](app);
-            }
-        }
+        beforeFunc.map(function (func) {
+            func(app);
+        });
 
         /** Check authenticate in backend */
-        app.use('/' + __config.admin_prefix + '/*', require(path.resolve(libFolder, '..', 'middleware/modules-plugin.js')));
+
+        app.use('/' + app._appConfig.admin_prefix + '/*', require('../middleware/modules-plugin.js'));
 
         /** Globbing backend route files */
         let adminRoute = __.getOverrideCorePath(__base + 'core/modules/*/backend/route.js', __base + 'app/modules/*/backend/route.js', 3);
@@ -202,7 +178,7 @@ function loadingRouter(arrowApp) {
             if (adminRoute.hasOwnProperty(index)) {
                 let myRoute = require(path.resolve(adminRoute[index]));
                 if (myRoute.name === 'router') {
-                    app.use('/' + __config.admin_prefix, myRoute);
+                    app.use('/' + app._appConfig.admin_prefix, myRoute);
                 } else {
                     myRoute(app);
                 }
@@ -234,6 +210,7 @@ function loadingRouter(arrowApp) {
             }
         }
 
+
         /** Globbing route frontend files */
         let frontRoute = __.getOverrideCorePath(__base + 'core/modules/*/frontend/route.js', __base + 'app/modules/*/frontend/route.js', 3);
         let frontPath = [];
@@ -263,7 +240,6 @@ function loadingRouter(arrowApp) {
         app.use(function (err, req, res, next) {
             // If the error object doesn't exists
             if (!err) return next();
-
             // Log it
             console.error(err.stack);
 
@@ -290,28 +266,6 @@ function loadingRouter(arrowApp) {
     })
 }
 
-function loadMenuAndModule() {
-    let md = require('../deprecated/modules_manager.js');
-
-    let mn = require('../deprecated/menus_manager.js');
-
-    return new Promise(function (fulfill, reject) {
-        return mn().then(function (menus) {
-            global.__menus = menus;
-            return md().then(function (modules) {
-                if (Object.keys(modules).length === 0) {
-                    return md.loadAllModules().then(function () {
-                        fulfill(true);
-                    });
-                } else {
-                    global.__modules = modules;
-                    fulfill(true);
-                }
-            });
-        })
-    })
-
-}
 
 function buildStructure() {
     /** Create app dir if not exist */
@@ -329,33 +283,28 @@ function buildStructure() {
     utils.createDirectory('core/widgets');
 }
 
-function expressMe(app) {
-
+function expressApp(app) {
     return new Promise(function (fulfill, reject) {
-        return fs.access(app.baseFolder + "config/express.js", function (err, data) {
-            let expressFunction;
-            if (err) {
-                expressFunction = require("../demo/express");
-            } else {
-                expressFunction = require(app.baseFolder + "config/express");
-            }
-            expressFunction(app);
-            fulfill(app)
-        });
+        let expressFunction
+        if (fs.existsSync(path.resolve(app.baseFolder + "config/express.js"))) {
+            expressFunction = require(app.baseFolder + "config/express");
+        } else {
+            expressFunction = require("../demo/express");
+        }
+        fulfill(expressFunction(app));
     });
 }
 
 function makeGlobalVariables(arrowApp) {
-    return new Promise(function (fulfill, reject) {
-        global.__services = arrowApp.services;
-        global.__configManager = arrowApp.configManager;
-        global.__config = arrowApp._config;
-        global.__widget = arrowApp.widgets;
-        global.__models = arrowApp.models;
-        global.__modules = arrowApp.modules;
-        global.__menus = arrowApp.menus;
-        global.__mailSender = mailer.createTransport(smtpPool(__config.mailer_config));
-        fulfill(true)
-    })
+    global.__services = arrowApp.services;
+    global.__configManager = arrowApp.configManager;
+    global.__config = arrowApp._config;
+    global.__widget = arrowApp.widgets;
+    global.__models = arrowApp.models;
+    global.__modules = arrowApp.modules;
+    global.__menus = arrowApp.menus;
+    global.__mailSender = mailer.createTransport(smtpPool(__config.mailer_config));
+    return true
 }
+
 module.exports = ArrowApplication;

@@ -34,7 +34,7 @@ class ModuleManager extends SystemManager {
 
         let self = this;
 
-        this.subscriber.subscribe(self._config.redis_prefix + "module_update");
+        this.subscriber.subscribe(self._config.redis_prefix + self._config.redis_event.update_module);
 
         this.subscriber.on("message", function (demo) {
             self.getModule();
@@ -44,7 +44,7 @@ class ModuleManager extends SystemManager {
     }
     getCache() {
         let self = this._config;
-        return this.publisher.getAsync(self.redis_prefix + 'arrow_modules')
+        return this.publisher.getAsync(self.redis_prefix + self.redis_key.modules)
             .then(function (data) {
                 let m = JSON.parse(data);
                 _.assign(this._modules,m);
@@ -57,12 +57,12 @@ class ModuleManager extends SystemManager {
     reload(){
         let self = this;
         this.getModule().then(function () {
-            self.publisher.publish(self._config.redis_prefix + "module_update","Update modules")
+            self.publisher.publish(self._config.redis_prefix + self._config.redis_event.update_module,"Update modules")
         })
     }
     setCache() {
         let self = this;
-        return this.publisher.setAsync(self.redis_prefix + 'arrow_modules',JSON.stringify(self._modules))
+        return this.publisher.setAsync(self.redis_prefix + self.redis_key.modules,JSON.stringify(self._modules))
     }
 }
 
