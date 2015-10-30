@@ -4,7 +4,7 @@
  * Module dependencies.
  */
 let fs = require('fs'),
-    callsite = require('./ArrStack'),
+    arrowStack = require('./ArrStack'),
     path = require('path'),
     express = require('express'),
     _ = require('lodash'),
@@ -30,14 +30,17 @@ let fs = require('fs'),
 
 class ArrowApplication {
     constructor() {
-
+        //if NODE_ENV does not exist, use development by default
         process.env.NODE_ENV = process.env.NODE_ENV || 'development';
+
 
         let eventEmitter = new EventEmitter();
         this.modules = [];
         this.beforeFunction = [];
         this._expressApplication = express();
 
+        //Move all functions of express to ArrowApplication
+        //So we can call ArrowApplication.listen(port)
         let self = this._expressApplication;
         for (let func in self) {
             if (typeof self[func] == 'function') {
@@ -47,7 +50,7 @@ class ArrowApplication {
             }
         }
 
-        let requester = callsite(2);
+        let requester = arrowStack(2);  //Why arrowStack(2)?
         this.baseFolder = path.dirname(requester) + '/';
         global.__base = this.baseFolder;
         this._config = __.getRawConfig();
@@ -143,6 +146,11 @@ class ArrowApplication {
             })
     }
 
+    /**
+     * Add function that will execute before authentication task
+     * @param func
+     */
+
     before(func) {
         if (typeof func == "function") {
             this.beforeFunction.push(func);
@@ -152,10 +160,12 @@ class ArrowApplication {
 
 /**
  *
- * Support function
+ * Supporting functions
  */
 
-
+/**
+ *
+ */
 function buildStructure() {
     /** Create app dir if not exist */
     utils.createDirectory('app');

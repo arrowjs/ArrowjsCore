@@ -1,7 +1,10 @@
 "use strict";
-
-//Change code TJ to es 6
-
+/**
+ * This module is inspired by CallSite module https://www.npmjs.com/package/callsite
+ * Modify to compatible with ES6
+ * @param lineNumber
+ * @returns {*}
+ */
 module.exports = function(lineNumber){
     let orig = Error.prepareStackTrace;
     Error.prepareStackTrace = function(_, stack){ return stack; };
