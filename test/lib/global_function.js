@@ -1,3 +1,4 @@
+/*
 "use strict";
 
 var chai = require('chai'),
@@ -34,4 +35,4 @@ describe("Global function", function () {
     context("Load structure system", function () {
 
     });
-});
+});*/

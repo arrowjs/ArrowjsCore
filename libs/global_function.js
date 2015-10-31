@@ -578,12 +578,11 @@ module.exports.getRawConfig = function() {
     //get ENV config
     let env = process.env.NODE_ENV || "development";
     try {
-        fs.accessSync(__base + 'config/env/' + env);
+        fs.accessSync(__base + 'config/env/' + env + ".js");
         _.assign(conf, require(__base + 'config/env/' + env));
     } catch(err) {
         fsEx.copySync(path.resolve(__dirname, '..', 'config/env/development.js'), __base + 'config/env/' + env + '.js');
         _.assign(conf, require(__base + 'config/env/' + env));
     }
-
     return conf
 };

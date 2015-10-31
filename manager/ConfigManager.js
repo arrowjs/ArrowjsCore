@@ -24,13 +24,13 @@ class ConfigManager extends SystemManager {
             .then(function (data) {
                 if(data) {
                     let conf = JSON.parse(data);
-                    if(self.raw_config || self.raw_config.length > 0) {
-                        self.raw_config.map(function (key) {
-                            if(conf[key]) {
-                                delete conf[key];
-                            }
-                        })
-                    }
+                    //if(self.raw_config || self.raw_config.length > 0) {
+                    //    self.raw_config.map(function (key) {
+                    //        if(conf[key]) {
+                    //            delete conf[key];
+                    //        }
+                    //    })
+                    //}
                     _.assign(this._config,conf);
                 }
             }.bind(this))

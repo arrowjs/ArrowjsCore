@@ -132,17 +132,39 @@ class ArrowApplication {
         let exApp = self._expressApplication ;
         /** Init the express application */
         return self.configManager.getCache()
-            .then(self.moduleManager.getCache())
-            .then(self.menuManager.makeMenu())
-            .then(self.menuManager.setCache())
-            .then(self.pluginManager.getCache())
-            .then(makeGlobalVariables(self))
-            .then(expressApp(exApp))
-            .then(loadPreFunc(exApp, self.beforeFunction))
-            .then(loadRouteBackend(exApp))
-            .then(loadSettingMenu(exApp))
-            .then(loadRouteFrontend(exApp))
-            .then(handleError(exApp))
+            .then(function () {
+                self.moduleManager.getCache();
+            })
+            .then(function () {
+                self.menuManager.makeMenu()
+            })
+            .then(function () {
+                self.menuManager.setCache()
+            })
+            .then(function () {
+                self.pluginManager.getCache()
+            })
+            .then(function () {
+                makeGlobalVariables(self)
+            })
+            .then(function () {
+                expressApp(exApp)
+            })
+            .then(function () {
+                loadPreFunc(exApp, self.beforeFunction)
+            })
+            .then(function () {
+                loadRouteBackend(exApp)
+            })
+            .then(function () {
+                loadSettingMenu(exApp)
+            })
+            .then(function () {
+                loadRouteFrontend(exApp)
+            })
+            .then(function () {
+                handleError(exApp)
+            })
             .then(function (app) {
                 console.log(chalk.black.bgWhite('Application loaded using the "' + process.env.NODE_ENV + '" environment configuration'));
                 return app
@@ -327,7 +349,6 @@ function handleError(app){
         if (!err) return next();
         // Log it
         console.error(err.stack);
-
         // Error page
         res.status(500).render('500', {
             error: err.stack
