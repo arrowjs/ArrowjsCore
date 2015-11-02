@@ -25,7 +25,9 @@ let fs = require('fs'),
     LanguageManager = require("../manager/LanguageManager"),
     ModuleManager = require("../manager/ModuleManager"),
     MenuManager = require("../manager/MenuManager"),
-    PluginManager = require("../manager/PluginManager");
+    PluginManager = require("../manager/PluginManager"),
+    DemoManager = require("../manager/DemoManager"),
+    buildStructure = require("./buildStructure");
 
 
 class ArrowApplication {
@@ -56,6 +58,8 @@ class ArrowApplication {
 
         global.__base = this.baseFolder;
         this._config = __.getRawConfig();
+        let structure = __.getStructure();
+        this.structure = buildStructure(structure);
 
         this._expressApplication.baseFolder = this.baseFolder;
         this._expressApplication._appConfig = this._config;
@@ -81,7 +85,7 @@ class ArrowApplication {
         global.__.t = __.t.bind(this);
         global.__utils = utils;
 
-        this.languageManager = new LanguageManager();
+        this.languageManager = new LanguageManager(this);
         this.languageManager.eventHook(eventEmitter);
         this.langs = this.languageManager._langs;
         global.__lang = this.langs;
@@ -91,6 +95,11 @@ class ArrowApplication {
 
         require('./BaseWidget')(this);
         global.BaseWidget = require('./BaseWidget').BaseWidget;
+
+        let key = "modules";
+        let demoManager = new DemoManager(this);
+        demoManager.loadComponents(key);
+        this.demo = demoManager["_" + key];
 
         this.widgetManager = new WidgetManager(this);
         this.widgetManager.eventHook(eventEmitter);
@@ -112,6 +121,9 @@ class ArrowApplication {
         this.pluginManager.eventHook(PluginManager);
         this.plugins = this.pluginManager._plugins;
 
+
+
+
     }
 
     addModule(modulePath) {
@@ -127,7 +139,7 @@ class ArrowApplication {
     config() {
         let self = this;
 
-        buildStructure();
+        makeFolder();
 
         let exApp = self._expressApplication ;
         /** Init the express application */
@@ -191,7 +203,7 @@ class ArrowApplication {
 /**
  * Create app dir if not exist
  */
-function buildStructure() {
+function makeFolder() {
     utils.createDirectory('app');
     utils.createDirectory('app/custom_filters');
     utils.createDirectory('app/modules');

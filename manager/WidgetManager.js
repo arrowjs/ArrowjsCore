@@ -5,7 +5,7 @@ let __ = require('../libs/global_function');
 
 class WidgetManager extends SystemManager {
     constructor(app) {
-        super();
+        super(app);
         let widgets = __.getOverrideCorePath(__base + "core/widgets/*/*.js", __base + "app/widgets/*/*.js", 2);
         let w = [];
         for (let index in widgets) {

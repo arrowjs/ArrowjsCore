@@ -512,6 +512,11 @@ module.exports.getOverrideCorePath = function (corePath, appPath, checkIndex) {
     return paths
 };
 
+module.exports.getOverrideArrayPath = function(arrayPath) {
+
+
+}
+
 /**
  * Merge all path in same directory
  */
@@ -554,7 +559,7 @@ module.exports.getCSSAssets = function () {
  * Get raw config file
  */
 
-module.exports.getRawConfig = function() {
+module.exports.getRawConfig = function getRawConfig() {
     let conf = {};
 
     //get config.js
@@ -585,4 +590,16 @@ module.exports.getRawConfig = function() {
         _.assign(conf, require(__base + 'config/env/' + env));
     }
     return conf
+};
+
+module.exports.getStructure = function getStructure() {
+    let struc = {};
+    try {
+        fs.accessSync(__base + 'config/structure.js');
+        _.assign(struc, require(__base + 'config/structure'));
+    } catch(err) {
+        fsEx.copySync(path.resolve(__dirname, '..', 'config/structure.js'), __base + 'config/structure.js');
+        _.assign(struc, require(__base + 'config/structure'));
+    }
+    return struc;
 };

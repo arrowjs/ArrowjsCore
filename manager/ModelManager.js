@@ -7,7 +7,7 @@ let path = require("path");
 
 class ModelManager extends SystemManager {
     constructor(app) {
-        super();
+        super(app);
         let config = app._config;
         let database = new Database(config.db.database, config.db.username, config.db.password, config.db);
 

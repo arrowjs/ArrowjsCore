@@ -1,45 +1,137 @@
 "use strict";
 
 let _ = require("lodash");
-module.exports = function (app) {
-    let struc = require(app.arrFolder + "/config/structure");
-    try {
-        if(typeof struc !== "object" || (struc.managers && struc.modules && struc.services)) {
-            throw Error("Your structure config file is invalid");
-        }
-    } catch(err) {
-        struc = require(app.baseFolder + "/config/structure");
-    }
+let path = require('path');
+let globalPattern = {};
+
+module.exports = function (struc) {
+    let arrStruc = {};
     Object.keys(struc).map(function (key) {
         if (typeof struc[key] === "object") {
-            let arrPart = struc[key];
-            Object.keys(arrPart).map(function (attribute) {
-                if (checkValid(arrPart[attribute])) {
-                    switch (attribute) {
-                        case "path":
-                            break;
-                        case "config":
-                            break;
-                        case "controller":
-                            break;
-                        case "model":
-                            break;
-                        case "view":
-                            break;
-                        case "manager":
-                            break;
-                    }
-                }
-            })
+            if (_.isArray(struc[key])) {
+                arrStruc[key] = [];
+                struc[key].forEach(function (small) {
+                    let obj = getDataFromObject(small,key);
+                    obj && arrStruc[key].push(obj);
+                })
+            } else {
+                arrStruc[key] = getDataFromObject(struc[key],key);
+            }
+
         }
     });
-    return struc
+    return arrStruc
 };
 
-function checkValid(data) {
-    if (typeof data !== "object" || typeof data !== "number" || typeof data !== "string") {
-        return true
+
+
+function makeGlob(level, pathInfo, fatherPath) {
+    let globFolder;
+    if(pathInfo.folder) {
+        if(level === 1) {
+            globFolder = path.normalize("/" + pathInfo.folder + "/*");
+        } else {
+            if(pathInfo.folder[0] !== "/") {
+                globFolder = path.normalize(pathInfo.folder);
+            } else {
+                globFolder = path.normalize("/" + pathInfo.folder );
+            }
+        }
     } else {
-        return false
+        if(level === 1) {
+            globFolder = "/";
+        } else {
+            globFolder = fatherPath;
+        }
+    }
+    let globFile = pathInfo.file || "*.js";
+    globFile = path.normalize(globFolder + "/" + globFile);
+    return [globFile,globFolder]
+}
+
+function getDataFromObject(obj,key) {
+    let newObj = {};
+    let fatherFolder;
+    let localPattern = {};
+
+    if (obj.path && (obj.path.folder || obj.path.file)) {
+        let arrayPath = makeGlob(1,obj.path,"/");
+        newObj.path = arrayPath[0];
+        fatherFolder = arrayPath[1];
+    } else {
+        return null
+    }
+
+    let objectKey = checkPatternExist(globalPattern,newObj.path);
+
+    if(objectKey.length > 0) {
+        let errorMessage = "Pattern already exists: Check '" + key + "' in structure.js";
+        throw Error(errorMessage);
+    } else {
+        globalPattern[key] = newObj.path;
+    }
+
+    if (obj.extends) {
+        newObj.extends = obj.extends;
+    }
+
+    //controller,helper,route,model,view
+    Object.keys(obj).map(function (attribute) {
+        if(attribute !== "path" && attribute != "extends") {
+            let attr = simplyObject(obj[attribute],fatherFolder);
+            if(attr) {
+                newObj[attribute] = attr;
+                if(attr.path[0] !== '/') {
+                    let localPatternCheck = checkPatternExist(localPattern,attr.path);
+                    if(localPatternCheck.length > 0) {
+                        let errorMessage = "Pattern already exists: Check '" + key + "' : '"+ attribute + "' in structure.js";
+                        throw Error(errorMessage);
+                    } else {
+                        localPattern[attribute] = attr.path;
+                    }
+                } else {
+                    let globalPatternCheck = checkPatternExist(localPattern,attr.path);
+                    if(globalPatternCheck.length > 0) {
+                        let errorMessage = "Pattern already exists: Check '" + key + "' : '"+ attribute +"' in structure.js";
+                        throw Error(errorMessage);
+                    } else {
+                        globalPatternCheck[attribute] = attr.path;
+                    }
+                }
+            }
+
+        }
+    });
+
+    return newObj;
+}
+
+function simplyObject(obj,path) {
+    if (typeof obj === "object" && obj.path) {
+        obj.path = makeGlob(2,obj.path,path)[0];
+        return obj
+    } else {
+        return null
     }
 }
+
+function checkPatternExist(patternObject,patternNeedCheck) {
+    let test = [];
+    Object.keys(patternObject).map(function (key) {
+        if (patternObject[key] === patternNeedCheck) {
+            return test.push(key)
+        }
+    });
+    return test;
+}
+
+module.exports.stringWithAsterisk = function (path_string) {
+
+};
+
+
+
+module.exports.stringNoAsterisk = function (path_string) {
+    path_string = path.normalize("/" + path_string);
+    return path_string + "/*"
+};

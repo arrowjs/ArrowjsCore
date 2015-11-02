@@ -5,7 +5,7 @@ let __ = require('./../libs/global_function');
 
 class BackendMenuManager extends SystemManager {
     constructor(app){
-        super();
+        super(app);
         this._config = app._config;
         this._modules = app.modules;
         this.pub = app.redisCache;

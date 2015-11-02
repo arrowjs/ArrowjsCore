@@ -8,7 +8,7 @@ let Database = require('../libs/database');
 
 class ServiceManager extends SystemManager {
     constructor(app) {
-        super();
+        super(app);
         let self = this;
         let services = {};
         let listServices = __.getGlobbedFiles(__base + "/services/**/service.js");

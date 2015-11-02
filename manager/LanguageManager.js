@@ -5,7 +5,7 @@ let __ = require("../libs/global_function");
 
 class LanguageManager extends SystemManager {
     constructor(app){
-        super();
+        super(app);
         let data = {};
 
         __.getGlobbedFiles(__base + '/lang/*.js').forEach(function (file) {

@@ -6,7 +6,7 @@ let _ = require('lodash');
 
 class ModuleManager extends SystemManager {
     constructor(app){
-        super();
+        super(app);
         this._config = app._config;
         this.pub = app.redisCache;
         this.sub = app.RedisCache();

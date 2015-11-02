@@ -7,7 +7,7 @@ let _ = require('lodash');
 
 class PluginManager extends SystemManager {
     constructor(app) {
-        super();
+        super(app);
         this._config = app._config;
         this.pub = app.redisCache;
 
