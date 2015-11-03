@@ -27,6 +27,7 @@ let fs = require('fs'),
     MenuManager = require("../manager/MenuManager"),
     PluginManager = require("../manager/PluginManager"),
     DemoManager = require("../manager/DemoManager"),
+    DefaultManager = require("../manager/DefaultManager"),
     buildStructure = require("./buildStructure");
 
 
@@ -73,56 +74,16 @@ class ArrowApplication {
         this.RedisCache = RedisCache.bind(null, redisConfig);
         this.redisCache = RedisCache(redisConfig);
 
-        this.serviceManager = new ServiceManager(this);
-        this.serviceManager.eventHook(eventEmitter);
-        this.services = this.serviceManager._services;
+        this._managerList = Object.keys(this.structure);
 
-        this.configManager = new ConfigManager(this);
-        this.configManager.eventHook(eventEmitter);
-        this._config = this.configManager._config;
-
-        global.__ = __;
-        global.__.t = __.t.bind(this);
-        global.__utils = utils;
-
-        this.languageManager = new LanguageManager(this);
-        this.languageManager.eventHook(eventEmitter);
-        this.langs = this.languageManager._langs;
-        global.__lang = this.langs;
-
-        global.BackModule = require('./BackModule');
-        global.FrontModule = require('./FrontModule');
-
-        require('./BaseWidget')(this);
-        global.BaseWidget = require('./BaseWidget').BaseWidget;
-
-        let key = "modules";
-        let demoManager = new DemoManager(this);
-        demoManager.loadComponents(key);
-        this.demo = demoManager["_" + key];
-
-        this.widgetManager = new WidgetManager(this);
-        this.widgetManager.eventHook(eventEmitter);
-        this.widgets = this.widgetManager._widgets;
-
-        this.modelManager = new ModelManager(this);
-        this.modelManager.eventHook(eventEmitter);
-        this.models = this.modelManager._databases;
-
-        this.moduleManager = new ModuleManager(this);
-        this.moduleManager.eventHook(eventEmitter);
-        this.modules = this.moduleManager._modules;
-
-        this.menuManager = new MenuManager(this);
-        this.menuManager.eventHook(eventEmitter);
-        this.menus = this.menuManager._menus;
-
-        this.pluginManager = new PluginManager(this);
-        this.pluginManager.eventHook(PluginManager);
-        this.plugins = this.pluginManager._plugins;
-
-
-
+        this._managerList.map(function (managerKey) {
+            let key = managerKey;
+            let managerName = managerKey + "Manager";
+            this[managerName] = new DefaultManager(this);
+            this[managerName].eventHook(eventEmitter);
+            this[managerName].loadComponents(key);
+            this[key] = this[managerName]["_" + key];
+        }.bind(this));
 
     }
 
@@ -139,26 +100,12 @@ class ArrowApplication {
     config() {
         let self = this;
 
-        makeFolder();
+        //makeFolder();
 
         let exApp = self._expressApplication ;
+        let resolve = Promise.resolve();
         /** Init the express application */
-        return self.configManager.getCache()
-            .then(function () {
-                self.moduleManager.getCache();
-            })
-            .then(function () {
-                self.menuManager.makeMenu()
-            })
-            .then(function () {
-                self.menuManager.setCache()
-            })
-            .then(function () {
-                self.pluginManager.getCache()
-            })
-            .then(function () {
-                makeGlobalVariables(self)
-            })
+        return resolve
             .then(function () {
                 expressApp(exApp)
             })
@@ -166,16 +113,7 @@ class ArrowApplication {
                 loadPreFunc(exApp, self.beforeFunction)
             })
             .then(function () {
-                loadRouteBackend(exApp)
-            })
-            .then(function () {
-                loadSettingMenu(exApp)
-            })
-            .then(function () {
-                loadRouteFrontend(exApp)
-            })
-            .then(function () {
-                handleError(exApp)
+
             })
             .then(function (app) {
                 console.log(chalk.black.bgWhite('Application loaded using the "' + process.env.NODE_ENV + '" environment configuration'));
@@ -246,7 +184,7 @@ function expressApp(app) {
         if (fs.existsSync(path.resolve(app.baseFolder + "config/express.js"))) {
             expressFunction = require(app.baseFolder + "config/express");
         } else {
-            expressFunction = require("../demo/express");
+            expressFunction = require("../config/express");
         }
         fulfill(expressFunction(app));
     });

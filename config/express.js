@@ -2,7 +2,13 @@
 
 let bodyParser = require('body-parser'),
     methodOverride = require('method-override'),
-    __ = require("arrowjs").globalFunction;
+    express = require('express'),
+    path = require('path'),
+    morgan = require('morgan'),
+    fs = require('fs'),
+    helmet = require('helmet'),
+    cookieParser = require('cookie-parser'),
+    __ = require("../libs/global_function");
 
 
 
@@ -45,7 +51,7 @@ module.exports = function (app) {
     app.use(cookieParser());
 
     /** Express session storage */
-    app.use(require(app.baseFolder + 'config/session'));
+    //app.use(require(app.baseFolder + 'config/session'));
 
     app.use(function (req, res, next) {
 
@@ -57,16 +63,16 @@ module.exports = function (app) {
 
     /** Use passport session */
 
-    if (!fs.accessSync(app.baseFolder + 'config/passport.js')) {
-        // Initialize strategies
-        __.getGlobbedFiles(app.baseFolder + 'config/strategies/**/*.js').forEach(function (strategy) {
-            require(path.resolve(strategy))();
-        });
-        require(__base + 'config/passport.js')(passport);
-
-        app.use(passport.initialize());
-        app.use(passport.session());
-    }
+    //if (!fs.accessSync(app.baseFolder + 'config/passport.js')) {
+    //    // Initialize strategies
+    //    __.getGlobbedFiles(app.baseFolder + 'config/strategies/**/*.js').forEach(function (strategy) {
+    //        require(path.resolve(strategy))();
+    //    });
+    //    require(__base + 'config/passport.js')(passport);
+    //
+    //    app.use(passport.initialize());
+    //    app.use(passport.session());
+    //}
 
 
     /** Flash messages */

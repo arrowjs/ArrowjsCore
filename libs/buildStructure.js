@@ -31,11 +31,11 @@ function makeGlob(level, pathInfo, fatherPath) {
         if(level === 1) {
             globFolder = path.normalize("/" + pathInfo.folder + "/*");
         } else {
-            if(pathInfo.folder[0] !== "/") {
+            //if(pathInfo.folder[0] !== "/") {
                 globFolder = path.normalize(pathInfo.folder);
-            } else {
-                globFolder = path.normalize("/" + pathInfo.folder );
-            }
+            //} else {
+            //    globFolder = path.normalize("/" + pathInfo.folder );
+            //}
         }
     } else {
         if(level === 1) {
@@ -77,7 +77,7 @@ function getDataFromObject(obj,key) {
 
     //controller,helper,route,model,view
     Object.keys(obj).map(function (attribute) {
-        if(attribute !== "path" && attribute != "extends") {
+        if(attribute !== "path" && attribute !== "extends") {
             let attr = simplyObject(obj[attribute],fatherFolder);
             if(attr) {
                 newObj[attribute] = attr;
@@ -107,6 +107,16 @@ function getDataFromObject(obj,key) {
 }
 
 function simplyObject(obj,path) {
+    if(_.isArray(obj)) {
+        let newObj = {};
+        obj.forEach(function (_path) {
+            if(_path.path && _path.path.name) {
+                newObj[_path.path.name] = makeGlob(2,_path.path,path)[0];
+            }
+        });
+        obj.path = newObj;
+        return obj
+    }
     if (typeof obj === "object" && obj.path) {
         obj.path = makeGlob(2,obj.path,path)[0];
         return obj
