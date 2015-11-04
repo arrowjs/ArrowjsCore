@@ -3,7 +3,7 @@
 let Promise = require('bluebird'),
     fs = require('fs'),
     _ = require('lodash'),
-    __ = require("./global_function");
+    __ = require("./../libs/global_function");
 let env = __.createNewEnv([__base + 'app/widgets/', __base + 'core/widgets/', __base + "themes/frontend/"]);
 
 let config;

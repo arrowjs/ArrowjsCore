@@ -3,8 +3,8 @@
 let BaseModule = require('./BaseModule.js');
 let fs = require('fs'),
     _ = require('lodash');
-let callsite = require('./ArrStack');
-let __ = require("./global_function");
+let callsite = require('./../libs/ArrStack');
+let __ = require("./../libs/global_function");
 let frontEnv = __.createNewEnv([__base + 'app/modules/', __base + 'core/modules/', __base + 'themes/frontend/']);
 
 

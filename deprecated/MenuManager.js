@@ -1,6 +1,6 @@
 "use strict";
 
-let SystemManager = require('./SystemManager');
+let SystemManager = require('./../manager/SystemManager');
 let __ = require('./../libs/global_function');
 
 class BackendMenuManager extends SystemManager {

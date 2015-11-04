@@ -10,9 +10,11 @@ let Express = require('express');
 class SystemManager extends events.EventEmitter {
     constructor(app) {
         super();
-        this.baseFolder = app.baseFolder;
+        this.arrFolder = app.arrFolder;
         this.structure = app.structure;
         this._arrType = "manager";
+        this.pub = app.redisCache;
+        this.sub = app.RedisCache();
         this._app = app;
     }
 
@@ -34,7 +36,7 @@ class SystemManager extends events.EventEmitter {
 
     loadComponents(name) {
         let struc = this.structure[name];
-        let _base = this.baseFolder;
+        let _base = this.arrFolder;
         let privateName = "_" + name;
         let components = {};
         let _app = this._app;
@@ -87,29 +89,30 @@ class SystemManager extends events.EventEmitter {
             components[name]._configFile = paths[name].configFile;
             components[name]._strucID = paths[name].strucID;
             components[name]._structure = struc[paths[name].strucID] || struc;
-            components[name]._controllers = {};
-            components[name]._models = {};
-            components[name]._helpers = {};
-            components[name]._views = {};
-            components[name]._routes = Express.Router();
+            components[name].controllers = {};
+            components[name].models = {};
+            components[name].helpers = {};
+            components[name].views = {};
+            components[name].routes = Express.Router();
 
             let componentConfig = require(paths[name].configFile)();
             _.assign(components[name], componentConfig);
             Object.keys(components[name]._structure).map(function (attribute) {
                 let data = actionByAttribute(components[name]._structure, attribute, paths[name].path, components[name], _app);
                 _.assign(components[name], data);
-            })
+            });
         });
+
         this[privateName] = components;
     }
 }
 
-function getlistFile(componentPath, fatherPath) {
+function getlistFile(componentPath, fatherPath, basePath) {
     let files = [];
     if (componentPath.path && typeof componentPath.path === "string") {
-
         if (componentPath.path[0] === "/") {
-            __.getGlobbedFiles(componentPath.path).map(function (componentLink) {
+            let normalizepath = path.normalize(basePath + "/" + componentPath.path);
+            __.getGlobbedFiles(normalizepath).map(function (componentLink) {
                 files.push(componentLink);
             })
         } else {
@@ -120,23 +123,55 @@ function getlistFile(componentPath, fatherPath) {
         }
     }
     if (componentPath.path && typeof componentPath.path === "object") {
-
         Object.keys(componentPath.path).map(function (key) {
             files[key] = [];
             if (componentPath.path[0] === "/") {
-                __.getGlobbedFiles(componentPath.path).map(function (componentLink) {
-                    files[key].push(componentLink);
-                })
-            } else {
-                let normalizepath = path.normalize(fatherPath + "/" + componentPath.path[key]);
+                let normalizepath = path.normalize(basePath + "/" + componentPath.path);
                 __.getGlobbedFiles(normalizepath).map(function (componentLink) {
                     files[key].push(componentLink);
                 })
+            } else {
+                if (typeof componentPath.path[key] === "object") {
+                    let normalizepath = path.normalize(fatherPath + "/" + componentPath.path[key].path);
+                    __.getGlobbedFiles(normalizepath).map(function (componentLink) {
+                        files[key].push(componentLink);
+                    })
+                } else {
+                    let normalizepath = path.normalize(fatherPath + "/" + componentPath.path[key]);
+                    __.getGlobbedFiles(normalizepath).map(function (componentLink) {
+                        files[key].push(componentLink);
+                    })
+                }
             }
         })
     }
     return files
 }
+
+function getListFolder(componentPath, fatherPath, basePath) {
+    let folders = [];
+    if (_.isArray(componentPath)) {
+        componentPath.path.map(function (folderInfo) {
+            if (folderInfo[0] === "/") {
+                let normalizepath = path.normalize(basePath + "/" + folderInfo);
+                folders.push(normalizepath);
+            } else {
+                let normalizepath = path.normalize(fatherPath + "/" + folderInfo);
+                folders.push(normalizepath);
+            }
+        })
+    } else {
+        if (componentPath.path[0] === "/") {
+            let normalizepath = path.normalize(basePath + "/" + componentPath.path);
+            folders.push(normalizepath);
+        } else {
+            let normalizepath = path.normalize(fatherPath + "/" + componentPath.path);
+            folders.push(normalizepath);
+        }
+    }
+    return folders;
+}
+
 
 function actionByAttribute(struc, attName, fatherPath, component, application) {
     let setting = struc[attName];
@@ -154,7 +189,7 @@ function actionByAttribute(struc, attName, fatherPath, component, application) {
         case "controller":
             return controllerAttribute(setting, fatherPath, component, application);
         default :
-            return otherAttribute(setting, attName);
+            return otherAttribute(setting, attName, component);
     }
 }
 
@@ -164,7 +199,7 @@ function extendsAttribute(setting) {
 }
 
 function modelAttribute(setting, fatherPath, component, application) {
-    let files = getlistFile(setting, fatherPath);
+    let files = getlistFile(setting, fatherPath, application.arrFolder);
     let database = new Database(application._config.db.database, application._config.db.username, application._config.db.password, application._config.db);
     let db = {};
     Object.keys(files).map(function (key) {
@@ -176,22 +211,30 @@ function modelAttribute(setting, fatherPath, component, application) {
             db[modelName].associate(db)
         }
     });
-    component._models = db;
+    component.models = db;
 }
-function viewAttribute(setting, fatherPath) {
+function viewAttribute(setting, fatherPath,component, application) {
     let obj = Object.create(null);
-    let files = getlistFile(setting, fatherPath);
+    let folderList = getListFolder(setting, fatherPath, application.arrFolder);
+    obj.viewPath =folderList;
+    return obj
 }
 function controllerAttribute(setting, fatherPath, component, application) {
-    let files = getlistFile(setting, fatherPath);
+    let files = getlistFile(setting, fatherPath, application.arrFolder);
     Object.keys(files).map(function (key) {
-        if (files[key].length > 0) {
+        if (typeof files[key] === "string") {
+            try {
+                require(files[key]).call(null, component.controllers, component, application);
+            } catch (err) {
+                throw Error("This component dont this attribute");
+            }
+        } else if (files[key].length > 0) {
             files[key].map(function (link) {
-                component._controllers[key] = {}
+                component.controllers[key] = {};
                 if (typeof key === "string") {
-                    require(link).call(null, component._controllers[key], component, application);
+                    require(link).call(null, component.controllers[key], component, application);
                 } else {
-                    require(link).call(null, component._controllers, component, application);
+                    require(link).call(null, component.controllers, component, application);
                 }
             })
         }
@@ -199,15 +242,17 @@ function controllerAttribute(setting, fatherPath, component, application) {
 }
 
 function helperAttribute(setting, fatherPath) {
-    let files = getlistFile(setting, fatherPath);
+    let files = getlistFile(setting, fatherPath, application.arrFolder);
     Object.keys(files).map(function (key) {
-        if (files[key].length > 0) {
+        if (typeof files[key] === "string") {
+            require(link).call(null, component.helpers, component, application);
+        } else if (files[key].length > 0) {
             files[key].map(function (link) {
-                component._helpers[key] = {};
+                component.helpers[key] = {};
                 if (typeof key === "string") {
-                    require(link).call(null, component._helpers[key], component, application);
+                    require(link).call(null, component.helpers[key], component, application);
                 } else {
-                    require(link).call(null, component._helpers, component, application);
+                    require(link).call(null, component.helpers, component, application);
                 }
             })
         }
@@ -215,25 +260,30 @@ function helperAttribute(setting, fatherPath) {
 }
 
 function routeAttribute(setting, fatherPath, component, application) {
-    let files = getlistFile(setting, fatherPath);
+    let files = getlistFile(setting, fatherPath, application.arrFolder);
     Object.keys(files).map(function (key) {
-        if (files[key].length > 0) {
+        if (typeof files[key] === "string") {
+            require(files[key]).call(null, component.routes, component, application);
+        } else if (files[key].length > 0) {
             files[key].map(function (link) {
-                component._routes[key] = Express.Router();
+                component.routes[key] = Express.Router();
                 if (typeof key === "string") {
-                    require(link).call(null, component._routes[key], component, application);
+                    require(link).call(null, component.routes[key], component, application);
                 } else {
-                    require(link).call(null, component._routes, component, application);
-
+                    require(link).call(null, component.routes, component, application);
                 }
             })
         }
     });
 }
 
-function otherAttribute(setting, attName) {
+function otherAttribute(setting, attName, component) {
     let obj = Object.create(null);
-    obj[attName] = setting;
+    if (typeof setting === "function") {
+        obj[attName] = setting.bind(component);
+    } else {
+        obj[attName] = setting;
+    }
     return obj
 }
 

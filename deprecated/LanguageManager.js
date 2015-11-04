@@ -1,5 +1,5 @@
 "use strict";
-let SystemManager = require("./SystemManager");
+let SystemManager = require("./../manager/SystemManager");
 let path = require('path');
 let __ = require("../libs/global_function");
 

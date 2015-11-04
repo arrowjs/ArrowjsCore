@@ -9,9 +9,11 @@ module.exports = function (struc) {
     Object.keys(struc).map(function (key) {
         if (typeof struc[key] === "object") {
             if (_.isArray(struc[key])) {
+                let baseStruc = struc[key][0];
                 arrStruc[key] = [];
                 struc[key].forEach(function (small) {
-                    let obj = getDataFromObject(small,key);
+                    let assignCall = _.assign(baseStruc,small);
+                    let obj = getDataFromObject(assignCall,key);
                     obj && arrStruc[key].push(obj);
                 })
             } else {
@@ -25,17 +27,13 @@ module.exports = function (struc) {
 
 
 
-function makeGlob(level, pathInfo, fatherPath) {
+function makeGlob(level, pathInfo, fatherPath,attribute) {
     let globFolder;
     if(pathInfo.folder) {
         if(level === 1) {
             globFolder = path.normalize("/" + pathInfo.folder + "/*");
         } else {
-            //if(pathInfo.folder[0] !== "/") {
-                globFolder = path.normalize(pathInfo.folder);
-            //} else {
-            //    globFolder = path.normalize("/" + pathInfo.folder );
-            //}
+            globFolder = path.normalize(pathInfo.folder);
         }
     } else {
         if(level === 1) {
@@ -45,6 +43,10 @@ function makeGlob(level, pathInfo, fatherPath) {
         }
     }
     let globFile = pathInfo.file || "*.js";
+
+    if(attribute === "view") {
+        globFile = "";
+    }
     globFile = path.normalize(globFolder + "/" + globFile);
     return [globFile,globFolder]
 }
@@ -78,7 +80,7 @@ function getDataFromObject(obj,key) {
     //controller,helper,route,model,view
     Object.keys(obj).map(function (attribute) {
         if(attribute !== "path" && attribute !== "extends") {
-            let attr = simplyObject(obj[attribute],fatherFolder);
+            let attr = simplyObject(obj[attribute],fatherFolder,attribute);
             if(attr) {
                 newObj[attribute] = attr;
                 if(attr.path[0] !== '/') {
@@ -98,30 +100,41 @@ function getDataFromObject(obj,key) {
                         globalPatternCheck[attribute] = attr.path;
                     }
                 }
+            } else {
+                if (typeof obj[attribute] === "function") {
+                    newObj[attribute] = obj[attribute];
+                }
             }
-
         }
     });
-
     return newObj;
 }
-
-function simplyObject(obj,path) {
+function simplyObject(obj,path,attribute) {
     if(_.isArray(obj)) {
         let newObj = {};
-        obj.forEach(function (_path) {
-            if(_path.path && _path.path.name) {
-                newObj[_path.path.name] = makeGlob(2,_path.path,path)[0];
-            }
-        });
+        if (attribute === "view") {
+            newObj = [];
+            obj.forEach(function (_path) {
+                newObj.push(makeGlob(2,_path.path,path,attribute)[0]);
+            })
+        } else {
+            obj.forEach(function (_path) {
+                if(_path.path && _path.path.name) {
+                    newObj[_path.path.name] = {};
+                    newObj[_path.path.name].path = makeGlob(2,_path.path,path,attribute)[0];
+                    if(_path.prefix && typeof _path.prefix === "string") {
+                        newObj[_path.path.name].prefix = _path.prefix;
+                    }
+                }
+            });
+        }
+
         obj.path = newObj;
         return obj
     }
     if (typeof obj === "object" && obj.path) {
-        obj.path = makeGlob(2,obj.path,path)[0];
+        obj.path = makeGlob(2,obj.path,path,attribute)[0];
         return obj
-    } else {
-        return null
     }
 }
 
@@ -134,14 +147,3 @@ function checkPatternExist(patternObject,patternNeedCheck) {
     });
     return test;
 }
-
-module.exports.stringWithAsterisk = function (path_string) {
-
-};
-
-
-
-module.exports.stringNoAsterisk = function (path_string) {
-    path_string = path.normalize("/" + path_string);
-    return path_string + "/*"
-};

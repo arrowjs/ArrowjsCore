@@ -110,14 +110,10 @@ exports.createNewEnv = function (views) {
     let self = this;
     let env;
 
-    if (views) {
-        env = new nunjucks.Environment(new nunjucks.FileSystemLoader(views));
-    } else {
-        env = new nunjucks.Environment(new nunjucks.FileSystemLoader([__base + 'core/widgets', __base + 'app/widgets', __base + 'themes/frontend']));
-    }
+    env = new nunjucks.Environment(new nunjucks.FileSystemLoader(views));
 
-    env = self.getAllCustomFilter(env);
-    env = self.getAllGlobalVariable(env);
+    //env = self.getAllCustomFilter(env);
+    //env = self.getAllGlobalVariable(env);
 
     return env;
 };

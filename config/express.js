@@ -16,15 +16,15 @@ module.exports = function (app) {
     /**
      * Set folder static resource
      */
-    app.use(express.static(path.resolve(app.baseFolder + app._appConfig.resource.path), app._appConfig.resource.option));
+    app.use(express.static(path.resolve(app.baseFolder + app.arrConfig.resource.path), app.arrConfig.resource.option));
 
     /**
      * Set local variable
      */
-    app.locals.title = app._appConfig.app.title;
-    app.locals.description = app._appConfig.app.description;
-    app.locals.keywords = app._appConfig.app.keywords;
-    app.locals.facebookAppId = app._appConfig.facebook.clientID || "";
+    app.locals.title = app.arrConfig.app.title;
+    app.locals.description = app.arrConfig.app.description;
+    app.locals.keywords = app.arrConfig.app.keywords;
+    app.locals.facebookAppId = app.arrConfig.facebook.clientID || "";
 
     /** Showing stack errors */
     app.set('showStackError', true);
@@ -43,41 +43,24 @@ module.exports = function (app) {
         app.locals.cache = 'memory';
     }
 
-    app.use(bodyParser.urlencoded(app._appConfig.bodyParser));
-    app.use(bodyParser.json({limit: app._appConfig.bodyParser.limit}));
+    app.use(bodyParser.urlencoded(app.arrConfig.bodyParser));
+    app.use(bodyParser.json({limit: app.arrConfig.bodyParser.limit}));
     app.use(methodOverride());
 
     /** CookieParser should be above session */
     app.use(cookieParser());
 
     /** Express session storage */
-    //app.use(require(app.baseFolder + 'config/session'));
 
-    app.use(function (req, res, next) {
-
-        if (!req.session) {
-            return next(new Error('Session destroy')); // handle error
-        }
-        next(); // otherwise continue
-    });
+    //app.useSession();
 
     /** Use passport session */
 
-    //if (!fs.accessSync(app.baseFolder + 'config/passport.js')) {
-    //    // Initialize strategies
-    //    __.getGlobbedFiles(app.baseFolder + 'config/strategies/**/*.js').forEach(function (strategy) {
-    //        require(path.resolve(strategy))();
-    //    });
-    //    require(__base + 'config/passport.js')(passport);
-    //
-    //    app.use(passport.initialize());
-    //    app.use(passport.session());
-    //}
-
+    //app.usePassport();
 
     /** Flash messages */
 
-    app.use(require(app.baseFolder + '/middleware/flash-plugin.js'));
+    //app.useFlashMessage();
 
     /** Use helmet to secure Express headers */
     app.use(helmet.xframe());
@@ -86,7 +69,7 @@ module.exports = function (app) {
     app.use(helmet.ienoopen());
     app.disable('x-powered-by');
 
-    /** Passing the request url to environment locals */
+    /** Passing the variables to environment locals */
     app.use(function (req, res, next) {
         res.locals.hasOwnProperty = Object.hasOwnProperty;
         res.locals.url = req.protocol + '://' + req.headers.host + req.url;
