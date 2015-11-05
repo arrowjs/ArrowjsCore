@@ -99,10 +99,14 @@ class SystemManager extends events.EventEmitter {
             _.assign(components[name], componentConfig);
             Object.keys(components[name]._structure).map(function (attribute) {
                 let data = actionByAttribute(components[name]._structure, attribute, paths[name].path, components[name], _app);
+                console.log(data);
                 _.assign(components[name], data);
             });
 
-            console.log(components[name].views);
+            //Object.keys(components).map(function (name) {
+            //    console.log(components[name].views)
+            //})
+
         });
 
         this[privateName] = components;
@@ -234,7 +238,8 @@ function modelAttribute(setting, fatherPath, component, application) {
 function viewAttribute(setting, fatherPath,component, application) {
     let obj = Object.create(null);
     let folderList = getListFolder(setting, fatherPath, application.arrFolder);
-    return obj = folderList;
+    obj.views = folderList;
+    return obj;
 }
 function controllerAttribute(setting, fatherPath, component, application) {
     let files = getlistFile(setting, fatherPath, application.arrFolder);

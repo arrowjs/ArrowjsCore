@@ -2,7 +2,7 @@
 
 module.exports = function (controller,component,application) {
     controller.get = function (req,res) {
-        res.send("Asdasdas");
+        res.send("HelloWorld");
     }
 };
 
