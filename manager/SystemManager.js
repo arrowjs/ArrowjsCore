@@ -92,7 +92,7 @@ class SystemManager extends events.EventEmitter {
             components[name].controllers = {};
             components[name].models = {};
             components[name].helpers = {};
-            components[name].views = {};
+            components[name].views = [];
             components[name].routes = Express.Router();
 
             let componentConfig = require(paths[name].configFile)();
@@ -101,6 +101,8 @@ class SystemManager extends events.EventEmitter {
                 let data = actionByAttribute(components[name]._structure, attribute, paths[name].path, components[name], _app);
                 _.assign(components[name], data);
             });
+
+            console.log(components[name].views);
         });
 
         this[privateName] = components;
@@ -150,16 +152,32 @@ function getlistFile(componentPath, fatherPath, basePath) {
 
 function getListFolder(componentPath, fatherPath, basePath) {
     let folders = [];
+
     if (_.isArray(componentPath)) {
-        componentPath.path.map(function (folderInfo) {
-            if (folderInfo[0] === "/") {
-                let normalizepath = path.normalize(basePath + "/" + folderInfo);
-                folders.push(normalizepath);
-            } else {
-                let normalizepath = path.normalize(fatherPath + "/" + folderInfo);
-                folders.push(normalizepath);
-            }
-        })
+            Object.keys(componentPath.path).map(function (nameFolder) {
+                if(typeof nameFolder === "string") {
+                    folders[nameFolder] = [];
+                    if(_.isArray(componentPath.path[nameFolder])){
+                        componentPath.path[nameFolder].map(function (key) {
+                            let normalizePath = path.normalize(basePath + "/" + key);
+                            folders[nameFolder].push(normalizePath);
+
+                        })
+                    } else {
+                        let normalizePath = path.normalize(basePath + "/" + componentPath.path[nameFolder]);
+                        folders[nameFolder].push(normalizePath);
+                    }
+                } else {
+                    if (folderInfo[0] === "/") {
+                        let normalizepath = path.normalize(basePath + "/" + folderInfo);
+                        folders.push(normalizepath);
+                    } else {
+                        let normalizepath = path.normalize(fatherPath + "/" + folderInfo);
+                        folders.push(normalizepath);
+                    }
+                }
+            })
+
     } else {
         if (componentPath.path[0] === "/") {
             let normalizepath = path.normalize(basePath + "/" + componentPath.path);
@@ -216,8 +234,7 @@ function modelAttribute(setting, fatherPath, component, application) {
 function viewAttribute(setting, fatherPath,component, application) {
     let obj = Object.create(null);
     let folderList = getListFolder(setting, fatherPath, application.arrFolder);
-    obj.viewPath =folderList;
-    return obj
+    return obj = folderList;
 }
 function controllerAttribute(setting, fatherPath, component, application) {
     let files = getlistFile(setting, fatherPath, application.arrFolder);
