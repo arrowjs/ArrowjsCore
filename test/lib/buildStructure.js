@@ -29,7 +29,7 @@ describe("Building application structure", function () {
    it("Throw error if file config/structure.js not a function ", function () {
        mockery.registerMock(app.arrFolder + "/config/structure", function(){});
        expect(build).to.throw(Error);
-   })
+   });
    it("Use default config/structure.js in node_modules", function () {
        mockery.registerMock(app.arrFolder + "/config/structure", function(){});
        mockery.registerMock(app.baseFolder + "/config/structure", default_structure);

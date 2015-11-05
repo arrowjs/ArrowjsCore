@@ -4,7 +4,7 @@
  * Module dependencies.
  */
 //process.env.NODE_ENV = "production";
-let Arrow = require('arrowjs');
+let Arrow = require('../..');
 
 let application = new Arrow();
 
