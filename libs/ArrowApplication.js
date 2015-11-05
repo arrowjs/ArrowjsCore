@@ -62,14 +62,12 @@ class ArrowApplication {
 
             this.RedisCache = redis.bind(null, redisConfig);
             this.redisCache = redis(redisConfig);
-
             this._expressApplication.arrFolder = this.arrFolder;
             this._expressApplication.arrConfig = this._config;
             this._expressApplication.redisCache = this.redisCache;
             this._expressApplication.usePassport = require("./loadPassport");
             this._expressApplication.useFlashMessage = require("./flashMessage");
             this._expressApplication.useSession = require("./useSession");
-
             this._componentList = [];
 
             this.configManager = new ConfigManager(this);
@@ -85,6 +83,8 @@ class ArrowApplication {
                 this[key] = this[managerName]["_" + key];
                 this._componentList.push(key);
             }.bind(this));
+
+            this.config();
         }.bind(this));
     }
 
