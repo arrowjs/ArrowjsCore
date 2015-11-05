@@ -200,7 +200,7 @@ function extendsAttribute(setting) {
 
 function modelAttribute(setting, fatherPath, component, application) {
     let files = getlistFile(setting, fatherPath, application.arrFolder);
-    let database = new Database(application._config.db.database, application._config.db.username, application._config.db.password, application._config.db);
+    let database = Database(application);
     let db = {};
     Object.keys(files).map(function (key) {
         let model = database.import(path.resolve(files[key]));

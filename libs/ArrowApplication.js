@@ -51,39 +51,41 @@ class ArrowApplication {
         let structure = __.getStructure();
         this.structure = buildStructure(structure);
 
+
         //TODO: Cuong Tran, will this better way to use Winston Log?
         //http://thottingal.in/blog/2014/04/06/winston-nodejs-logging/
         this.arrlog = SystemLog;
 
         //Make redis cache
         let redisConfig = this._config.redis || {};
-        this.RedisCache = RedisCache.bind(null, redisConfig);
-        this.redisCache = RedisCache(redisConfig);
+        RedisCache(redisConfig).then(function (redis) {
 
-        this._expressApplication.arrFolder = this.arrFolder;
-        this._expressApplication.arrConfig = this._config;
-        this._expressApplication.redisCache = this.redisCache;
-        this._expressApplication.usePassport = require("./loadPassport");
-        this._expressApplication.useFlashMessage = require("./flashMessage");
-        this._expressApplication.useSession = require("./useSession");
+            this.RedisCache = redis.bind(null, redisConfig);
+            this.redisCache = redis(redisConfig);
 
-        this._componentList = [];
+            this._expressApplication.arrFolder = this.arrFolder;
+            this._expressApplication.arrConfig = this._config;
+            this._expressApplication.redisCache = this.redisCache;
+            this._expressApplication.usePassport = require("./loadPassport");
+            this._expressApplication.useFlashMessage = require("./flashMessage");
+            this._expressApplication.useSession = require("./useSession");
 
-        this.configManager = new ConfigManager(this);
-        this.configManager.eventHook(eventEmitter);
-        this._config = this.configManager._config;
+            this._componentList = [];
 
-        Object.keys(this.structure).map(function (managerKey) {
-            let key = managerKey;
-            let managerName = managerKey + "Manager";
-            this[managerName] = new DefaultManager(this);
-            this[managerName].eventHook(eventEmitter);
-            this[managerName].loadComponents(key);
-            this[key] = this[managerName]["_" + key];
-            this._componentList.push(key);
+            this.configManager = new ConfigManager(this);
+            this.configManager.eventHook(eventEmitter);
+            this._config = this.configManager._config;
+
+            Object.keys(this.structure).map(function (managerKey) {
+                let key = managerKey;
+                let managerName = managerKey + "Manager";
+                this[managerName] = new DefaultManager(this);
+                this[managerName].eventHook(eventEmitter);
+                this[managerName].loadComponents(key);
+                this[key] = this[managerName]["_" + key];
+                this._componentList.push(key);
+            }.bind(this));
         }.bind(this));
-
-
     }
 
     addModule(modulePath) {

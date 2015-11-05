@@ -12,4 +12,14 @@ bluebird.promisifyAll(fakeRedis.RedisClient.prototype);
 bluebird.promisifyAll(fakeRedis.Multi.prototype);
 
 //TODO: How to check system have redis and change use another solution;
-module.exports = redis.createClient;
+module.exports = function (config) {
+    return new Promise(function (fulfill, reject) {
+        let client = redis.createClient(config);
+        client.on('error', function (err) {
+            fulfill(fakeRedis.createClient)
+        });
+        client.on("ready", function () {
+            fulfill(redis.createClient)
+        })
+    })
+};

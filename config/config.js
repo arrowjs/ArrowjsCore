@@ -43,10 +43,6 @@ module.exports = {
         number_item: 20
     },
     port: process.env.PORT || 3333,
-    templateEngine: 'nunjucks',
-    sessionSecret: 'ARROWJS',
-    sessionCollection: 'sessions',
-    theme: 'default',
     resource : {
         path : 'public',
         option : {
