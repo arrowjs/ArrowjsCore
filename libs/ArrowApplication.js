@@ -19,9 +19,10 @@ let fs = require('fs'),
     ConfigManager = require("../manager/ConfigManager"),
     buildStructure = require("./buildStructure");
 
+let coreEvent = new EventEmitter();
 
 class ArrowApplication {
-    constructor() {
+    constructor(setting) {
         //if NODE_ENV does not exist, use development by default
         process.env.NODE_ENV = process.env.NODE_ENV || 'development';
 
@@ -68,6 +69,7 @@ class ArrowApplication {
             this._expressApplication.usePassport = require("./loadPassport");
             this._expressApplication.useFlashMessage = require("./flashMessage");
             this._expressApplication.useSession = require("./useSession");
+
             this._componentList = [];
 
             this.configManager = new ConfigManager(this);
@@ -83,8 +85,7 @@ class ArrowApplication {
                 this[key] = this[managerName]["_" + key];
                 this._componentList.push(key);
             }.bind(this));
-
-            this.config();
+            coreEvent.emit("Arrow_config_run");
         }.bind(this));
     }
 
@@ -100,27 +101,28 @@ class ArrowApplication {
 
     config() {
         let self = this;
-
-        let exApp = self._expressApplication;
-        let resolve = Promise.resolve();
-        /** Init the express application */
-        return resolve
-            .then(function () {
-                expressApp(exApp)
-            })
-            .then(function () {
-                loadPreFunc(exApp, self.beforeFunction)
-            })
-            .then(function () {
-                setupManager(self);
-            })
-            .then(function () {
-                loadRoute(self)
-            })
-            .then(function (app) {
-                console.log(chalk.black.bgWhite('Application loaded using the "' + process.env.NODE_ENV + '" environment configuration'));
-                return app
-            })
+        coreEvent.on("Arrow_config_run", function () {
+            let exApp = self._expressApplication;
+            let resolve = Promise.resolve();
+            /** Init the express application */
+            return resolve
+                .then(function () {
+                    expressApp(exApp)
+                })
+                .then(function () {
+                    loadPreFunc(exApp, self.beforeFunction)
+                })
+                .then(function () {
+                    setupManager(self);
+                })
+                .then(function () {
+                    loadRoute(self)
+                })
+                .then(function (app) {
+                    console.log(chalk.black.bgWhite('Application loaded using the "' + process.env.NODE_ENV + '" environment configuration'));
+                    return app
+                })
+        })
     }
 
     /**
