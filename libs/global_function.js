@@ -495,7 +495,7 @@ module.exports.overrideCorePath = function (paths, routePath, checkIndex) {
  */
 module.exports.getOverrideCorePath = function (corePath, appPath, checkIndex) {
     let paths = [];
-    let self = this
+    let self = this;
 
     self.getGlobbedFiles(corePath).forEach(function (routePath) {
         paths = self.overrideCorePath(paths, routePath, checkIndex);
@@ -505,13 +505,13 @@ module.exports.getOverrideCorePath = function (corePath, appPath, checkIndex) {
         paths = self.overrideCorePath(paths, routePath, checkIndex);
     });
 
-    return paths
+    return paths;
 };
 
 module.exports.getOverrideArrayPath = function(arrayPath) {
 
 
-}
+};
 
 /**
  * Merge all path in same directory
@@ -547,8 +547,7 @@ module.exports.getJavaScriptAssets = function (includeTests) {
  * Get the modules CSS files
  */
 module.exports.getCSSAssets = function () {
-    let output = this.getGlobbedFiles(this.assets.lib.css.concat(this.assets.css), 'public/');
-    return output;
+    return this.getGlobbedFiles(this.assets.lib.css.concat(this.assets.css), 'public/');
 };
 
 /**
@@ -587,15 +586,18 @@ module.exports.getRawConfig = function getRawConfig() {
     }
     return conf
 };
-
+/**
+ *
+ * @returns {{}}
+ */
 module.exports.getStructure = function getStructure() {
-    let struc = {};
+    let structure = {};
     try {
         fs.accessSync(__base + 'config/structure.js');
-        _.assign(struc, require(__base + 'config/structure'));
+        _.assign(structure, require(__base + 'config/structure'));
     } catch(err) {
         fsEx.copySync(path.resolve(__dirname, '..', 'config/structure.js'), __base + 'config/structure.js');
-        _.assign(struc, require(__base + 'config/structure'));
+        _.assign(structurec, require(__base + 'config/structure'));
     }
-    return struc;
+    return structure;
 };
