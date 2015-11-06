@@ -52,5 +52,6 @@ module.exports = {
     bodyParser : {
         extended: true,
         limit: '5mb'
-    }
+    },
+    viewExtension : "html"
 };

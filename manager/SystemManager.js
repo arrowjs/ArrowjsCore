@@ -173,6 +173,9 @@ class SystemManager extends events.EventEmitter {
         //TODO: need logic with name;
         Object.keys(components).map(function (key) {
             components[key].render = function (name, ctx, cb) {
+                if (name.indexOf(_app._config.viewExtension) === -1) {
+                    name += "." + _app._config.viewExtension;
+                }
                 return new Promise(function(fulfill,reject){
                     componentsRender.loaders[0].searchPaths = components[key].views;
                     componentsRender.render.call(componentsRender,name, ctx, function (err,html) {
