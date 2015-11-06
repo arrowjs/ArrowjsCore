@@ -15,18 +15,42 @@ module.exports = function (struc) {
 function getDataFromArray(obj, key) {
     let newObj = {};
     let wrapArray = [];
-    newObj.path = {};
+
+
     if (_.isArray(obj)) {
         wrapArray = obj;
     } else if (_.isObject(obj)) {
         wrapArray.push(obj);
     }
+
     wrapArray.map(function (data) {
-        let pathInfo = handlePath(data.path, key);
-        let pathKey = pathInfo[1] || wrapArray.indexOf(data);
-        newObj.path[pathKey] = {};
-        newObj.path[pathKey].path = pathInfo[0];
-    })
+        //handle path
+        if (data.path) {
+            newObj.path = {};
+            let pathInfo = handlePath(data.path, key);
+            let pathKey = pathInfo[1] || wrapArray.indexOf(data);
+            newObj.path[pathKey] = {};
+            newObj.path[pathKey].path = pathInfo[0];
+        } else {
+            return null;
+        }
+
+        Object.keys(data).map(function (key) {
+            if (key === "extends") {
+                newObj.extends = data.extends;
+            }
+
+            if (typeof data.key === 'function') {
+                newObj[key] = data[key];
+            }
+
+            if (['controller', "view", "helper", "model"].indexOf(key) > -1) {
+                data[key].path && !data[key].path.singleton && (data[key].path.singleton = true);
+                newObj[key] = getDataFromArray(data[key], key);
+            }
+
+        })
+    });
     return newObj
 }
 function handlePath(pathInfo, attribute) {
@@ -123,7 +147,7 @@ function pathWithConfig(front, back) {
         let frontArray = front.split("*");
         let newFront = "";
         let newArray = [];
-        if(_.isString(key)){
+        if (_.isString(key)) {
             newArray.push(key);
         } else {
             newArray = key;
@@ -137,8 +161,7 @@ function pathWithConfig(front, back) {
                     newFront += frontKey
                 }
             });
-            console.log(newFront);
-            newFront = newFront.replace(/\*/g,"");
+            newFront = newFront.replace(/\*/g, "");
             return path.normalize(newFront + back)
         }
 
