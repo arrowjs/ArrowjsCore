@@ -597,7 +597,7 @@ module.exports.getStructure = function getStructure() {
         _.assign(structure, require(__base + 'config/structure'));
     } catch(err) {
         fsEx.copySync(path.resolve(__dirname, '..', 'config/structure.js'), __base + 'config/structure.js');
-        _.assign(structurec, require(__base + 'config/structure'));
+        _.assign(structure, require(__base + 'config/structure'));
     }
     return structure;
 };

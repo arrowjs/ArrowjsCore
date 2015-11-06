@@ -15,64 +15,78 @@ module.exports = function (struc) {
 function getDataFromArray(obj, key) {
     let newObj = {};
     let wrapArray = [];
-
-
     if (_.isArray(obj)) {
         wrapArray = obj;
     } else if (_.isObject(obj)) {
         wrapArray.push(obj);
     }
+    let baseObject = wrapArray[0];
     newObj.path = {};
-    newObj.type = "single"
-    wrapArray.map(function (data) {
+    newObj.type = "single";
+    wrapArray.map(function (data, index) {
         //handle path
         if (data.path) {
+            data = _.assign(baseObject, data);
             let pathInfo = handlePath(data.path, key);
+
             if (!_.isEmpty(pathInfo[1])) {
                 newObj.type = "multi";
             }
-
-            let pathKey = pathInfo[1] || wrapArray.indexOf(data);
+            let pathKey = pathInfo[1] || index;
             newObj.path[pathKey] = {};
             newObj.path[pathKey].path = pathInfo[0];
-            console.log(newObj);
+            Object.keys(data).map(function (key) {
+                if (key === "extends") {
+                    newObj.path[pathKey].extends = data.extends;
+                }
+
+                if (typeof data.key === 'function') {
+                    newObj.path[pathKey][key] = data[key];
+                }
+
+                if (['controller', "view", "helper", "model", "route"].indexOf(key) > -1) {
+                    if (_.isArray(data[key])) {
+                        data[key].map(function (data_key) {
+                            if (!data_key.path.singleton) {
+                                data_key.path.singleton = true;
+                            }
+                        });
+                    } else {
+                        if (!data[key].path.singleton) {
+                            data[key].path.singleton = true;
+                        }
+                    }
+                    newObj.path[pathKey][key] = getDataFromArray(data[key], key);
+                } else {
+                    if (key !== "extends" && key !== "path" && typeof data.key === 'object') {
+                        newObj.path[pathKey][key] = data[key]
+                    }
+                }
+
+            })
         } else {
             return null;
         }
-
-        Object.keys(data).map(function (key) {
-            if (key === "extends") {
-                newObj.extends = data.extends;
-            }
-
-            if (typeof data.key === 'function') {
-                newObj[key] = data[key];
-            }
-
-            if (['controller', "view", "helper", "model"].indexOf(key) > -1) {
-                data[key].path && !data[key].path.singleton && (data[key].path.singleton = true);
-                newObj[key] = getDataFromArray(data[key], key);
-            } else {
-                if (key !== "extends" && key !== "path" && typeof data.key === 'object') {
-                    newObj[key] = data[key]
-                }
-            }
-
-        })
     });
     return newObj
 }
 function handlePath(pathInfo, attribute) {
-
     if (pathInfo) {
         let singleton = handleSingleton(pathInfo.singleton);
         let folderName = handleFolder(pathInfo.folder);
         let depend = handleDepend(pathInfo.depend);
         let fileName = handleDepend(pathInfo.file);
         let name = handleName(pathInfo.name);
-
         switch (attribute) {
             case "view":
+                break;
+            case "controller":
+                break;
+            case "helper":
+                break;
+            case "route":
+                break;
+            case "model":
                 break;
             default:
                 break;
@@ -80,8 +94,13 @@ function handlePath(pathInfo, attribute) {
 
         let results = [];
         folderName.map(function (folderInfo) {
-            let backInfo = singleton + "/" + fileName;
-            let frontkey = folderInfo;
+            let backInfo;
+            if (folderInfo) {
+                backInfo = singleton + "/" + fileName;
+            } else {
+                backInfo = fileName;
+            }
+            let frontkey = folderInfo || "";
             let result;
             if (folderInfo.indexOf("*") > -1) {
                 if (depend) {
@@ -114,6 +133,9 @@ function handleFolder(folder) {
     }
     if (_.isString(folder)) {
         newFolder.push(folder);
+    }
+    if (!folder) {
+        newFolder.push("");
     }
     return newFolder;
 }

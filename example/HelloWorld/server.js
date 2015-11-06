@@ -3,13 +3,13 @@
 /**
  * Module dependencies.
  */
-let Arrow = require('../..');
+let Arrow = require('arrowjs');
 
 let application = new Arrow();
 
-global.Arrow = application;
+application.config();
 
-const port = 8000;
+const port = 3333;
 application.listen(port, function () {
     console.log('Application started on port ' + port, ', Process ID: ' + process.pid);
 });

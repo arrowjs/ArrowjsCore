@@ -15,51 +15,50 @@ module.exports = function (struc) {
 function getDataFromArray(obj, key) {
     let newObj = {};
     let wrapArray = [];
-
-
     if (_.isArray(obj)) {
         wrapArray = obj;
     } else if (_.isObject(obj)) {
         wrapArray.push(obj);
     }
+    let baseObject = wrapArray[0];
     newObj.path = {};
-    newObj.type = "single"
+    newObj.type = "single";
     wrapArray.map(function (data) {
         //handle path
         if (data.path) {
+            data = _.assign(baseObject,data);
             let pathInfo = handlePath(data.path, key);
             if (!_.isEmpty(pathInfo[1])) {
                 newObj.type = "multi";
             }
-
             let pathKey = pathInfo[1] || wrapArray.indexOf(data);
             newObj.path[pathKey] = {};
             newObj.path[pathKey].path = pathInfo[0];
-            console.log(newObj);
+
+            Object.keys(data).map(function (key) {
+                if (key === "extends") {
+                    newObj.path[pathKey].extends = data.extends;
+                }
+
+                if (typeof data.key === 'function') {
+                    newObj.path[pathKey][key] = data[key];
+                }
+
+                if (['controller', "view", "helper", "model","route"].indexOf(key) > -1) {
+                    data[key].path && !data[key].path.singleton && (data[key].path.singleton = true);
+                    newObj.path[pathKey][key] = getDataFromArray(data[key], key);
+                } else {
+                    if (key !== "extends" && key !== "path" && typeof data.key === 'object') {
+                        newObj.path[pathKey][key] = data[key]
+                    }
+                }
+
+            })
         } else {
             return null;
         }
-
-        Object.keys(data).map(function (key) {
-            if (key === "extends") {
-                newObj.extends = data.extends;
-            }
-
-            if (typeof data.key === 'function') {
-                newObj[key] = data[key];
-            }
-
-            if (['controller', "view", "helper", "model"].indexOf(key) > -1) {
-                data[key].path && !data[key].path.singleton && (data[key].path.singleton = true);
-                newObj[key] = getDataFromArray(data[key], key);
-            } else {
-                if (key !== "extends" && key !== "path" && typeof data.key === 'object') {
-                    newObj[key] = data[key]
-                }
-            }
-
-        })
     });
+    console.log(newObj);
     return newObj
 }
 function handlePath(pathInfo, attribute) {
