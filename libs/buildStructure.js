@@ -79,6 +79,7 @@ function handlePath(pathInfo, attribute) {
         let name = handleName(pathInfo.name);
         switch (attribute) {
             case "view":
+                fileName = "";
                 break;
             case "controller":
                 break;

@@ -2,7 +2,7 @@
 
 let Sequelize = require('sequelize');
 
-//TODO : If db.database = mongo call mongoose :
+//TODO : If db.database = mongo call mongoose
 module.exports = function (application) {
     let sequelize = new Sequelize(application._config.db.database, application._config.db.username, application._config.db.password, application._config.db)
 

@@ -4,6 +4,7 @@ let events = require('events');
 let path = require('path');
 let _ = require('lodash');
 let Database = require("../libs/database");
+let ViewEngine = require("../libs/ViewEngine");
 let Express = require('express');
 
 
@@ -122,8 +123,9 @@ class SystemManager extends events.EventEmitter {
                 components[name].controllers = {};
                 components[name].routes = Express.Router();
                 components[name].models = {};
+                components[name].views = [];
                 //components[name].helpers = {};
-                //components[name].views = [];
+
 
                 let componentConfig = require(paths[name].configFile)();
                 _.assign(components[name], componentConfig);
@@ -133,7 +135,7 @@ class SystemManager extends events.EventEmitter {
                 });
 
             } else {
-                //TODO : need finish;
+                //TODO : logic multi id
                 components[id][name] = {};
                 components[id][name]._path = paths[name].path;
                 components[id][name]._configFile = paths[name].configFile;
@@ -149,51 +151,42 @@ class SystemManager extends events.EventEmitter {
                 });
             }
         });
+
+        // Setup view engine by name;
+        //let componentsView = {};
+        //componentsView.default = [];
+        //
+        //Object.keys(components).map(function (key) {
+        //    if (components[key].views) {
+        //        Object.keys(components[key].views).map(function (view_id) {
+        //            if (!_.isNaN(parseInt(view_id))) {
+        //                componentsView.default.push(components[key].views[view_id])
+        //            } else {
+        //                componentsView[view_id] = componentsView[view_id] || [];
+        //                componentsView[view_id].push(components[key].views[view_id]);
+        //            }
+        //        })
+        //    }
+        //});
+        let componentsRender = ViewEngine(_app.arrFolder);
+        this.viewTemplateEngine = componentsRender;
+        //TODO: need logic with name;
+        Object.keys(components).map(function (key) {
+            components[key].render = function (name, ctx, cb) {
+                return new Promise(function(fulfill,reject){
+                    componentsRender.loaders[0].searchPaths = components[key].views;
+                    componentsRender.render.call(componentsRender,name, ctx, function (err,html) {
+                        if(err) {
+                            reject(err);
+                        }
+                        fulfill(html);
+                    });
+                })
+            };
+        });
         this[privateName] = components;
     }
 }
-
-
-function getListFolder(componentPath, fatherPath, basePath) {
-    let folders = [];
-
-    if (_.isArray(componentPath)) {
-        Object.keys(componentPath.path).map(function (nameFolder) {
-            if (typeof nameFolder === "string") {
-                folders[nameFolder] = [];
-                if (_.isArray(componentPath.path[nameFolder])) {
-                    componentPath.path[nameFolder].map(function (key) {
-                        let normalizePath = path.normalize(basePath + "/" + key);
-                        folders[nameFolder].push(normalizePath);
-
-                    })
-                } else {
-                    let normalizePath = path.normalize(basePath + "/" + componentPath.path[nameFolder]);
-                    folders[nameFolder].push(normalizePath);
-                }
-            } else {
-                if (folderInfo[0] === "/") {
-                    let normalizepath = path.normalize(basePath + "/" + folderInfo);
-                    folders.push(normalizepath);
-                } else {
-                    let normalizepath = path.normalize(fatherPath + "/" + folderInfo);
-                    folders.push(normalizepath);
-                }
-            }
-        })
-
-    } else {
-        if (componentPath.path[0] === "/") {
-            let normalizepath = path.normalize(basePath + "/" + componentPath.path);
-            folders.push(normalizepath);
-        } else {
-            let normalizepath = path.normalize(fatherPath + "/" + componentPath.path);
-            folders.push(normalizepath);
-        }
-    }
-    return folders;
-}
-
 
 function actionByAttribute(attName, component, fatherPath, application) {
     let setting = component._structure[attName];
@@ -218,8 +211,7 @@ function actionByAttribute(attName, component, fatherPath, application) {
 }
 
 function extendsAttribute(setting) {
-    let obj = setting;
-    return obj
+    return setting
 }
 
 function modelAttribute(setting, fatherPath, component, application) {
@@ -233,7 +225,7 @@ function modelAttribute(setting, fatherPath, component, application) {
                     component.models[model.name] = model
                 })
             }
-        })
+        });
         Object.keys(component.models).forEach(function (modelName) {
             if ("associate" in component.models[modelName]) {
                 component.models[modelName].associate(component.models)
@@ -246,7 +238,7 @@ function modelAttribute(setting, fatherPath, component, application) {
                 files[key].map(function (link) {
                     let model = database.import(path.resolve(link));
                     component.models[key][model.name] = model
-                })
+                });
                 Object.keys(component.models[key]).forEach(function (modelName) {
                     if ("associate" in component.models[key][modelName]) {
                         component.models[key][modelName].associate(component.models[key])
@@ -257,10 +249,25 @@ function modelAttribute(setting, fatherPath, component, application) {
     }
 }
 function viewAttribute(setting, fatherPath, component, application) {
-    let obj = Object.create(null);
-    let folderList = getListFolder(setting, fatherPath, application.arrFolder);
-    obj.views = folderList;
-    return obj;
+    let folders = getListFolder(setting, fatherPath, application);
+    if (folders.type === "single") {
+        Object.keys(folders).map(function (key) {
+            if (key !== "type") {
+                folders[key].map(function (link) {
+                    component.views.push(link);
+                })
+            }
+        })
+    } else if (folders.type === "multi") {
+        Object.keys(folders).map(function (key) {
+            if (key !== "type") {
+                component.views[key] = [];
+                folders[key].map(function (link) {
+                    component.views[key].push(link);
+                })
+            }
+        })
+    }
 }
 function controllerAttribute(setting, fatherPath, component, application) {
     let files = getlistFile(setting, fatherPath, application);
@@ -283,23 +290,23 @@ function controllerAttribute(setting, fatherPath, component, application) {
         })
     }
 }
-
+//TODO: helper logic
 function helperAttribute(setting, fatherPath) {
-    let files = getlistFile(setting, fatherPath, application.arrFolder);
-    Object.keys(files).map(function (key) {
-        if (typeof files[key] === "string") {
-            require(link).call(null, component.helpers, component, application);
-        } else if (files[key].length > 0) {
-            files[key].map(function (link) {
-                component.helpers[key] = {};
-                if (typeof key === "string") {
-                    require(link).call(null, component.helpers[key], component, application);
-                } else {
-                    require(link).call(null, component.helpers, component, application);
-                }
-            })
-        }
-    });
+    //let files = getlistFile(setting, fatherPath, application.arrFolder);
+    //Object.keys(files).map(function (key) {
+    //    if (typeof files[key] === "string") {
+    //        require(link).call(null, component.helpers, component, application);
+    //    } else if (files[key].length > 0) {
+    //        files[key].map(function (link) {
+    //            component.helpers[key] = {};
+    //            if (typeof key === "string") {
+    //                require(link).call(null, component.helpers[key], component, application);
+    //            } else {
+    //                require(link).call(null, component.helpers, component, application);
+    //            }
+    //        })
+    //    }
+    //});
 }
 
 function routeAttribute(setting, fatherPath, component, application) {
@@ -362,5 +369,26 @@ function getlistFile(componentSetting, fatherPath, application) {
     return files
 }
 
+function getListFolder(componentSetting, fatherPath, application) {
+    let folders = {};
+    let componentPath = componentSetting.path;
+    folders.type = componentSetting.type;
+    if (componentPath) {
+        Object.keys(componentPath).map(function (id) {
+            folders[id] = [];
+            componentPath[id].path.map(function (globByConfig) {
+                let miniPath = globByConfig(application._config);
+                let normalizePath;
+                if (miniPath[0] === "/") {
+                    normalizePath = path.normalize(application.arrFolder + "/" + miniPath);
+                } else {
+                    normalizePath = path.normalize(fatherPath + "/" + miniPath)
+                }
+                folders[id].push(normalizePath);
+            })
+        });
+    }
+    return folders
+}
 
 module.exports = SystemManager;
