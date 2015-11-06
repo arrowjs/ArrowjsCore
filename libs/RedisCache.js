@@ -11,7 +11,11 @@ bluebird.promisifyAll(redis.Multi.prototype);
 bluebird.promisifyAll(fakeRedis.RedisClient.prototype);
 bluebird.promisifyAll(fakeRedis.Multi.prototype);
 
-//TODO: How to check system have redis and change use another solution;
+/**
+ * If Redis server presents then create client to connect to it else create fakeRedis
+ * @param config
+ * @returns {Promise}
+ */
 module.exports = function (config) {
     return new Promise(function (fulfill, reject) {
         let client = redis.createClient(config);
