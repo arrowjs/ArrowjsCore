@@ -41,73 +41,78 @@ class SystemManager extends events.EventEmitter {
         let components = {};
         let _app = this._app;
         let paths = {};
-        if (_.isArray(struc)) {
-            let arrayPath = struc.map(function (a) {
-                return a.path;
-            });
-            arrayPath.map(function (globLink) {
-                let componentGlobConfig = path.normalize(_base + globLink);
-                let listComponents = __.getGlobbedFiles(componentGlobConfig);
-                let componentFolder = componentGlobConfig.slice(0, componentGlobConfig.indexOf('*'));
-                listComponents.forEach(function (link) {
-                    let nodeList = path.relative(componentGlobConfig, link).split(path.sep).filter(function (node) {
-                        return (node !== "..")
-                    });
-                    let componentConfigFunction = require(link);
-                    if (typeof componentConfigFunction === "function") {
-                        let componentConfig = componentConfigFunction();
-                        let componentName = componentConfig.name || nodeList[0];
-                        paths[componentName] = {};
-                        paths[componentName].configFile = link;
-                        paths[componentName].path = componentFolder + nodeList[0];
-                        paths[componentName].strucID = arrayPath.indexOf(globLink);
-                    }
-                });
-            });
-        } else {
-            let componentGlobConfig = path.normalize(_base + struc.path);
-            let listComponents = __.getGlobbedFiles(componentGlobConfig);
-            let componentFolder = componentGlobConfig.slice(0, componentGlobConfig.indexOf('*'));
-            listComponents.forEach(function (link) {
-                let nodeList = path.relative(componentGlobConfig, link).split(path.sep).filter(function (node) {
-                    return (node !== "..")
-                });
-                let componentConfigFunction = require(link);
-                if (typeof componentConfigFunction === "function") {
-                    let componentConfig = componentConfigFunction();
-                    let componentName = componentConfig.name || nodeList[0];
-                    paths[componentName] = {};
-                    paths[componentName].configFile = link;
-                    paths[componentName].path = componentFolder + nodeList[0];
-                    paths[componentName].strucID = 0;
-                }
-            });
+        console.log(struc);
+        if(struc.type !== "single") {
+
+        } else if (struc.type != "multi") {
+
         }
-        Object.keys(paths).map(function (name) {
-            components[name] = {};
-            components[name]._path = paths[name].path;
-            components[name]._configFile = paths[name].configFile;
-            components[name]._strucID = paths[name].strucID;
-            components[name]._structure = struc[paths[name].strucID] || struc;
-            components[name].controllers = {};
-            components[name].models = {};
-            components[name].helpers = {};
-            components[name].views = [];
-            components[name].routes = Express.Router();
-
-            let componentConfig = require(paths[name].configFile)();
-            _.assign(components[name], componentConfig);
-            Object.keys(components[name]._structure).map(function (attribute) {
-                let data = actionByAttribute(components[name]._structure, attribute, paths[name].path, components[name], _app);
-                console.log(data);
-                _.assign(components[name], data);
-            });
-
-            //Object.keys(components).map(function (name) {
-            //    console.log(components[name].views)
-            //})
-
-        });
+        //if (_.isArray(struc)) {
+        //    let arrayPath = struc.map(function (a) {
+        //        return a.path;
+        //    });
+        //    arrayPath.map(function (globLink) {
+        //        let componentGlobConfig = path.normalize(_base + globLink);
+        //        let listComponents = __.getGlobbedFiles(componentGlobConfig);
+        //        let componentFolder = componentGlobConfig.slice(0, componentGlobConfig.indexOf('*'));
+        //        listComponents.forEach(function (link) {
+        //            let nodeList = path.relative(componentGlobConfig, link).split(path.sep).filter(function (node) {
+        //                return (node !== "..")
+        //            });
+        //            let componentConfigFunction = require(link);
+        //            if (typeof componentConfigFunction === "function") {
+        //                let componentConfig = componentConfigFunction();
+        //                let componentName = componentConfig.name || nodeList[0];
+        //                paths[componentName] = {};
+        //                paths[componentName].configFile = link;
+        //                paths[componentName].path = componentFolder + nodeList[0];
+        //                paths[componentName].strucID = arrayPath.indexOf(globLink);
+        //            }
+        //        });
+        //    });
+        //} else {
+        //    let componentGlobConfig = path.normalize(_base + struc.path);
+        //    let listComponents = __.getGlobbedFiles(componentGlobConfig);
+        //    let componentFolder = componentGlobConfig.slice(0, componentGlobConfig.indexOf('*'));
+        //    listComponents.forEach(function (link) {
+        //        let nodeList = path.relative(componentGlobConfig, link).split(path.sep).filter(function (node) {
+        //            return (node !== "..")
+        //        });
+        //        let componentConfigFunction = require(link);
+        //        if (typeof componentConfigFunction === "function") {
+        //            let componentConfig = componentConfigFunction();
+        //            let componentName = componentConfig.name || nodeList[0];
+        //            paths[componentName] = {};
+        //            paths[componentName].configFile = link;
+        //            paths[componentName].path = componentFolder + nodeList[0];
+        //            paths[componentName].strucID = 0;
+        //        }
+        //    });
+        //}
+        //Object.keys(paths).map(function (name) {
+        //    components[name] = {};
+        //    components[name]._path = paths[name].path;
+        //    components[name]._configFile = paths[name].configFile;
+        //    components[name]._strucID = paths[name].strucID;
+        //    components[name]._structure = struc[paths[name].strucID] || struc;
+        //    components[name].controllers = {};
+        //    components[name].models = {};
+        //    components[name].helpers = {};
+        //    components[name].views = [];
+        //    components[name].routes = Express.Router();
+        //
+        //    let componentConfig = require(paths[name].configFile)();
+        //    _.assign(components[name], componentConfig);
+        //    Object.keys(components[name]._structure).map(function (attribute) {
+        //        let data = actionByAttribute(components[name]._structure, attribute, paths[name].path, components[name], _app);
+        //        _.assign(components[name], data);
+        //    });
+        //
+        //    //Object.keys(components).map(function (name) {
+        //    //    console.log(components[name].views)
+        //    //})
+        //
+        //});
 
         this[privateName] = components;
     }

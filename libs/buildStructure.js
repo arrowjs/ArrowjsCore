@@ -7,159 +7,174 @@ let globalPattern = {};
 module.exports = function (struc) {
     let arrStruc = {};
     Object.keys(struc).map(function (key) {
-        if (typeof struc[key] === "object") {
-            if (_.isArray(struc[key])) {
-                let baseStruc = struc[key][0];
-                arrStruc[key] = [];
-                struc[key].forEach(function (small) {
-                    let assignCall = _.assign(baseStruc, small);
-                    let obj = getDataFromObject(assignCall, key);
-                    obj && arrStruc[key].push(obj);
-                })
-            } else {
-                arrStruc[key] = getDataFromObject(struc[key], key);
-            }
-
-        }
+        arrStruc[key] = getDataFromArray(struc[key], key);
     });
     return arrStruc
 };
 
-
-function makeGlob(level, pathInfo, fatherPath, attribute) {
-    let globFolder;
-    if (pathInfo.folder) {
-        if (level === 1) {
-            globFolder = path.normalize("/" + pathInfo.folder + "/*");
-        } else {
-            globFolder = path.normalize(pathInfo.folder);
-
-        }
-    } else {
-        if (level === 1) {
-            globFolder = "/";
-        } else {
-            globFolder = fatherPath;
-        }
-    }
-    let globFile = pathInfo.file || "*.js";
-
-    if (attribute === "view") {
-        globFile = "";
-    }
-    globFile = path.normalize(globFolder + "/" + globFile);
-    return [globFile, globFolder]
-}
-
-function getDataFromObject(obj, key) {
+function getDataFromArray(obj, key) {
     let newObj = {};
-    let fatherFolder;
-    let localPattern = {};
+    let wrapArray = [];
 
-    if (obj.path && (obj.path.folder || obj.path.file)) {
-        let arrayPath = makeGlob(1, obj.path, "/");
-        newObj.path = arrayPath[0];
-        fatherFolder = arrayPath[1];
-    } else {
-        return null
+
+    if (_.isArray(obj)) {
+        wrapArray = obj;
+    } else if (_.isObject(obj)) {
+        wrapArray.push(obj);
     }
+    newObj.path = {};
+    newObj.type = "single"
+    wrapArray.map(function (data) {
+        //handle path
+        if (data.path) {
+            let pathInfo = handlePath(data.path, key);
+            if (!_.isEmpty(pathInfo[1])) {
+                newObj.type = "multi";
+            }
 
-    let objectKey = checkPatternExist(globalPattern, newObj.path);
+            let pathKey = pathInfo[1] || wrapArray.indexOf(data);
+            newObj.path[pathKey] = {};
+            newObj.path[pathKey].path = pathInfo[0];
+            console.log(newObj);
+        } else {
+            return null;
+        }
 
-    if (objectKey.length > 0) {
-        let errorMessage = "Pattern already exists: Check '" + key + "' in structure.js";
-        throw Error(errorMessage);
-    } else {
-        globalPattern[key] = newObj.path;
-    }
+        Object.keys(data).map(function (key) {
+            if (key === "extends") {
+                newObj.extends = data.extends;
+            }
 
-    if (obj.extends) {
-        newObj.extends = obj.extends;
-    }
+            if (typeof data.key === 'function') {
+                newObj[key] = data[key];
+            }
 
-    //controller,helper,route,model,view
-    Object.keys(obj).map(function (attribute) {
-        if (attribute !== "path" && attribute !== "extends") {
-            let attr = simplyObject(obj[attribute], fatherFolder, attribute);
-            if (attr) {
-                newObj[attribute] = attr;
-                if (attr.path[0] !== '/') {
-                    let localPatternCheck = checkPatternExist(localPattern, attr.path);
-                    if (localPatternCheck.length > 0) {
-                        let errorMessage = "Pattern already exists: Check '" + key + "' : '" + attribute + "' in structure.js";
-                        throw Error(errorMessage);
-                    } else {
-                        localPattern[attribute] = attr.path;
-                    }
-                } else {
-                    let globalPatternCheck = checkPatternExist(localPattern, attr.path);
-                    if (globalPatternCheck.length > 0) {
-                        let errorMessage = "Pattern already exists: Check '" + key + "' : '" + attribute + "' in structure.js";
-                        throw Error(errorMessage);
-                    } else {
-                        globalPatternCheck[attribute] = attr.path;
-                    }
-                }
+            if (['controller', "view", "helper", "model"].indexOf(key) > -1) {
+                data[key].path && !data[key].path.singleton && (data[key].path.singleton = true);
+                newObj[key] = getDataFromArray(data[key], key);
             } else {
-                if (typeof obj[attribute] === "function") {
-                    newObj[attribute] = obj[attribute];
+                if (key !== "extends" && key !== "path" && typeof data.key === 'object') {
+                    newObj[key] = data[key]
                 }
             }
-        }
+
+        })
     });
-    return newObj;
+    return newObj
 }
-function simplyObject(obj, path, attribute) {
-    if (_.isArray(obj)) {
-        let newObj = {};
-        if (attribute === "view") {
-            newObj = [];
-            obj.forEach(function (_path) {
-                if (_path.path && _path.path.folder) {
-                    if (_path.path.name) {
-                        if (typeof _path.path.folder === "string") {
-                            newObj[_path.path.name] = makeGlob(2, _path.path, path, attribute)[0];
-                        } else if (_.isArray(_path.path.folder)){
-                            newObj[_path.path.name] = [];
-                            _path.path.folder.map(function (nameFolder) {
-                                let miniViewFolder = Object.create(null);
-                                miniViewFolder.folder = nameFolder;
-                                miniViewFolder.name = _path.path.name;
-                                newObj[_path.path.name].push(makeGlob(2, miniViewFolder, path, attribute)[0]);
-                            })
-                        }
-                    } else {
-                        newObj.push(makeGlob(2, _path.path, path, attribute)[0]);
-                    }
+function handlePath(pathInfo, attribute) {
+
+    if (pathInfo) {
+        let singleton = handleSingleton(pathInfo.singleton);
+        let folderName = handleFolder(pathInfo.folder);
+        let depend = handleDepend(pathInfo.depend);
+        let fileName = handleDepend(pathInfo.file);
+        let name = handleName(pathInfo.name);
+
+        switch (attribute) {
+            case "view":
+                break;
+            default:
+                break;
+        }
+
+        let results = [];
+        folderName.map(function (folderInfo) {
+            let backInfo = singleton + "/" + fileName;
+            let frontkey = folderInfo;
+            let result;
+            if (folderInfo.indexOf("*") > -1) {
+                if (depend) {
+                    result = pathWithConfig(frontkey, backInfo).bind(null, depend);
+                } else {
+                    throw Error("folder not contain '*' without  depend attribute ");
                 }
-            })
+            } else {
+                result = pathWithConfig(frontkey, backInfo).bind(null, null);
+            }
+            results.push(result);
+
+        });
+        return [results, name];
+    }
+    return [null, null]
+}
+
+function handleSingleton(singleton) {
+    if (!singleton) return "/*";
+    return ""
+}
+
+function handleFolder(folder) {
+    let newFolder = [];
+    if (_.isArray(folder)) {
+        folder.map(function (folderInfo) {
+            newFolder.push(folderInfo)
+        })
+    }
+    if (_.isString(folder)) {
+        newFolder.push(folder);
+    }
+    return newFolder;
+}
+
+function handleName(name) {
+    if (_.isString(name)) return name;
+    return "";
+}
+
+function handleDepend(depend) {
+    let newDepend = [];
+    if (_.isArray(depend)) {
+        depend.map(function (dependInfo) {
+            newDepend.push(dependInfo)
+        })
+    }
+    if (_.isString(depend)) {
+        newDepend.push(depend);
+    }
+    return depend;
+}
+
+function handleFile(file) {
+    if (_.isString(file)) {
+        return file
+    }
+    return "";
+}
+
+function getConfigByKey(key) {
+    return function (key) {
+        let self = this;
+        return self._config[key]
+    }
+}
+
+function pathWithConfig(front, back) {
+    return function makeGlob(key) {
+        let config = arguments[1];
+        let frontArray = front.split("*");
+        let newFront = "";
+        let newArray = [];
+        if (_.isString(key)) {
+            newArray.push(key);
         } else {
-            obj.forEach(function (_path) {
-                if (_path.path && _path.path.name) {
-                    newObj[_path.path.name] = {};
-                    newObj[_path.path.name].path = makeGlob(2, _path.path, path, attribute)[0];
-                    if (_path.prefix && typeof _path.prefix === "string") {
-                        newObj[_path.path.name].prefix = _path.prefix;
-                    }
+            newArray = key;
+        }
+        if (frontArray.length > 1) {
+            frontArray.map(function (frontKey) {
+                let index = frontArray.indexOf(frontKey);
+                if (index < frontArray.length - 1) {
+                    newFront += frontKey + ( config[newArray[index]] || "")
+                } else {
+                    newFront += frontKey
                 }
             });
+            newFront = newFront.replace(/\*/g, "");
+            return path.normalize(newFront + back)
         }
 
-        obj.path = newObj;
-        return obj
+        let endPath = path.normalize(front + back);
+        return endPath;
     }
-    if (typeof obj === "object" && obj.path) {
-        obj.path = makeGlob(2, obj.path, path, attribute)[0];
-        return obj
-    }
-}
-
-function checkPatternExist(patternObject, patternNeedCheck) {
-    let test = [];
-    Object.keys(patternObject).map(function (key) {
-        if (patternObject[key] === patternNeedCheck) {
-            return test.push(key)
-        }
-    });
-    return test;
 }

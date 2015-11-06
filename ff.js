@@ -8,7 +8,7 @@ module.exports = function (struc) {
     let arrStruc = {};
     Object.keys(struc).map(function (key) {
         arrStruc[key] = getDataFromArray(struc[key], key);
-    })
+    });
     return arrStruc
 };
 
@@ -22,15 +22,20 @@ function getDataFromArray(obj, key) {
     } else if (_.isObject(obj)) {
         wrapArray.push(obj);
     }
-
+    newObj.path = {};
+    newObj.type = "single"
     wrapArray.map(function (data) {
         //handle path
         if (data.path) {
-            newObj.path = {};
             let pathInfo = handlePath(data.path, key);
+            if (!_.isEmpty(pathInfo[1])) {
+                newObj.type = "multi";
+            }
+
             let pathKey = pathInfo[1] || wrapArray.indexOf(data);
             newObj.path[pathKey] = {};
             newObj.path[pathKey].path = pathInfo[0];
+            console.log(newObj);
         } else {
             return null;
         }
@@ -47,6 +52,10 @@ function getDataFromArray(obj, key) {
             if (['controller', "view", "helper", "model"].indexOf(key) > -1) {
                 data[key].path && !data[key].path.singleton && (data[key].path.singleton = true);
                 newObj[key] = getDataFromArray(data[key], key);
+            } else {
+                if (key !== "extends" && key !== "path" && typeof data.key === 'object') {
+                    newObj[key] = data[key]
+                }
             }
 
         })
