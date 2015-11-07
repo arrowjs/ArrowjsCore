@@ -28,7 +28,6 @@ class ArrowApplication {
         //if NODE_ENV does not exist, use development by default
         process.env.NODE_ENV = process.env.NODE_ENV || 'development';
 
-
         let eventEmitter = new EventEmitter();
         this.modules = [];
         this.beforeFunction = [];
@@ -61,36 +60,32 @@ class ArrowApplication {
 
         //Make redis cache
         let redisConfig = this._config.redis || {};
-        RedisCache(redisConfig).then(function (redis) {
+        let redisFunction = RedisCache(redisConfig);
+        this.RedisCache = redisFunction.bind(null, redisConfig);
+        this.redisCache = redisFunction(redisConfig);
+        this._expressApplication.arrFolder = this.arrFolder;
+        this._expressApplication.arrConfig = this._config;
+        this._expressApplication.redisCache = this.redisCache;
+        this._expressApplication.usePassport = require("./loadPassport");
+        this._expressApplication.useFlashMessage = require("./flashMessage");
+        this._expressApplication.useSession = require("./useSession");
 
-            this.RedisCache = redis.bind(null, redisConfig);
-            this.redisCache = redis(redisConfig);
-            this._expressApplication.arrFolder = this.arrFolder;
-            this._expressApplication.arrConfig = this._config;
-            this._expressApplication.redisCache = this.redisCache;
-            this._expressApplication.usePassport = require("./loadPassport");
-            this._expressApplication.useFlashMessage = require("./flashMessage");
-            this._expressApplication.useSession = require("./useSession");
+        this._componentList = [];
 
-            this._componentList = [];
+        this.configManager = new ConfigManager(this);
+        this.configManager.eventHook(eventEmitter);
+        this._config = this.configManager._config;
 
-            this.configManager = new ConfigManager(this);
-            this.configManager.eventHook(eventEmitter);
-            this._config = this.configManager._config;
-
-            let componentsRender = ViewEngine(this.arrFolder);
-            this.viewTemplateEngine = componentsRender;
-
-            Object.keys(this.structure).map(function (managerKey) {
-                let key = managerKey;
-                let managerName = managerKey + "Manager";
-                this[managerName] = new DefaultManager(this);
-                this[managerName].eventHook(eventEmitter);
-                this[managerName].loadComponents(key);
-                this[key] = this[managerName]["_" + key];
-                this._componentList.push(key);
-            }.bind(this));
-            coreEvent.emit("Arrow_config_run");
+        let componentsRender = ViewEngine(this.arrFolder);
+        this.viewTemplateEngine = componentsRender;
+        Object.keys(this.structure).map(function (managerKey) {
+            let key = managerKey;
+            let managerName = managerKey + "Manager";
+            this[managerName] = new DefaultManager(this);
+            this[managerName].eventHook(eventEmitter);
+            this[managerName].loadComponents(key);
+            this[key] = this[managerName]["_" + key];
+            this._componentList.push(key);
         }.bind(this));
     }
 
@@ -104,30 +99,32 @@ class ArrowApplication {
         }
     }
 
-    config() {
+    start() {
         let self = this;
-        coreEvent.on("Arrow_config_run", function () {
-            let exApp = self._expressApplication;
-            let resolve = Promise.resolve();
-            /** Init the express application */
-            return resolve
-                .then(function () {
-                    expressApp(exApp)
-                })
-                .then(function () {
-                    loadPreFunc(exApp, self.beforeFunction)
-                })
-                .then(function () {
-                    setupManager(self);
-                })
-                .then(function () {
-                    loadRoute(self)
-                })
-                .then(function (app) {
+        let exApp = self._expressApplication;
+        let resolve = Promise.resolve();
+        /** Init the express application */
+        return resolve
+            .then(function () {
+                expressApp(exApp)
+            })
+            .then(function () {
+                loadPreFunc(exApp, self.beforeFunction)
+            })
+            .then(function () {
+                setupManager(self);
+            })
+            .then(function () {
+                loadRoute(self)
+            })
+            .then(function (app) {
+                exApp.listen(self._config.port, function () {
                     console.log(chalk.black.bgWhite('Application loaded using the "' + process.env.NODE_ENV + '" environment configuration'));
-                    return app
-                })
-        })
+                    console.log('Application started on port ' + self._config.port, ', Process ID: ' + process.pid);
+                });
+                return app
+            })
+
     }
 
     /**
@@ -218,7 +215,7 @@ function setupManager(app) {
         fs.accessSync(path.resolve(app.arrFolder + "config/manager.js"));
         let setupManager = require(app.arrFolder + "config/manager");
         setupManager(app);
-    } catch(err) {
+    } catch (err) {
 
     }
     return null;

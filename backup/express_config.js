@@ -5,7 +5,6 @@ let bodyParser = require('body-parser'),
     __ = require("arrowjs").globalFunction;
 
 
-
 module.exports = function (app) {
     /**
      * Set folder static resource

@@ -7,16 +7,14 @@ let bodyParser = require('body-parser'),
     morgan = require('morgan'),
     fs = require('fs'),
     helmet = require('helmet'),
-    cookieParser = require('cookie-parser'),
-    __ = require("../libs/global_function");
-
+    cookieParser = require('cookie-parser');
 
 
 module.exports = function (app) {
     /**
      * Set folder static resource
      */
-    app.use(express.static(path.resolve(app.baseFolder + app.arrConfig.resource.path), app.arrConfig.resource.option));
+    app.use(express.static(path.resolve(app.arrFolder + app.arrConfig.resource.path), app.arrConfig.resource.option));
 
     /**
      * Set local variable

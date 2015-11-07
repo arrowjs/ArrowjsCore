@@ -17,13 +17,21 @@ bluebird.promisifyAll(fakeRedis.Multi.prototype);
  * @returns {Promise}
  */
 module.exports = function (config) {
-    return new Promise(function (fulfill, reject) {
-        let client = redis.createClient(config);
-        client.on('error', function (err) {
-            fulfill(fakeRedis.createClient)
-        });
-        client.on("ready", function () {
-            fulfill(redis.createClient)
-        })
-    })
+    if (config.type === 'fakeredis') {
+        return fakeRedis.createClient;
+    }
+    return redis.createClient;
 };
+
+//return new Promise(function (fulfill, reject) {
+//    let client = redis.createClient(config);
+//    client.on('error', function (err) {
+//        if(err) {
+//            reject(err);
+//        }
+//        fulfill(fakeRedis.createClient)
+//    });
+//    client.on("ready", function () {
+//        return fulfill(redis.createClient)
+//    })
+//})

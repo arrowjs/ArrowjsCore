@@ -7,12 +7,12 @@ let globalPattern = {};
 module.exports = function (struc) {
     let arrStruc = {};
     Object.keys(struc).map(function (key) {
-        arrStruc[key] = getDataFromArray(struc[key], key);
+        arrStruc[key] = getDataFromArray(struc[key], key,1);
     });
     return arrStruc
 };
 
-function getDataFromArray(obj, key) {
+function getDataFromArray(obj, key,level) {
     let newObj = {};
     let wrapArray = [];
     if (_.isArray(obj)) {
@@ -27,7 +27,7 @@ function getDataFromArray(obj, key) {
         //handle path
         if (data.path) {
             data = _.assign(baseObject, data);
-            let pathInfo = handlePath(data.path, key);
+            let pathInfo = handlePath(data.path, key,level);
 
             if (!_.isEmpty(pathInfo[1])) {
                 newObj.type = "multi";
@@ -56,7 +56,7 @@ function getDataFromArray(obj, key) {
                             data[key].path.singleton = true;
                         }
                     }
-                    newObj.path[pathKey][key] = getDataFromArray(data[key], key);
+                    newObj.path[pathKey][key] = getDataFromArray(data[key], key ,2);
                 } else {
                     if (key !== "extends" && key !== "path" && typeof data.key === 'object') {
                         newObj.path[pathKey][key] = data[key]
@@ -70,7 +70,7 @@ function getDataFromArray(obj, key) {
     });
     return newObj
 }
-function handlePath(pathInfo, attribute) {
+function handlePath(pathInfo, attribute,level) {
     if (pathInfo) {
         let singleton = handleSingleton(pathInfo.singleton);
         let folderName = handleFolder(pathInfo.folder);
@@ -93,6 +93,19 @@ function handlePath(pathInfo, attribute) {
                 break;
         }
 
+        switch (level) {
+            case 1:
+                if(name) {
+                    console.log('Carefully : Cant set "name" attribute at level 1 in structure.js');
+                }
+                name = "";
+                break;
+            case 2:
+                break;
+            default:
+                break;
+        }
+
         let results = [];
         folderName.map(function (folderInfo) {
             let backInfo;
@@ -107,7 +120,7 @@ function handlePath(pathInfo, attribute) {
                 if (depend) {
                     result = pathWithConfig(frontkey, backInfo).bind(null, depend);
                 } else {
-                    throw Error("folder not contain '*' without  depend attribute ");
+                    throw Error("'folder' attribute not contain '*' without  'depend' attribute: " + folderInfo);
                 }
             } else {
                 result = pathWithConfig(frontkey, backInfo).bind(null, null);

@@ -12,7 +12,8 @@ module.exports = {
     },
     redis: {
         host: 'localhost',
-        port: '6379'
+        port: '6379',
+        type : 'fakeredis'
     },
     facebook: {
         clientID: process.env.FACEBOOK_ID || 'APP_ID',
