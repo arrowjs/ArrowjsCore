@@ -4,7 +4,6 @@ let events = require('events');
 let path = require('path');
 let _ = require('lodash');
 let Database = require("../libs/database");
-let ViewEngine = require("../libs/ViewEngine");
 let Express = require('express');
 
 
@@ -168,17 +167,34 @@ class SystemManager extends events.EventEmitter {
         //        })
         //    }
         //});
-        let componentsRender = ViewEngine(_app.arrFolder);
-        this.viewTemplateEngine = componentsRender;
         //TODO: need logic with name;
+
+        let defaultDatabase = {};
+        let defaultQueryResolve = function () {
+            return new Promise(function (fulfill,reject) {
+                fulfill("No models")
+            })
+        };
+
         Object.keys(components).map(function (key) {
+            if(Object.keys(components[key].models).length > 0 ) {
+                if (_.isEmpty(defaultDatabase)) {
+                    defaultDatabase = Database(_app);
+                }
+            }
+
+            components[key].models.rawQuery = defaultDatabase.query ? defaultDatabase.query.bind(defaultDatabase) : defaultQueryResolve;
+
+            //components[key].renderAndSend = function (name, ctx, cb) {
+            //
+            //};
             components[key].render = function (name, ctx, cb) {
-                if (name.indexOf(_app._config.viewExtension) === -1) {
+                if (_app._config.viewExtension && name.indexOf(_app._config.viewExtension) === -1) {
                     name += "." + _app._config.viewExtension;
                 }
                 return new Promise(function(fulfill,reject){
-                    componentsRender.loaders[0].searchPaths = components[key].views;
-                    componentsRender.render.call(componentsRender,name, ctx, function (err,html) {
+                    _app.viewTemplateEngine.loaders[0].searchPaths = components[key].views;
+                    _app.viewTemplateEngine.render.call(_app.viewTemplateEngine,name, ctx, function (err,html) {
                         if(err) {
                             reject(err);
                         }
@@ -187,6 +203,7 @@ class SystemManager extends events.EventEmitter {
                 })
             };
         });
+
         this[privateName] = components;
     }
 }

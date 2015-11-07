@@ -17,7 +17,9 @@ let fs = require('fs'),
     EventEmitter = require('events').EventEmitter,
     DefaultManager = require("../manager/DefaultManager"),
     ConfigManager = require("../manager/ConfigManager"),
-    buildStructure = require("./buildStructure");
+    buildStructure = require("./buildStructure"),
+    ViewEngine = require("../libs/ViewEngine");
+
 
 let coreEvent = new EventEmitter();
 
@@ -75,6 +77,9 @@ class ArrowApplication {
             this.configManager = new ConfigManager(this);
             this.configManager.eventHook(eventEmitter);
             this._config = this.configManager._config;
+
+            let componentsRender = ViewEngine(this.arrFolder);
+            this.viewTemplateEngine = componentsRender;
 
             Object.keys(this.structure).map(function (managerKey) {
                 let key = managerKey;

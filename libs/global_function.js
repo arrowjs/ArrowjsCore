@@ -106,11 +106,13 @@ exports.getWidget = function (alias) {
  * @param {array} views - List of loaders
  * @returns {object}
  */
-exports.createNewEnv = function (views) {
+exports.createNewEnv = function (views,expressApp) {
     let self = this;
     let env;
 
-    env = new nunjucks.Environment(new nunjucks.FileSystemLoader(views));
+    env = new nunjucks.Environment(new nunjucks.FileSystemLoader(views), {
+
+    });
 
     //env = self.getAllCustomFilter(env);
     //env = self.getAllGlobalVariable(env);
