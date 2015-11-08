@@ -1,12 +1,8 @@
 'use strict';
+const Arrow = require('../..');
 
-/**
- * Module dependencies.
- */
-let Arrow = require('arrowjs');
-
-let application = new Arrow();
-
+const application = new Arrow();
+application._config.port = 9000;
 application.start();
 
-module.exports = application;
+//module.exports = application;

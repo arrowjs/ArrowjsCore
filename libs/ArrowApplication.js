@@ -11,7 +11,7 @@ let fs = require('fs'),
     Promise = require('bluebird'),
     chalk = require('chalk'),
     RedisCache = require("./RedisCache"),
-    SystemLog = require("./SystemLog"),
+    logger = require("./logger"),
     utils = require("./utils"),
     __ = require("./global_function"),
     EventEmitter = require('events').EventEmitter,
@@ -23,6 +23,11 @@ let fs = require('fs'),
 //let coreEvent = new EventEmitter();
 
 class ArrowApplication {
+
+    /**
+     * Constructor
+     * @param setting
+     */
     constructor(setting) {
         //if NODE_ENV does not exist, use development by default
         process.env.NODE_ENV = process.env.NODE_ENV || 'development';
@@ -48,20 +53,19 @@ class ArrowApplication {
 
 
         global.__base = this.arrFolder;
-        this._config = __.getRawConfig();
-        let structure = __.getStructure();
-        this.structure = buildStructure(structure);
+        this._config = __.getRawConfig();  //Read config/config.js into this._config
+        //let structure = __.getStructure();
+        this.structure = buildStructure(__.getStructure());
 
-
-        //TODO: Cuong Tran, will this better way to use Winston Log?
-        //http://thottingal.in/blog/2014/04/06/winston-nodejs-logging/
-        this.arrlog = SystemLog;
+        //this.arrlog = SystemLog;
 
         //Make redis cache
         let redisConfig = this._config.redis || {};
         let redisFunction = RedisCache(redisConfig);
         this.RedisCache = redisFunction.bind(null, redisConfig);
         this.redisCache = redisFunction(redisConfig);
+
+        //TODO: why we assign many properties of ArrowApplication to _expressApplication. It is redundant
         this._expressApplication.arrFolder = this.arrFolder;
         this._expressApplication.arrConfig = this._config;
         this._expressApplication.redisCache = this.redisCache;
@@ -93,17 +97,20 @@ class ArrowApplication {
             if (fs.existsFile(modulePath + '/module.js')) {
                 this.modules.push(modulePath);
             } else {
-                console.log(modulePath + 'is not Arrow module!');
+                logger.error(modulePath + 'is not Arrow module!');
             }
         }
     }
 
+    /**
+     * Kick start express application and listen at default port
+     * @returns {Promise.<T>}
+     */
     start() {
         let self = this;
         let exApp = self._expressApplication;
-        let resolve = Promise.resolve();
         /** Init the express application */
-        return resolve
+        return Promise.resolve()
             .then(function () {
                 expressApp(exApp)
             })
@@ -118,11 +125,11 @@ class ArrowApplication {
             })
             .then(function (app) {
                 exApp.listen(self._config.port, function () {
-                    console.log(chalk.black.bgWhite('Application loaded using the "' + process.env.NODE_ENV + '" environment configuration'));
-                    console.log('Application started on port ' + self._config.port, ', Process ID: ' + process.pid);
+                    logger.info('Application loaded using the "' + process.env.NODE_ENV + '" environment configuration');
+                    logger.info('Application started on port ' + self._config.port, ', Process ID: ' + process.pid);
                 });
-                return app
-            })
+                return app;
+            });
 
     }
 
@@ -144,7 +151,8 @@ class ArrowApplication {
  */
 
 /**
- * Load Route
+ * Load routers
+ * @param arrow
  */
 
  //TODO testing load router;

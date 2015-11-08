@@ -43,7 +43,8 @@
     "pg-hstore": "^2.3.2",
     "redis": "^2.3.0",
     "sequelize": "^3.13.0",
-    "serve-static": "^1.9.2"
+    "serve-static": "^1.9.2",
+    "winston": "^2.1.0"
   },
   "devDependencies": {
     "chai": "^3.4.0",
