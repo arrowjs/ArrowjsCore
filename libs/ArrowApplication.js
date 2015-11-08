@@ -11,7 +11,7 @@ let fs = require('fs'),
     Promise = require('bluebird'),
     chalk = require('chalk'),
     RedisCache = require("./RedisCache"),
-    SystemLog = require("./SystemLog"),
+    logger = require("./logger"),
     utils = require("./utils"),
     __ = require("./global_function"),
     EventEmitter = require('events').EventEmitter,
@@ -58,10 +58,7 @@ class ArrowApplication {
         //let structure = __.getStructure();
         this.structure = buildStructure(__.getStructure());
 
-
-        //TODO: will this better way to use Winston Log?
-        //http://thottingal.in/blog/2014/04/06/winston-nodejs-logging/
-        this.arrlog = SystemLog;
+        //this.arrlog = SystemLog;
 
         //Make redis cache
         let redisConfig = this._config.redis || {};
@@ -101,7 +98,7 @@ class ArrowApplication {
             if (fs.existsFile(modulePath + '/module.js')) {
                 this.modules.push(modulePath);
             } else {
-                console.log(modulePath + 'is not Arrow module!');
+                logger.error(modulePath + 'is not Arrow module!');
             }
         }
     }
@@ -129,8 +126,8 @@ class ArrowApplication {
             })
             .then(function (app) {
                 exApp.listen(self._config.port, function () {
-                    SystemLog('Application loaded using the "' + process.env.NODE_ENV + '" environment configuration');
-                    SystemLog('Application started on port ' + self._config.port, ', Process ID: ' + process.pid);
+                    logger.info('Application loaded using the "' + process.env.NODE_ENV + '" environment configuration');
+                    logger.info('Application started on port ' + self._config.port, ', Process ID: ' + process.pid);
                 });
                 return app;
             });
@@ -155,7 +152,8 @@ class ArrowApplication {
  */
 
 /**
- * Load Route
+ * Load routers
+ * @param arrow
  */
 function loadRoute(arrow) {
     arrow._componentList.map(function (key) {
