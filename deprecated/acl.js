@@ -1,6 +1,6 @@
 'use strict';
 
-let callsite = require('./ArrStack');
+let callsite = require('./../libs/ArrStack');
 
 /**
  * Check permission of users.

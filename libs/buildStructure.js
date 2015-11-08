@@ -62,8 +62,12 @@ function getDataFromArray(obj, key,level) {
                         newObj.path[pathKey][key] = data[key]
                     }
                 }
+            });
 
-            })
+            if(data.path.prefix) {
+                let prefix = handlePrefix(data.path.prefix);
+                newObj.path[pathKey].prefix = prefix;
+            }
         } else {
             return null;
         }
@@ -75,7 +79,7 @@ function handlePath(pathInfo, attribute,level) {
         let singleton = handleSingleton(pathInfo.singleton);
         let folderName = handleFolder(pathInfo.folder);
         let depend = handleDepend(pathInfo.depend);
-        let fileName = handleDepend(pathInfo.file);
+        let fileName = handleFile(pathInfo.file);
         let name = handleName(pathInfo.name);
         switch (attribute) {
             case "view":
@@ -126,7 +130,6 @@ function handlePath(pathInfo, attribute,level) {
                 result = pathWithConfig(frontkey, backInfo).bind(null, null);
             }
             results.push(result);
-
         });
         return [results, name];
     }
@@ -184,6 +187,13 @@ function getConfigByKey(key) {
         let self = this;
         return self._config[key]
     }
+}
+
+function handlePrefix(prefix) {
+    if (_.isString(prefix)) {
+        return prefix
+    }
+    return "";
 }
 
 function pathWithConfig(front, back) {

@@ -20,8 +20,7 @@ let fs = require('fs'),
     buildStructure = require("./buildStructure"),
     ViewEngine = require("../libs/ViewEngine");
 
-
-let coreEvent = new EventEmitter();
+//let coreEvent = new EventEmitter();
 
 class ArrowApplication {
     constructor(setting) {
@@ -147,30 +146,28 @@ class ArrowApplication {
 /**
  * Load Route
  */
+
+ //TODO testing load router;
 function loadRoute(arrow) {
     arrow._componentList.map(function (key) {
         Object.keys(arrow[key]).map(function (component) {
             let routeConfig = arrow[key][component]._structure.route;
             if (routeConfig) {
-                if (_.isArray(routeConfig)) {
-                    Object.keys(routeConfig.path).map(function (com_key) {
-                        if (arrow[key][component].routes[com_key]) {
-                            if (routeConfig.path[com_key].prefix) {
-                                arrow.use(routeConfig.path[com_key].prefix, arrow[key][component].routes[com_key]);
-                            } else {
-                                arrow.use("/", arrow[key][component].routes[com_key]);
-                            }
+                Object.keys(routeConfig.path).map(function (second_key) {
+                    if (arrow[key][component].routes[second_key]) {
+                        if (routeConfig.path[second_key].prefix) {
+                            arrow.use(routeConfig.path[second_key].prefix, arrow[key][component].routes[second_key]);
+                        } else {
+                            arrow.use("/", arrow[key][component].routes[second_key]);
                         }
-                    })
-                } else {
-                    if (arrow[key][component].routes) {
-                        if (routeConfig.prefix) {
-                            arrow.use(routeConfig.prefix, arrow[key][component].routes);
+                    } else {
+                        if (routeConfig.path[second_key].prefix) {
+                            arrow.use(routeConfig.path[second_key].prefix, arrow[key][component].routes);
                         } else {
                             arrow.use("/", arrow[key][component].routes);
                         }
                     }
-                }
+                });
             }
         })
     })
