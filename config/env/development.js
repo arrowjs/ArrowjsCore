@@ -1,6 +1,7 @@
 'use strict';
 
 module.exports = {
+    port: process.env.PORT || 3333,
     db: {
         host: 'localhost',
         port: '5432',

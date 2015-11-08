@@ -106,13 +106,11 @@ exports.getWidget = function (alias) {
  * @param {array} views - List of loaders
  * @returns {object}
  */
-exports.createNewEnv = function (views,expressApp) {
+exports.createNewEnv = function (views,viewEngineConfig) {
     let self = this;
     let env;
 
-    env = new nunjucks.Environment(new nunjucks.FileSystemLoader(views), {
-        noCache: true
-    });
+    env = new nunjucks.Environment(new nunjucks.FileSystemLoader(views),viewEngineConfig);
 
     //env = self.getAllCustomFilter(env);
     //env = self.getAllGlobalVariable(env);
@@ -566,6 +564,33 @@ module.exports.getRawConfig = function getRawConfig() {
     } catch(err) {
         fsEx.copySync(path.resolve(__dirname, '..', 'config/config.js'), __base + 'config/config.js');
         _.assign(conf, require(__base + 'config/config'));
+    }
+
+    //get mail.js
+    try {
+        fs.accessSync(__base + 'config/mail.js');
+        _.assign(conf, require(__base + 'config/mail'));
+    } catch(err) {
+        fsEx.copySync(path.resolve(__dirname, '..', 'config/mail.js'), __base + 'config/mail.js');
+        _.assign(conf, require(__base + 'config/mail'));
+    }
+
+    //get redis.js
+    try {
+        fs.accessSync(__base + 'config/redis.js');
+        _.assign(conf, require(__base + 'config/redis'));
+    } catch(err) {
+        fsEx.copySync(path.resolve(__dirname, '..', 'config/redis.js'), __base + 'config/redis.js');
+        _.assign(conf, require(__base + 'config/redis'));
+    }
+
+    //get view.js
+    try {
+        fs.accessSync(__base + 'config/view.js');
+        _.assign(conf, require(__base + 'config/view'));
+    } catch(err) {
+        fsEx.copySync(path.resolve(__dirname, '..', 'config/view.js'), __base + 'config/view.js');
+        _.assign(conf, require(__base + 'config/view'));
     }
 
     //get default config
