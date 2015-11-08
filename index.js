@@ -1,4 +1,4 @@
-'use strict'
+'use strict';
 
 var Arrow = require('./libs/ArrowApplication');
 module.exports = Arrow;
