@@ -24,4 +24,4 @@ module.exports = function getListFile(componentSetting, fatherPath, application)
         });
     }
     return files
-}
+};

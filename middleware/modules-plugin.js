@@ -21,6 +21,7 @@ module.exports = function (req, res, next) {
     if (__modules[moduleName] != undefined && (__modules[moduleName].system || __modules[moduleName].active)) {
         next();
     } else {
+        //TODO: Now we don't use console.log anymore, use logger from Winston Log!
         console.log(moduleName + ' is not active or not have permission');
         req.flash.error('Module ' + module + ' is not active: ' + res.locals.route);
         res.redirect('/admin/err/500');

@@ -152,7 +152,12 @@ class SystemManager extends events.EventEmitter {
         this[privateName] = components;
     }
 }
-
+/**
+ *
+ * @param obj
+ * @param application
+ * @returns {*}
+ */
 function handleView(obj,application){
     let miniPath = obj.func(application._config);
     let normalizePath;
