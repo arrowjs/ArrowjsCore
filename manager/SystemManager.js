@@ -112,7 +112,11 @@ class SystemManager extends events.EventEmitter {
                         name += "." + _app._config.viewExtension;
                     }
                     return new Promise(function (fulfill, reject) {
-                        _app.viewTemplateEngine.loaders[0].searchPaths = components[key].views;
+                        _app.viewTemplateEngine.loaders[0].pathsToNames = {};
+                        _app.viewTemplateEngine.loaders[0].cache = {};
+                        _app.viewTemplateEngine.loaders[0].searchPaths = components[key].views.map(function (obj) {
+                            return handleView(obj,_app);
+                        });
                         _app.viewTemplateEngine.render.call(_app.viewTemplateEngine, name, ctx, function (err, html) {
                             if (err) {
                                 reject(err);
@@ -129,7 +133,11 @@ class SystemManager extends events.EventEmitter {
                             name += "." + _app._config.viewExtension;
                         }
                         return new Promise(function (fulfill, reject) {
-                            _app.viewTemplateEngine.loaders[0].searchPaths = components[key][second_key].views;
+                            _app.viewTemplateEngine.loaders[0].pathsToNames = {};
+                            _app.viewTemplateEngine.loaders[0].cache = {};
+                            _app.viewTemplateEngine.loaders[0].searchPaths = components[key][second_key].views.map(function (obj) {
+                                return handleView(obj,_app);
+                            });
                             _app.viewTemplateEngine.render.call(_app.viewTemplateEngine, name, ctx, function (err, html) {
                                 if (err) {
                                     reject(err);
@@ -144,6 +152,17 @@ class SystemManager extends events.EventEmitter {
         });
         this[privateName] = components;
     }
+}
+
+function handleView(obj,application){
+    let miniPath = obj.func(application._config);
+    let normalizePath;
+    if (miniPath[0] === "/") {
+        normalizePath = path.normalize(obj.base + "/" + miniPath);
+    } else {
+        normalizePath = path.normalize(obj.fatherBase + "/" + miniPath)
+    }
+    return normalizePath
 }
 
 module.exports = SystemManager;

@@ -111,7 +111,7 @@ exports.createNewEnv = function (views,expressApp) {
     let env;
 
     env = new nunjucks.Environment(new nunjucks.FileSystemLoader(views), {
-
+        noCache: true
     });
 
     //env = self.getAllCustomFilter(env);

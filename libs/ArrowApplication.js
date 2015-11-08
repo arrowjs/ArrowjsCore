@@ -78,6 +78,8 @@ class ArrowApplication {
         this.configManager = new ConfigManager(this);
         this.configManager.eventHook(eventEmitter);
         this._config = this.configManager._config;
+        this.getConfig = this.configManager.getConfig.bind(this.configManager);
+        this.setConfig = this.configManager.setConfig.bind(this.configManager);
 
         let componentsRender = ViewEngine(this.arrFolder);
         this.viewTemplateEngine = componentsRender;

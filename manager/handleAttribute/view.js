@@ -1,24 +1,24 @@
 "use strict";
 
-let getListFolder = require('../helper/getListFile');
+let getListFunction = require('../helper/getListFunction');
 
 module.exports = function viewAttribute(setting, fatherPath, component, application) {
-    let folders = getListFolder(setting, fatherPath, application);
-    if (folders.type === "single") {
-        Object.keys(folders).map(function (key) {
+    let functions = getListFunction(setting, fatherPath, application);
+    if (functions.type === "single") {
+        Object.keys(functions).map(function (key) {
             if (key !== "type") {
-                folders[key].map(function (link) {
-                    component.views.push(link);
+                functions[key].map(function (func) {
+                    component.views.push(func);
                 })
             }
         })
-    } else if (folders.type === "multi") {
+    } else if (functions.type === "multi") {
         component.views = {};
-        Object.keys(folders).map(function (key) {
+        Object.keys(functions).map(function (key) {
             if (key !== "type") {
                 component.views[key] = [];
-                folders[key].map(function (link) {
-                    component.views[key].push(link);
+                functions[key].map(function (func) {
+                    component.views[key].push(func);
                 })
             }
         })

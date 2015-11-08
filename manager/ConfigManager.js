@@ -18,6 +18,14 @@ class ConfigManager extends SystemManager {
         })
     }
 
+    getConfig (key){
+        return this._config[key];
+    };
+
+    setConfig(key,setting){
+        this._config[key] = setting;
+    };
+
     getCache(){
         let self = this._config;
         return this.pub.getAsync(self.redis_prefix + self.redis_key.configs)
