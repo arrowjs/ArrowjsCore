@@ -13,6 +13,6 @@ module.exports = function useSession() {
             next(); // otherwise continue
         });
     } catch(err) {
-        throw Error("You dont have file config/session.js");
+        throw Error("You don't have file config/session.js");
     }
 };
