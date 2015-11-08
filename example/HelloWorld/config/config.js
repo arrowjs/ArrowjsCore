@@ -16,8 +16,8 @@ module.exports = {
     app: {
         language: 'en_US',
         title: 'ArrowJS',
-        description: '',
-        keywords: '',
+        description: 'Hello World',
+        keywords: 'Simple demo',
         logo: '',
         icon: ''
     },
@@ -42,7 +42,7 @@ module.exports = {
     pagination: {
         number_item: 20
     },
-    port: process.env.PORT || 3333,
+    port: process.env.PORT || 8000,
     templateEngine: 'nunjucks',
     sessionSecret: 'ARROWJS',
     sessionCollection: 'sessions',

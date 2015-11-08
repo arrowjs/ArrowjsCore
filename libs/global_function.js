@@ -516,7 +516,7 @@ module.exports.getOverrideArrayPath = function(arrayPath) {
 };
 
 /**
- * Merge all path in same directory
+ * Merge all paths in same directory
  */
 module.exports.mergePath = function (paths, routePath, checkIndex) {
     let arr_path = routePath.split('/');

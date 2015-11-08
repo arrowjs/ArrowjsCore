@@ -3,7 +3,7 @@
 /**
  * Module dependencies.
  */
-let Arrow = require('arrowjs');
+let Arrow = require('../..');
 
 let application = new Arrow();
 
