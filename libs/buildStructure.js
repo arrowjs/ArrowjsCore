@@ -11,7 +11,9 @@ module.exports = function (struc) {
     });
     return arrStruc
 };
+/*
 
+*/
 function getDataFromArray(obj, key,level) {
     let newObj = {};
     let wrapArray = [];
@@ -65,8 +67,7 @@ function getDataFromArray(obj, key,level) {
             });
 
             if(data.path.prefix) {
-                let prefix = handlePrefix(data.path.prefix);
-                newObj.path[pathKey].prefix = prefix;
+                newObj.path[pathKey].prefix = handlePrefix(data.path.prefix);
             }
         } else {
             return null;
@@ -124,6 +125,7 @@ function handlePath(pathInfo, attribute,level) {
                 if (depend) {
                     result = pathWithConfig(frontkey, backInfo).bind(null, depend);
                 } else {
+                    //TODO: When throw Error we need to log error somewhere. Your code will crash app !
                     throw Error("'folder' attribute not contain '*' without  'depend' attribute: " + folderInfo);
                 }
             } else {
@@ -220,7 +222,6 @@ function pathWithConfig(front, back) {
             return path.normalize(newFront + back)
         }
 
-        let endPath = path.normalize(front + back);
-        return endPath;
+        return path.normalize(front + back);
     }
 }

@@ -18,4 +18,4 @@ module.exports = function getListFunction(componentSetting, fatherPath, applicat
         });
     }
     return functions
-}
+};

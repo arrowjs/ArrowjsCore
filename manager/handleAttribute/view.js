@@ -23,4 +23,4 @@ module.exports = function viewAttribute(setting, fatherPath, component, applicat
             }
         })
     }
-}
+};

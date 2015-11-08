@@ -8,4 +8,4 @@ module.exports = function otherAttribute(setting, attName, component) {
         obj[attName] = setting;
     }
     return obj
-}
+};
