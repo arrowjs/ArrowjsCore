@@ -24,6 +24,7 @@ class ConfigManager extends SystemManager {
 
     setConfig(key,setting){
         this._config[key] = setting;
+        return this.setCache();
     };
 
     getCache(){

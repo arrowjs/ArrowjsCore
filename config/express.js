@@ -7,7 +7,8 @@ let bodyParser = require('body-parser'),
     morgan = require('morgan'),
     fs = require('fs'),
     helmet = require('helmet'),
-    cookieParser = require('cookie-parser');
+    cookieParser = require('cookie-parser'),
+    arrowStack = require('../libs/ArrStack').stack;
 
 
 module.exports = function (app) {
@@ -29,7 +30,6 @@ module.exports = function (app) {
 
     /** Set views path and view engine */
     app.set('view engine', 'html');
-
 
     /** Environment dependent middleware */
     if (process.env.NODE_ENV === 'development') {

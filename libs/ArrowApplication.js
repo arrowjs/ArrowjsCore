@@ -81,7 +81,23 @@ class ArrowApplication {
         this.getConfig = this.configManager.getConfig.bind(this.configManager);
         this.setConfig = this.configManager.setConfig.bind(this.configManager);
 
-        let componentsRender = ViewEngine(this.arrFolder);
+        let componentsRender = ViewEngine(this.arrFolder, {
+            express: this._expressApplication,
+            autoescape: true,
+            throwOnUndefined: false,
+            trimBlocks: false,
+            lstripBlocks: false,
+            watch: false,
+            noCache: true,
+            //tags: {
+            //    blockStart: '<%',
+            //    blockEnd: '%>',
+            //    variableStart: '<$',
+            //    variableEnd: '$>',
+            //    commentStart: '<#',
+            //    commentEnd: '#>'
+            //}
+        });
         this.viewTemplateEngine = componentsRender;
         Object.keys(this.structure).map(function (managerKey) {
             let key = managerKey;
@@ -123,7 +139,7 @@ class ArrowApplication {
                 setupManager(self);
             })
             .then(function () {
-                loadRoute(self)
+                loadRouteAndRender(self)
             })
             .then(function (app) {
                 exApp.listen(self._config.port, function () {
@@ -157,24 +173,25 @@ class ArrowApplication {
  * @param arrow
  */
 
- //TODO testing load router;
-function loadRoute(arrow) {
+//TODO testing render ;
+function loadRouteAndRender(arrow) {
     arrow._componentList.map(function (key) {
         Object.keys(arrow[key]).map(function (component) {
             let routeConfig = arrow[key][component]._structure.route;
             if (routeConfig) {
                 Object.keys(routeConfig.path).map(function (second_key) {
                     if (arrow[key][component].routes[second_key]) {
+                        //need testing this problems
                         if (routeConfig.path[second_key].prefix) {
-                            arrow.use(routeConfig.path[second_key].prefix, arrow[key][component].routes[second_key]);
+                            arrow.use(routeConfig.path[second_key].prefix,overrideViewRender(arrow,arrow[key][component].views), arrow[key][component].routes[second_key]);
                         } else {
-                            arrow.use("/", arrow[key][component].routes[second_key]);
+                            arrow.use("/",overrideViewRender(arrow,arrow[key][component].views), arrow[key][component].routes[second_key]);
                         }
                     } else {
                         if (routeConfig.path[second_key].prefix) {
-                            arrow.use(routeConfig.path[second_key].prefix, arrow[key][component].routes);
+                            arrow.use(routeConfig.path[second_key].prefix,overrideViewRender(arrow,arrow[key][component].views), arrow[key][component].routes);
                         } else {
-                            arrow.use("/", arrow[key][component].routes);
+                            arrow.use("/",overrideViewRender(arrow,arrow[key][component].views), arrow[key][component].routes);
                         }
                     }
                 });
@@ -228,4 +245,44 @@ function setupManager(app) {
     return null;
 }
 
+function overrideViewRender(application,componentView) {
+    return function (req,res,next) {
+        // Grab reference of render
+        let _render = res.render;
+
+        // Override logic
+        res.render = function (view, options, fn) {
+            if (application._config.viewExtension && view.indexOf(application._config.viewExtension) === -1) {
+                view += "." + application._config.viewExtension;
+            }
+            application.viewTemplateEngine.loaders[0].pathsToNames = {};
+            application.viewTemplateEngine.loaders[0].cache = {};
+            application.viewTemplateEngine.loaders[0].searchPaths = componentView.map(function (obj) {
+                return handleView(obj, application);
+            });
+            if (fn) {
+                application.viewTemplateEngine.render(view,options,fn)
+            } else {
+                application.viewTemplateEngine.render(view,options,function(err,html){
+                    if(err){
+                      return res.send(err)
+                    }
+                    return res.send(html)
+                })
+            }
+        };
+        next();
+    }
+}
+
+function handleView(obj, application) {
+    let miniPath = obj.func(application._config);
+    let normalizePath;
+    if (miniPath[0] === "/") {
+        normalizePath = path.normalize(obj.base + "/" + miniPath);
+    } else {
+        normalizePath = path.normalize(obj.fatherBase + "/" + miniPath)
+    }
+    return normalizePath
+}
 module.exports = ArrowApplication;

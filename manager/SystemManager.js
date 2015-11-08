@@ -53,8 +53,8 @@ class SystemManager extends events.EventEmitter {
                             return (node !== "..")
                         });
                         let componentConfigFunction = require(link);
-                        if (typeof componentConfigFunction === "function") {
-                            let componentConfig = componentConfigFunction();
+                        if (typeof componentConfigFunction === "object") {
+                            let componentConfig = componentConfigFunction;
                             let componentName = componentConfig.name || nodeList[0];
                             paths[componentName] = paths[componentName] || {};
                             paths[componentName].configFile = link;
@@ -79,8 +79,7 @@ class SystemManager extends events.EventEmitter {
                 components[name].models = {};
                 components[name].views = [];
                 //components[name].helpers = {};
-
-                let componentConfig = require(paths[name].configFile)();
+                let componentConfig = require(paths[name].configFile);
                 _.assign(components[name], componentConfig);
                 Object.keys(components[name]._structure).map(function (attribute) {
                     let data = actionByAttribute(attribute, components[name], paths[name].path, _app);
