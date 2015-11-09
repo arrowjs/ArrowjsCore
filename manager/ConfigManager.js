@@ -14,7 +14,7 @@ class ConfigManager extends SystemManager {
         this.sub.subscribe(self._config.redis_prefix + self._config.redis_event.update_config);
 
         this.sub.on("message", function (demo) {
-            self.getConfig();
+            self.getCache();
         })
     }
 
@@ -24,7 +24,8 @@ class ConfigManager extends SystemManager {
 
     setConfig(key,setting){
         this._config[key] = setting;
-        return this.setCache();
+        let self = this;
+        return self.setCache().then(self.reload());
     };
 
     getCache(){
@@ -42,6 +43,7 @@ class ConfigManager extends SystemManager {
                     //}
                     _.assign(this._config,conf);
                 }
+                return(this._config);
             }.bind(this))
             .catch(function (err) {
                 log("Config Manager Class: ",err);
@@ -51,7 +53,7 @@ class ConfigManager extends SystemManager {
 
     reload(){
         let self = this;
-        this.getConfig.then(function () {
+        self.getCache().then(function () {
             self.pub.publish(self._config.redis_prefix + self._config.redis_event.update_config,"Update config")
         })
     }
