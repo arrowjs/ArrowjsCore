@@ -1,6 +1,9 @@
 'use strict';
 
 module.exports = function (controller,component,application) {
+    /**
+     * Render index view with links to other views
+     */
     controller.index = function (req,res) {
         res.render('index',
             {
@@ -13,9 +16,7 @@ module.exports = function (controller,component,application) {
         )
     };
     /**
-     * Return view using Nunjuck template
-     * @param req
-     * @param res
+     * Render about view using Nunjuck template
      */
     controller.about = function (req,res) {
         res.render('about',
@@ -25,9 +26,7 @@ module.exports = function (controller,component,application) {
             })
     };
     /**
-     * return JSON
-     * @param req
-     * @param res
+     * return JSON list of github repositories of Arrowjs.io
      */
     controller.repos = function(req, res) {
         let repos = [
