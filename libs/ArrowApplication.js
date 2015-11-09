@@ -183,15 +183,15 @@ function loadRouteAndRender(arrow) {
                     if (arrow[key][component].routes[second_key]) {
                         //need testing this problems
                         if (routeConfig.path[second_key].prefix) {
-                            arrow.use(routeConfig.path[second_key].prefix,overrideViewRender(arrow,arrow[key][component].views), arrow[key][component].routes[second_key]);
+                            arrow.use(routeConfig.path[second_key].prefix, overrideViewRender(arrow, arrow[key][component].views), arrow[key][component].routes[second_key]);
                         } else {
-                            arrow.use("/",overrideViewRender(arrow,arrow[key][component].views), arrow[key][component].routes[second_key]);
+                            arrow.use("/", overrideViewRender(arrow, arrow[key][component].views), arrow[key][component].routes[second_key]);
                         }
                     } else {
                         if (routeConfig.path[second_key].prefix) {
-                            arrow.use(routeConfig.path[second_key].prefix,overrideViewRender(arrow,arrow[key][component].views), arrow[key][component].routes);
+                            arrow.use(routeConfig.path[second_key].prefix, overrideViewRender(arrow, arrow[key][component].views), arrow[key][component].routes);
                         } else {
-                            arrow.use("/",overrideViewRender(arrow,arrow[key][component].views), arrow[key][component].routes);
+                            arrow.use("/", overrideViewRender(arrow, arrow[key][component].views), arrow[key][component].routes);
                         }
                     }
                 });
@@ -245,31 +245,46 @@ function setupManager(app) {
     return null;
 }
 
-function overrideViewRender(application,componentView) {
-    return function (req,res,next) {
+function overrideViewRender(application, componentView) {
+    return function (req, res, next) {
         // Grab reference of render
         let _render = res.render;
 
         // Override logic
-        res.render = function (view, options, fn) {
+        res.render = function (view, options, callback) {
+            var done = callback;
+            var opts = options || {};
+            var req = this.req;
+            var self = this;
+
+
+            // support callback function as second arg
+            if (typeof options === 'function') {
+                done = options;
+                opts = {};
+            }
+
+            // merge res.locals
+            opts._locals = self.locals;
+
+            // default callback to respond
+            done = done || function (err, str) {
+                if (err) return req.next(err);
+                self.send(str);
+            };
+
             if (application._config.viewExtension && view.indexOf(application._config.viewExtension) === -1) {
                 view += "." + application._config.viewExtension;
             }
+
             application.viewTemplateEngine.loaders[0].pathsToNames = {};
             application.viewTemplateEngine.loaders[0].cache = {};
             application.viewTemplateEngine.loaders[0].searchPaths = componentView.map(function (obj) {
                 return handleView(obj, application);
             });
-            if (fn) {
-                application.viewTemplateEngine.render(view,options,fn)
-            } else {
-                application.viewTemplateEngine.render(view,options,function(err,html){
-                    if(err){
-                      return res.send(err)
-                    }
-                    return res.send(html)
-                })
-            }
+
+            application.viewTemplateEngine.render(view, options, done)
+
         };
         next();
     }
