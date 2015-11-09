@@ -193,9 +193,9 @@ function loadRouteAndRender(arrow) {
                     if (arrow[key][component].routes[second_key]) {
                         //need testing this problems
                         if (routeConfig.path[second_key].prefix) {
-                            arrow.use(routeConfig.path[second_key].prefix, overrideViewRender(arrow, arrow[key][component].views), arrow[key][component].routes[second_key]);
+                            arrow.use(routeConfig.path[second_key].prefix, overrideViewRender(arrow, arrow[key][component].views,second_key), arrow[key][component].routes[second_key]);
                         } else {
-                            arrow.use("/", overrideViewRender(arrow, arrow[key][component].views), arrow[key][component].routes[second_key]);
+                            arrow.use("/", overrideViewRender(arrow, arrow[key][component].views,second_key), arrow[key][component].routes[second_key]);
                         }
                     } else {
                         if (routeConfig.path[second_key].prefix) {
@@ -255,7 +255,7 @@ function setupManager(app) {
     return null;
 }
 
-function overrideViewRender(application, componentView) {
+function overrideViewRender(application, componentView, key) {
     return function (req, res, next) {
         // Grab reference of render
         let _render = res.render;
@@ -289,9 +289,16 @@ function overrideViewRender(application, componentView) {
 
             application.viewTemplateEngine.loaders[0].pathsToNames = {};
             application.viewTemplateEngine.loaders[0].cache = {};
-            application.viewTemplateEngine.loaders[0].searchPaths = componentView.map(function (obj) {
-                return handleView(obj, application);
-            });
+            if(key) {
+                application.viewTemplateEngine.loaders[0].searchPaths = componentView[key].map(function (obj) {
+                    return handleView(obj, application);
+                });
+            }else {
+                application.viewTemplateEngine.loaders[0].searchPaths = componentView.map(function (obj) {
+                    return handleView(obj, application);
+                });
+            }
+
 
             application.viewTemplateEngine.render(view, options, done)
 
