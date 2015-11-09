@@ -2,11 +2,11 @@
 
 module.exports = function () {
     let app = this;
-
+//TODO : testing flash messages;
     app.use(function (req, res, next) {
-        if (!req.session.messages) {
+        //if (!req.session.messages) {
             req.session.messages = [];
-        }
+        //}
 
         req.flash = {
             success: function (content) {
@@ -34,6 +34,7 @@ module.exports = function () {
                 })
             }
         };
+        next()
     });
     return null;
 };
