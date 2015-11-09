@@ -13,8 +13,8 @@ class SystemManager extends events.EventEmitter {
         this._config = app._config;
         this.arrFolder = app.arrFolder;
         this.structure = app.structure;
-        this.pub = app.redisCache;
-        this.sub = app.RedisCache();
+        this.pub = app.redisClient;
+        this.sub = app.redisSubscriber;
         this._app = app;
     }
 

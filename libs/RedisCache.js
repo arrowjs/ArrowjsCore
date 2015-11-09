@@ -1,9 +1,8 @@
-"use strict";
 
-let redis = require('redis');
-let bluebird = require('bluebird');
-let __ = require('./global_function');
-let fakeRedis = require("fakeredis");
+var redis = require('redis');
+var bluebird = require('bluebird');
+var __ = require('./global_function');
+var fakeRedis = require("fakeredis");
 
 bluebird.promisifyAll(redis.RedisClient.prototype);
 bluebird.promisifyAll(redis.Multi.prototype);

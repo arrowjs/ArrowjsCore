@@ -11,5 +11,5 @@ module.exports = {
     redis_event : {
         update_config : "config_update",
         update_module : "module_update"
-    },
+    }
 };

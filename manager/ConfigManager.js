@@ -8,8 +8,8 @@ class ConfigManager extends SystemManager {
     constructor(app){
         super(app);
         this._config = app._config;
-        this.pub = app.redisCache;
-        this.sub = app.RedisCache();
+        this.pub = app.redisClient;
+        this.sub = app.redisSubscriber;
         let self = this;
         this.sub.subscribe(self._config.redis_prefix + self._config.redis_event.update_config);
 
@@ -56,8 +56,8 @@ class ConfigManager extends SystemManager {
         })
     }
     setCache() {
-        let self = this;
-        return this.pub.setAsync(self.redis_prefix + self.redis_key.configs,JSON.stringify(self._config))
+        let self = this._config;
+        return this.pub.setAsync(self.redis_prefix + self.redis_key.configs,JSON.stringify(self))
     }
 }
 

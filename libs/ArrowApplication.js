@@ -62,8 +62,18 @@ class ArrowApplication {
         //Make redis cache
         let redisConfig = this._config.redis || {};
         let redisFunction = RedisCache(redisConfig);
-        this.RedisCache = redisFunction.bind(null, redisConfig);
-        this.redisCache = redisFunction(redisConfig);
+        var redisClient,redisSubscriber;
+
+        if(redisConfig.type === "fakeredis"){
+            redisClient = redisFunction("client");
+            redisSubscriber = redisFunction("subscriber");
+        } else {
+            redisClient = redisFunction(redisConfig);
+            redisSubscriber = redisFunction(redisConfig);
+        }
+
+        this.redisClient = redisClient;
+        this.redisSubscriber =  redisSubscriber;
 
         //TODO: why we assign many properties of ArrowApplication to _expressApplication. It is redundant
         this._expressApplication.arrFolder = this.arrFolder;
@@ -88,7 +98,7 @@ class ArrowApplication {
             trimBlocks: false,
             lstripBlocks: false,
             watch: false,
-            noCache: true,
+            noCache: true
             //tags: {
             //    blockStart: '<%',
             //    blockEnd: '%>',
