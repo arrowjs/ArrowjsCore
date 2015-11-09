@@ -5,17 +5,8 @@ let __ = require('../libs/global_function');
 let _ = require('lodash');
 
 class ConfigManager extends SystemManager {
-    constructor(app){
-        super(app);
-        this._config = app._config;
-        this.pub = app.redisClient;
-        this.sub = app.redisSubscriber;
-        let self = this;
-        this.sub.subscribe(self._config.redis_prefix + self._config.redis_event.update_config);
-
-        this.sub.on("message", function (demo) {
-            self.getCache();
-        })
+    constructor(app,name){
+        super(app,name);
     }
 
     getConfig (key){
@@ -53,8 +44,8 @@ class ConfigManager extends SystemManager {
 
     reload(){
         let self = this;
-        self.getCache().then(function () {
-            self.pub.publish(self._config.redis_prefix + self._config.redis_event.update_config,"Update config")
+        return self.getCache().then(function () {
+            return self.pub.publishAsync(self._config.redis_prefix + self._config.redis_event.update_config,"Update config")
         })
     }
     setCache() {

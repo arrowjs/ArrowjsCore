@@ -5,8 +5,8 @@ let __ = require('../libs/global_function');
 let _ = require('lodash');
 
 class DefaultManager extends SystemManager {
-    constructor(app){
-        super(app);
+    constructor(app,name){
+        super(app,name);
     }
 }
 

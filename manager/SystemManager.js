@@ -8,37 +8,70 @@ let Database = require("../libs/database");
 let actionByAttribute = require('./handleAttribute/handleFunction');
 
 class SystemManager extends events.EventEmitter {
-    constructor(app) {
+    constructor(app, name) {
         super();
         this._config = app._config;
         this.arrFolder = app.arrFolder;
         this.structure = app.structure;
         this.pub = app.redisClient;
-        this.sub = app.redisSubscriber;
+        this.sub = app.redisSubscriber();
         this._app = app;
+        this.name = name;
+        let self = this;
+        let updateKey = self._config.redis_event['update_' + self.name] || ('update_' + self.name);
+        this.sub.subscribe(self._config.redis_prefix + updateKey);
+
+        this.sub.on("message", function (demo) {
+            self.getCache();
+        });
+
     }
 
     getCache() {
-
+        let self = this;
+        return this.pub.getAsync(self._config.redis_prefix + self._config.redis_key[self.name] || self.name)
+            .then(function (data) {
+                if (data) {
+                    let cache = JSON.parse(data);
+                    _.assign(self["_" + self.name], cache);
+                }
+                return (self["_" + self.name]);
+            }.bind(this))
+            .catch(function (err) {
+                log(self.name + " Manager Class: ", err);
+                return err
+            }.bind(this));
     }
 
     setCache() {
+        let self = this;
 
+        if (self["_" + self.name]) {
+            let data = getInfo(self["_" + self.name]);
+            return this.pub.setAsync(self._config.redis_prefix + self._config.redis_key[self.name] || self.name, JSON.stringify(data));
+        } else {
+            return this.pub.setAsync(self._config.redis_prefix + self._config.redis_key[self.name] || self.name, null);
+        }
     }
 
     reload() {
-
+        let self = this;
+        return self.getCache().then(function (a) {
+            let name = self.name;
+            let updateKey = self._config.redis_event['update_' + self.name] || ('update_' + self.name);
+            return self.pub.publishAsync(self._config.redis_prefix + updateKey, "asdsadads")
+        })
     }
 
     eventHook(events) {
         this._events = events._events
     }
 
-    loadComponents(name) {
+    loadComponents() {
         let self = this;
-        let struc = this.structure[name];
+        let struc = this.structure[self.name];
         let _base = this.arrFolder;
-        let privateName = "_" + name;
+        let privateName = "_" + self.name;
         let components = {};
         let _app = this._app;
         let paths = {};
@@ -114,7 +147,7 @@ class SystemManager extends events.EventEmitter {
                         _app.viewTemplateEngine.loaders[0].pathsToNames = {};
                         _app.viewTemplateEngine.loaders[0].cache = {};
                         _app.viewTemplateEngine.loaders[0].searchPaths = components[key].views.map(function (obj) {
-                            return handleView(obj,_app);
+                            return handleView(obj, _app);
                         });
                         _app.viewTemplateEngine.render.call(_app.viewTemplateEngine, name, ctx, function (err, html) {
                             if (err) {
@@ -135,7 +168,7 @@ class SystemManager extends events.EventEmitter {
                             _app.viewTemplateEngine.loaders[0].pathsToNames = {};
                             _app.viewTemplateEngine.loaders[0].cache = {};
                             _app.viewTemplateEngine.loaders[0].searchPaths = components[key][second_key].views.map(function (obj) {
-                                return handleView(obj,_app);
+                                return handleView(obj, _app);
                             });
                             _app.viewTemplateEngine.render.call(_app.viewTemplateEngine, name, ctx, function (err, html) {
                                 if (err) {
@@ -150,6 +183,7 @@ class SystemManager extends events.EventEmitter {
 
         });
         this[privateName] = components;
+
     }
 }
 /**
@@ -158,7 +192,7 @@ class SystemManager extends events.EventEmitter {
  * @param application
  * @returns {*}
  */
-function handleView(obj,application){
+function handleView(obj, application) {
     let miniPath = obj.func(application._config);
     let normalizePath;
     if (miniPath[0] === "/") {
@@ -167,6 +201,17 @@ function handleView(obj,application){
         normalizePath = path.normalize(obj.fatherBase + "/" + miniPath)
     }
     return normalizePath
+}
+
+
+function getInfo(obj) {
+    return JSON.parse(JSON.stringify(obj), function (key, value) {
+        if (_.isEmpty(value) && !_.isNumber(value) && !_.isBoolean(value)) {
+            return
+        } else {
+            return value
+        }
+    });
 }
 
 module.exports = SystemManager;

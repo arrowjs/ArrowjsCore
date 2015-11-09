@@ -66,10 +66,10 @@ class ArrowApplication {
 
         if(redisConfig.type === "fakeredis"){
             redisClient = redisFunction("client");
-            redisSubscriber = redisFunction("subscriber");
+            redisSubscriber = redisFunction.bind(null,redisConfig);
         } else {
             redisClient = redisFunction(redisConfig);
-            redisSubscriber = redisFunction(redisConfig);
+            redisSubscriber = redisFunction.bind(null,redisConfig);
         }
 
         this.redisClient = redisClient;
@@ -85,7 +85,7 @@ class ArrowApplication {
 
         this._componentList = [];
 
-        this.configManager = new ConfigManager(this);
+        this.configManager = new ConfigManager(this,"config");
         this.configManager.eventHook(eventEmitter);
         this._config = this.configManager._config;
         this.getConfig = this.configManager.getConfig.bind(this.configManager);
@@ -112,7 +112,7 @@ class ArrowApplication {
         Object.keys(this.structure).map(function (managerKey) {
             let key = managerKey;
             let managerName = managerKey + "Manager";
-            this[managerName] = new DefaultManager(this);
+            this[managerName] = new DefaultManager(this,key);
             this[managerName].eventHook(eventEmitter);
             this[managerName].loadComponents(key);
             this[key] = this[managerName]["_" + key];
