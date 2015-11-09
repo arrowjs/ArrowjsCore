@@ -59,7 +59,7 @@ class SystemManager extends events.EventEmitter {
         return self.getCache().then(function (a) {
             let name = self.name;
             let updateKey = self._config.redis_event['update_' + self.name] || ('update_' + self.name);
-            return self.pub.publishAsync(self._config.redis_prefix + updateKey, "asdsadads")
+            return self.pub.publishAsync(self._config.redis_prefix + updateKey, "update " + name)
         })
     }
 

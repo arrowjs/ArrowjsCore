@@ -593,6 +593,13 @@ module.exports.getRawConfig = function getRawConfig() {
         _.assign(conf, require(__base + 'config/view'));
     }
 
+    //get session.js
+    try {
+        fs.accessSync(__base + 'config/session.js');
+    } catch(err) {
+        fsEx.copySync(path.resolve(__dirname, '..', 'config/session.js'), __base + 'config/session.js');
+    }
+
     //get default config
     try {
         fs.accessSync(__base + 'config/env/default.js');
