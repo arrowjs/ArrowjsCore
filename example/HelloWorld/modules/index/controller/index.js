@@ -2,8 +2,15 @@
 
 module.exports = function (controller,component,application) {
     controller.index = function (req,res) {
-
-        res.send("Welcome to Arrowjs.io<br><a href='\about'>About us</a>");
+        res.render('index',
+            {
+                title: 'Hello World app',
+                links: [
+                    {title: 'About this app', link: 'about'},
+                    {title: 'Repositories', link: 'repos'}
+                ]
+            }
+        )
     };
     /**
      * Return view using Nunjuck template
