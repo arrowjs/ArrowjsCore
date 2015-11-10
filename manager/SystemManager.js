@@ -93,6 +93,7 @@ class SystemManager extends events.EventEmitter {
                             paths[componentName].configFile = link;
                             paths[componentName].path = componentFolder + nodeList[0];
                             paths[componentName].strucID = id;
+                            paths[componentName].name = componentName;
                         }
                     });
                 });
@@ -103,12 +104,13 @@ class SystemManager extends events.EventEmitter {
             let id = paths[name].strucID;
             if (id) {
                 components[name] = {};
+                components[name].name = paths[name].name;
                 components[name]._path = paths[name].path;
                 components[name]._configFile = paths[name].configFile;
                 components[name]._strucID = id;
                 components[name]._structure = struc.path[id] || struc;
                 components[name].controllers = {};
-                components[name].routes = Express.Router();
+                components[name].routes = {};
                 components[name].models = {};
                 components[name].views = [];
                 //components[name].helpers = {};
