@@ -3,12 +3,28 @@
 /**
  * Map final part of URL to equivalent functions in controller
  */
-module.exports = function (route,component,application) {
-    route.route("/").get(component.controllers.index);
+module.exports = function (component,application) {
+    return {
+        "/": {
+            get : {
+                handler: component.controllers.index
+            }
+        },
+        "/about": {
+            get: {
+                handler : component.controllers.about
+            }
+        },
+        "/repos" : {
+            get : {
+                handler : component.controllers.repos
+            }
+        },
+        "/raw" : {
+            get : {
+                handler : component.controllers.raw
+            }
+        }
 
-    route.route("/about").get(component.controllers.about);
-
-    route.route("/repos").get(component.controllers.repos);
-
-    route.route("/raw").get(component.controllers.raw);
+    }
 };
