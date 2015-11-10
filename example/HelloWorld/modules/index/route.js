@@ -9,4 +9,6 @@ module.exports = function (route,component,application) {
     route.route("/about").get(component.controllers.about);
 
     route.route("/repos").get(component.controllers.repos);
+
+    route.route("/raw").get(component.controllers.raw);
 };

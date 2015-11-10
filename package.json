@@ -7,6 +7,10 @@
     "test": "./node_modules/.bin/mocha -u bdd -R spec -t 500 --recursive",
     "watch": "./node_modules/.bin/mocha -u bdd -R spec -t 500 -w"
   },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/arrowjs/ArrowjsCore.git"
+  },
   "author": "Techmaster Vietnam <cuong@techmaster.vn>",
   "license": "MIT",
   "dependencies": {

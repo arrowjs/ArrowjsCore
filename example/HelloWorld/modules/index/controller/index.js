@@ -10,7 +10,8 @@ module.exports = function (controller,component,application) {
                 title: 'Hello World app',
                 links: [
                     {title: 'About this app', link: 'about'},
-                    {title: 'Repositories', link: 'repos'}
+                    {title: 'Repositories', link: 'repos'},
+                    {title: 'Get App folder', link: 'raw'}
                 ]
             }
         )
@@ -36,5 +37,9 @@ module.exports = function (controller,component,application) {
             , { name: 'documents', url: 'https://github.com/arrowjs/Documents' }
         ];
         res.json(repos);
+    }
+
+    controller.raw = function(req, res) {
+        res.send(application.arrFolder);
     }
 };
