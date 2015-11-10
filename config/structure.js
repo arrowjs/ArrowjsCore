@@ -22,7 +22,8 @@ module.exports = {
         "controller": {
             "path": {
                 "folder": "controller",
-                "file": "*.js"
+                "file": "*.js",
+                "name" : "abc"
             }
         },
         "helper": {

@@ -69,6 +69,10 @@ function getDataFromArray(obj, key,level) {
             if(data.path.prefix) {
                 newObj.path[pathKey].prefix = handlePrefix(data.path.prefix);
             }
+
+            if(data.path.authenticate) {
+                newObj.path[pathKey].authenticate = handleAthenticate(data.path.authenticate);
+            }
         } else {
             return null;
         }
@@ -196,6 +200,13 @@ function handlePrefix(prefix) {
         return prefix
     }
     return "";
+}
+
+function handleAthenticate(authenticate){
+    if(_.isBoolean(authenticate)){
+        return authenticate
+    }
+    return false
 }
 
 function pathWithConfig(front, back) {
