@@ -296,9 +296,7 @@ function handleComponentRouteSetting(componentRouteSetting, componentName, defau
             if (roles) {
                 arrayHandler.splice(0, 0, handleRole(roles))
             }
-
             //Add to route
-
             if (method === "param") {
                 if (_.isString(componentRouteSetting[path][method].key)) {
                     return route.param(componentRouteSetting[path][method].key, arrayHandler);
@@ -321,7 +319,7 @@ function overrideViewRender(application, componentView) {
         let _render = res.render;
         let self = this;
         if (_.isArray(componentView)) {
-            res.render = makeRender(application, componentView, self);
+            res.render = makeRender(application, componentView,req,res);
         } else {
             Object.keys(componentView).map(function (key) {
                 res[key] = res[key] || {};
@@ -345,7 +343,7 @@ function makeRender(application, componentView, req, res) {
         }
 
         // merge res.locals
-        opts._locals = res.locals;
+        opts._locals = res.locals || {};
 
         // default callback to respond
         done = done || function (err, str) {
