@@ -212,27 +212,22 @@ function handleAthenticate(authenticate){
 function pathWithConfig(front, back) {
     return function makeGlob(key) {
         let config = arguments[1];
-        let frontArray = front.split("*");
-        let newFront = "";
-        let newArray = [];
-        if (_.isString(key)) {
-            newArray.push(key);
+        let frontArray = front.split("/");
+        let filterArray = frontArray.filter(function (key) {
+            return key[0] === ":"
+        });
+        if(_.isEmpty(filterArray)) {
+            return path.normalize(front + back);
         } else {
-            newArray = key;
-        }
-        if (frontArray.length > 1) {
-            frontArray.map(function (frontKey) {
-                let index = frontArray.indexOf(frontKey);
-                if (index < frontArray.length - 1) {
-                    newFront += frontKey + ( config[newArray[index]] || "")
+            frontArray = frontArray.map(function (key) {
+                if (key[0] === ":") {
+                    let configKey = key.slice(1);
+                    return (config[configKey] || "")
                 } else {
-                    newFront += frontKey
+                    return key
                 }
             });
-            newFront = newFront.replace(/\*/g, "");
-            return path.normalize(newFront + back)
+            return path.normalize(frontArray.join('/') + back)
         }
-
-        return path.normalize(front + back);
     }
 }
