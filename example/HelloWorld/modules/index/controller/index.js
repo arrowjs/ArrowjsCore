@@ -37,7 +37,7 @@ module.exports = function (controller,component,application) {
             , { name: 'documents', url: 'https://github.com/arrowjs/Documents' }
         ];
         res.json(repos);
-    }
+    };
 
     controller.raw = function(req, res) {
         res.send(application.arrFolder);
