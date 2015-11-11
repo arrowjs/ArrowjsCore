@@ -118,40 +118,38 @@ class SystemManager extends events.EventEmitter {
                 _.assign(components[name], componentConfig);
 
                 //Logic make order to loading
-
                 if(components[name]._structure.path) {
-                    let data = actionByAttribute(components[name]._structure.path, components[name], paths[name].path, _app);
+                    let data = actionByAttribute("path", components[name], paths[name].path, _app);
                     _.assign(components[name], data);
                 }
 
                 if(components[name]._structure.extends) {
-                    let data = actionByAttribute(components[name]._structure.extends, components[name], paths[name].path, _app);
+                    let data = actionByAttribute("extends", components[name], paths[name].path, _app);
                     _.assign(components[name], data);
                 }
 
-
                 if(components[name]._structure.model) {
-                    let data = actionByAttribute(components[name]._structure.model, components[name], paths[name].path, _app);
+                    let data = actionByAttribute("model", components[name], paths[name].path, _app);
                     _.assign(components[name], data);
                 }
 
                 if(components[name]._structure.helper) {
-                    let data = actionByAttribute(components[name]._structure.helper, components[name], paths[name].path, _app);
+                    let data = actionByAttribute("helper", components[name], paths[name].path, _app);
                     _.assign(components[name], data);
                 }
 
                 if(components[name]._structure.controller) {
-                    let data = actionByAttribute(components[name]._structure.controller, components[name], paths[name].path, _app);
+                    let data = actionByAttribute("controller", components[name], paths[name].path, _app);
                     _.assign(components[name], data);
                 }
 
                 if(components[name]._structure.view) {
-                    let data = actionByAttribute(components[name]._structure.view, components[name], paths[name].path, _app);
+                    let data = actionByAttribute("view", components[name], paths[name].path, _app);
                     _.assign(components[name], data);
                 }
 
                 if(components[name]._structure.route) {
-                    let data = actionByAttribute(components[name]._structure.route, components[name], paths[name].path, _app);
+                    let data = actionByAttribute("route", components[name], paths[name].path, _app);
                     _.assign(components[name], data);
                 }
 

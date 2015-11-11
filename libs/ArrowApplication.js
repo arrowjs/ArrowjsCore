@@ -184,6 +184,7 @@ class ArrowApplication {
 //TODO testing render ;
 function loadRouteAndRender(arrow) {
     arrow._componentList.map(function (key) {
+    console.log(arrow[key]);
         Object.keys(arrow[key]).map(function (component) {
             let routeConfig = arrow[key][component]._structure.route;
             if (routeConfig) {
