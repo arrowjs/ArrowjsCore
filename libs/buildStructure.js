@@ -205,9 +205,7 @@ function pathWithConfig(front, back) {
             return key[0] === ":"
         });
         let stringPath;
-        if(_.isEmpty(filterArray)) {
-            stringPath = path.normalize(front + back);
-        } else {
+
             frontArray = frontArray.map(function (key) {
                 if (key[0] === ":") {
                     let configKey = key.slice(1);
