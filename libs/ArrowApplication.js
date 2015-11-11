@@ -33,7 +33,6 @@ class ArrowApplication {
         process.env.NODE_ENV = process.env.NODE_ENV || 'development';
 
         let eventEmitter = new EventEmitter();
-        //this.modules = [];
         this.beforeFunction = [];
         this._expressApplication = express();
 
@@ -128,15 +127,6 @@ class ArrowApplication {
         }.bind(this));
     }
 
-    //addModule(modulePath) {
-    //    if (path.isAbsolute(modulePath)) {
-    //        if (fs.existsFile(modulePath + '/module.js')) {
-    //            this.modules.push(modulePath);
-    //        } else {
-    //            logger.error(modulePath + 'is not Arrow module!');
-    //        }
-    //    }
-    //}
 
     /**
      * Kick start express application and listen at default port
@@ -310,8 +300,8 @@ function handleComponentRouteSetting(componentRouteSetting, componentName, defau
             }
             //Add to route
             if (method === "param") {
-                if (_.isString(componentRouteSetting[path][method].key)) {
-                    return route.param(componentRouteSetting[path][method].key, arrayHandler);
+                if (_.isString(componentRouteSetting[path][method].key) && !_.isArray(componentRouteSetting[path][method].handler)) {
+                    return route.param(componentRouteSetting[path][method].key, componentRouteSetting[path][method].handler);
                 }
             } else if (method === 'all') {
                 return route.route(routePath)

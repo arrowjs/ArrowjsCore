@@ -116,9 +116,50 @@ class SystemManager extends events.EventEmitter {
                 //components[name].helpers = {};
                 let componentConfig = require(paths[name].configFile);
                 _.assign(components[name], componentConfig);
-                Object.keys(components[name]._structure).map(function (attribute) {
-                    let data = actionByAttribute(attribute, components[name], paths[name].path, _app);
+
+                //Logic make order to loading
+
+                if(components[name]._structure.path) {
+                    let data = actionByAttribute(components[name]._structure.model, components[name], paths[name].path, _app);
                     _.assign(components[name], data);
+                }
+
+                if(components[name]._structure.extends) {
+                    let data = actionByAttribute(components[name]._structure.model, components[name], paths[name].path, _app);
+                    _.assign(components[name], data);
+                }
+
+
+                if(components[name]._structure.model) {
+                    let data = actionByAttribute(components[name]._structure.model, components[name], paths[name].path, _app);
+                    _.assign(components[name], data);
+                }
+
+                if(components[name]._structure.helper) {
+                    let data = actionByAttribute(components[name]._structure.helper, components[name], paths[name].path, _app);
+                    _.assign(components[name], data);
+                }
+
+                if(components[name]._structure.controller) {
+                    let data = actionByAttribute(components[name]._structure.controller, components[name], paths[name].path, _app);
+                    _.assign(components[name], data);
+                }
+
+                if(components[name]._structure.view) {
+                    let data = actionByAttribute(components[name]._structure.view, components[name], paths[name].path, _app);
+                    _.assign(components[name], data);
+                }
+
+                if(components[name]._structure.route) {
+                    let data = actionByAttribute(components[name]._structure.route, components[name], paths[name].path, _app);
+                    _.assign(components[name], data);
+                }
+
+                Object.keys(components[name]._structure).map(function (attribute) {
+                    if(["controller","view","path","helper","model","extends","route"].indexOf(attribute) === -1) {
+                        let data = actionByAttribute(attribute, components[name], paths[name].path, _app);
+                        _.assign(components[name], data);
+                    }
                 });
             }
         });
