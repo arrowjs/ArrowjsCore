@@ -600,13 +600,40 @@ module.exports.getRawConfig = function getRawConfig() {
         fsEx.copySync(path.resolve(__dirname, '..', 'config/session.js'), __base + 'config/session.js');
     }
 
-    //get session.js
+    //get i18n.js
     try {
         fs.accessSync(__base + 'config/i18n.js');
         _.assign(conf, require(__base + 'config/i18n'));
     } catch(err) {
         fsEx.copySync(path.resolve(__dirname, '..', 'config/i18n.js'), __base + 'config/i18n.js');
         _.assign(conf, require(__base + 'config/i18n'));
+    }
+
+    //get passport.js
+    try {
+        fs.accessSync(__base + 'config/passport.js');
+    } catch(err) {
+        fsEx.copySync(path.resolve(__dirname, '..', 'config/passport.js'), __base + 'config/passport.js');
+    }
+
+    //setup strategy
+    this.createDirectory('config/strategies');
+    try {
+        fs.accessSync(__base + 'config/strategies/local.js');
+    } catch(err) {
+        fsEx.copySync(path.resolve(__dirname, '..', 'config/strategies/local.js'), __base + 'config/strategies/local.js');
+    }
+
+    try {
+        fs.accessSync(__base + 'config/strategies/google.js');
+    } catch(err) {
+        fsEx.copySync(path.resolve(__dirname, '..', 'config/strategies/google.js'), __base + 'config/strategies/google.js');
+    }
+
+    try {
+        fs.accessSync(__base + 'config/strategies/facebook.js');
+    } catch(err) {
+        fsEx.copySync(path.resolve(__dirname, '..', 'config/strategies/facebook.js'), __base + 'config/strategies/facebook.js');
     }
 
     //get default config
@@ -643,4 +670,15 @@ module.exports.getStructure = function getStructure() {
         _.assign(structure, require(__base + 'config/structure'));
     }
     return structure;
+};
+
+/**
+ * Create directory
+ * @param {string} path
+ * return {void}
+ */
+exports.createDirectory = function (path) {
+    fs.mkdir(__base + path, function (err) {
+        if (err == null) console.log('Create directory ' + path);
+    });
 };

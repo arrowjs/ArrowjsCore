@@ -243,13 +243,3 @@ exports.shuffle = function (array) {
     return array;
 };
 
-/**
- * Create directory
- * @param {string} path
- * return {void}
- */
-exports.createDirectory = function (path) {
-    fs.mkdir(__base + path, function (err) {
-        if (err == null) console.log('Create directory ' + path);
-    });
-};

@@ -10,6 +10,8 @@ let bodyParser = require('body-parser'),
     cookieParser = require('cookie-parser'),
     arrowStack = require('../libs/ArrStack').stack;
 
+let flash = require('connect-flash');
+
 
 module.exports = function (app) {
     /**
@@ -52,13 +54,17 @@ module.exports = function (app) {
 
     app.useSession();
 
+
+
     /** Use passport session */
 
-    //app.usePassport();
+    app.usePassport(app);
 
     /** Flash messages */
 
-    //app.useFlashMessage();
+    app.use(flash());
+
+    app.useFlashMessage();
 
     /** Use helmet to secure Express headers */
     app.use(helmet.xframe());

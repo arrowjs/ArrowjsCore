@@ -78,6 +78,7 @@ class ArrowApplication {
         this._expressApplication.arrFolder = this.arrFolder;
         this._expressApplication.arrConfig = this._config;
         this._expressApplication.redisCache = this.redisCache;
+        this._expressApplication._arrApplication = this;
         this._expressApplication.usePassport = require("./loadPassport");
         this._expressApplication.useFlashMessage = require("./flashMessage");
         this._expressApplication.useSession = require("./useSession");
@@ -262,7 +263,7 @@ function handleComponentRouteSetting(componentRouteSetting, componentName, defau
         let routePath = path[0] === '/' ? path : "/" + componentName + "/" + path;
 
         //handle prefix
-        if(defaultRouteConfig.prefix && defaultRouteConfig.prefix[0] !== "/"){
+        if (defaultRouteConfig.prefix && defaultRouteConfig.prefix[0] !== "/") {
             defaultRouteConfig.prefix = "/" + defaultRouteConfig.prefix
         }
         let prefix = defaultRouteConfig.prefix || '/';
@@ -270,6 +271,8 @@ function handleComponentRouteSetting(componentRouteSetting, componentName, defau
         let arrayMethod = Object.keys(componentRouteSetting[path]).filter(function (method) {
             //handle function
             let routeHandler = componentRouteSetting[path][method].handler;
+            let authenticate = componentRouteSetting[path][method].authenticate !== undefined ? componentRouteSetting[path][method].authenticate : defaultRouteConfig.authenticate;
+
             let arrayHandler = [];
             if (arrayHandler && _.isArray(routeHandler)) {
                 arrayHandler = routeHandler.filter(function (func) {
@@ -279,26 +282,26 @@ function handleComponentRouteSetting(componentRouteSetting, componentName, defau
                 });
             } else if (_.isFunction(routeHandler)) {
                 arrayHandler.push(routeHandler)
-            } else {
+            } else if (!_.isString(authenticate)){
                 return
             }
 
             //Add viewRender
-            if (!_.isEmpty(view)) {
-                arrayHandler.splice(0, 0, overrideViewRender(arrow, view,componentName))
+            if (!_.isEmpty(view) && !_.isString(authenticate)) {
+                arrayHandler.splice(0, 0, overrideViewRender(arrow, view, componentName))
             }
 
             //handle Authenticate
-            let authenticate = componentRouteSetting[path][method].authenticate !== undefined ? componentRouteSetting[path][method].authenticate : defaultRouteConfig.authenticate;
             if (authenticate) {
-                arrayHandler.splice(0, 0, handleAuthenticate(authenticate))
+                arrayHandler.splice(0, 0, handleAuthenticate(arrow, authenticate))
             }
 
             //handle role
             let roles = componentRouteSetting[path][method].role;
-            if (roles) {
+            if (roles && !_.isString(authenticate)) {
                 arrayHandler.splice(0, 0, handleRole(roles))
             }
+
             //Add to route
             if (method === "param") {
                 if (_.isString(componentRouteSetting[path][method].key) && !_.isArray(componentRouteSetting[path][method].handler)) {
@@ -316,17 +319,17 @@ function handleComponentRouteSetting(componentRouteSetting, componentName, defau
     });
 }
 
-function overrideViewRender(application, componentView,componentName) {
+function overrideViewRender(application, componentView, componentName) {
     return function (req, res, next) {
         // Grab reference of render
         let _render = res.render;
         let self = this;
         if (_.isArray(componentView)) {
-            res.render = makeRender(application, componentView,req,res,componentName);
+            res.render = makeRender(application, componentView, req, res, componentName);
         } else {
             Object.keys(componentView).map(function (key) {
                 res[key] = res[key] || {};
-                res[key].render = makeRender(application, componentView[key], req, res,componentName);
+                res[key].render = makeRender(application, componentView[key], req, res, componentName);
             });
             res.render = res[Object.keys(componentView)[0]].render
         }
@@ -334,7 +337,7 @@ function overrideViewRender(application, componentView,componentName) {
     }
 }
 
-function makeRender(application, componentView, req, res,componentName) {
+function makeRender(application, componentView, req, res, componentName) {
     return function (view, options, callback) {
         var done = callback;
         var opts = options || {};
@@ -350,9 +353,9 @@ function makeRender(application, componentView, req, res,componentName) {
 
         // default callback to respond
         done = done || function (err, str) {
-            if (err) return req.next(err);
-            res.send(str);
-        };
+                if (err) return req.next(err);
+                res.send(str);
+            };
 
         if (application._config.viewExtension && view.indexOf(application._config.viewExtension) === -1) {
             view += "." + application._config.viewExtension;
@@ -361,7 +364,7 @@ function makeRender(application, componentView, req, res,componentName) {
         application.viewTemplateEngine.loaders[0].pathsToNames = {};
         application.viewTemplateEngine.loaders[0].cache = {};
         application.viewTemplateEngine.loaders[0].searchPaths = componentView.map(function (obj) {
-            return handleView(obj, application,componentName);
+            return handleView(obj, application, componentName);
         });
 
         application.viewTemplateEngine.render(view, options, done)
@@ -369,8 +372,8 @@ function makeRender(application, componentView, req, res,componentName) {
 }
 
 
-function handleView(obj, application,componentName) {
-    let miniPath = obj.func(application._config,componentName);
+function handleView(obj, application, componentName) {
+    let miniPath = obj.func(application._config, componentName);
     let normalizePath;
     if (miniPath[0] === "/") {
         normalizePath = path.normalize(obj.base + "/" + miniPath);
@@ -380,19 +383,39 @@ function handleView(obj, application,componentName) {
     return normalizePath
 }
 
-function handleAuthenticate(name) {
+function handleAuthenticate(application, name) {
+    let passport  = application.passport;
+    if(_.isString(name)) {
+        //TODO need minify this code
+        if (application.passportSetting[name]) {
+            let callback = application.passportSetting[name].callback;
+            let option = application.passportSetting[name].option || {};
+            if (callback) return passport.authenticate(name, option,callback);
+            return passport.authenticate(name, option);
+        } else  if (application.passportSetting["local"]){
+            let callback = application.passportSetting["local"].callback;
+            let option = application.passportSetting["local"].option || {};
+            if (callback) return passport.authenticate("local", option,callback);
+            return passport.authenticate("local", option);
+        }
+
+    } else if (_.isBoolean(name)) {
+        if(application.passportSetting.checkAuthenticate && _.isFunction(application.passportSetting.checkAuthenticate)) {
+            return application.passportSetting.checkAuthenticate
+        }
+    }
     return function (req, res, next) {
         next()
     }
 }
 
 function handleRole(roles) {
-    return function (req, res, next) {
+    return function handleRoles(req, res, next) {
         next()
     }
 }
 
-function loadingGlobalFunction(self){
+function loadingGlobalFunction(self) {
     global.t = function (key) {
         return self._lang[self._config.language][key] || "undefined";
     }

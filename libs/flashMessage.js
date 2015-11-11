@@ -1,5 +1,7 @@
 'use strict';
 
+let _ = require('lodash');
+
 module.exports = function () {
     let app = this;
 //TODO : testing flash messages;
@@ -8,7 +10,7 @@ module.exports = function () {
             req.session.messages = [];
         //}
 
-        req.flash = {
+        let easyFlash = {
             success: function (content) {
                 req.session.messages.push({
                     type: 'success',
@@ -34,6 +36,7 @@ module.exports = function () {
                 })
             }
         };
+        _.assign(req.flash,easyFlash);
         next()
     });
     return null;
