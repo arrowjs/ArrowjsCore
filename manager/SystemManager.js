@@ -93,6 +93,7 @@ class SystemManager extends events.EventEmitter {
                             paths[componentName].configFile = link;
                             paths[componentName].path = componentFolder + nodeList[0];
                             paths[componentName].strucID = id;
+                            paths[componentName].name = componentName;
                         }
                     });
                 });
@@ -103,20 +104,60 @@ class SystemManager extends events.EventEmitter {
             let id = paths[name].strucID;
             if (id) {
                 components[name] = {};
+                components[name].name = paths[name].name;
                 components[name]._path = paths[name].path;
                 components[name]._configFile = paths[name].configFile;
                 components[name]._strucID = id;
                 components[name]._structure = struc.path[id] || struc;
                 components[name].controllers = {};
-                components[name].routes = Express.Router();
+                components[name].routes = {};
                 components[name].models = {};
                 components[name].views = [];
                 //components[name].helpers = {};
                 let componentConfig = require(paths[name].configFile);
                 _.assign(components[name], componentConfig);
-                Object.keys(components[name]._structure).map(function (attribute) {
-                    let data = actionByAttribute(attribute, components[name], paths[name].path, _app);
+
+                //Logic make order to loading
+                if(components[name]._structure.path) {
+                    let data = actionByAttribute("path", components[name], paths[name].path, _app);
                     _.assign(components[name], data);
+                }
+
+                if(components[name]._structure.extends) {
+                    let data = actionByAttribute("extends", components[name], paths[name].path, _app);
+                    _.assign(components[name], data);
+                }
+
+                if(components[name]._structure.model) {
+                    let data = actionByAttribute("model", components[name], paths[name].path, _app);
+                    _.assign(components[name], data);
+                }
+
+                if(components[name]._structure.helper) {
+                    let data = actionByAttribute("helper", components[name], paths[name].path, _app);
+                    _.assign(components[name], data);
+                }
+
+                if(components[name]._structure.controller) {
+                    let data = actionByAttribute("controller", components[name], paths[name].path, _app);
+                    _.assign(components[name], data);
+                }
+
+                if(components[name]._structure.view) {
+                    let data = actionByAttribute("view", components[name], paths[name].path, _app);
+                    _.assign(components[name], data);
+                }
+
+                if(components[name]._structure.route) {
+                    let data = actionByAttribute("route", components[name], paths[name].path, _app);
+                    _.assign(components[name], data);
+                }
+
+                Object.keys(components[name]._structure).map(function (attribute) {
+                    if(["controller","view","path","helper","model","extends","route"].indexOf(attribute) === -1) {
+                        let data = actionByAttribute(attribute, components[name], paths[name].path, _app);
+                        _.assign(components[name], data);
+                    }
                 });
             }
         });
@@ -136,52 +177,6 @@ class SystemManager extends events.EventEmitter {
             }
             components[key].models.rawQuery = defaultDatabase.query ? defaultDatabase.query.bind(defaultDatabase) : defaultQueryResolve;
         });
-
-        Object.keys(components).map(function (key) {
-            if (_.isArray(components[key].views)) {
-                components[key].render = function (name, ctx, cb) {
-                    if (_app._config.viewExtension && name.indexOf(_app._config.viewExtension) === -1) {
-                        name += "." + _app._config.viewExtension;
-                    }
-                    return new Promise(function (fulfill, reject) {
-                        _app.viewTemplateEngine.loaders[0].pathsToNames = {};
-                        _app.viewTemplateEngine.loaders[0].cache = {};
-                        _app.viewTemplateEngine.loaders[0].searchPaths = components[key].views.map(function (obj) {
-                            return handleView(obj, _app);
-                        });
-                        _app.viewTemplateEngine.render.call(_app.viewTemplateEngine, name, ctx, function (err, html) {
-                            if (err) {
-                                reject(err);
-                            }
-                            fulfill(html);
-                        });
-                    })
-                };
-            } else {
-                Object.keys(components[key].views).map(function (second_key) {
-                    components[key][second_key] = components[key][second_key] || {};
-                    components[key][second_key].render = function (name, ctx, cb) {
-                        if (_app._config.viewExtension && name.indexOf(_app._config.viewExtension) === -1) {
-                            name += "." + _app._config.viewExtension;
-                        }
-                        return new Promise(function (fulfill, reject) {
-                            _app.viewTemplateEngine.loaders[0].pathsToNames = {};
-                            _app.viewTemplateEngine.loaders[0].cache = {};
-                            _app.viewTemplateEngine.loaders[0].searchPaths = components[key][second_key].views.map(function (obj) {
-                                return handleView(obj, _app);
-                            });
-                            _app.viewTemplateEngine.render.call(_app.viewTemplateEngine, name, ctx, function (err, html) {
-                                if (err) {
-                                    reject(err);
-                                }
-                                fulfill(html);
-                            });
-                        })
-                    };
-                })
-            }
-
-        });
         this[privateName] = components;
 
     }
@@ -192,17 +187,6 @@ class SystemManager extends events.EventEmitter {
  * @param application
  * @returns {*}
  */
-function handleView(obj, application) {
-    let miniPath = obj.func(application._config);
-    let normalizePath;
-    if (miniPath[0] === "/") {
-        normalizePath = path.normalize(obj.base + "/" + miniPath);
-    } else {
-        normalizePath = path.normalize(obj.fatherBase + "/" + miniPath)
-    }
-    return normalizePath
-}
-
 
 function getInfo(obj) {
     return JSON.parse(JSON.stringify(obj), function (key, value) {

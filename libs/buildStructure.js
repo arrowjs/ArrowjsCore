@@ -69,6 +69,10 @@ function getDataFromArray(obj, key,level) {
             if(data.path.prefix) {
                 newObj.path[pathKey].prefix = handlePrefix(data.path.prefix);
             }
+
+            if(data.path.authenticate) {
+                newObj.path[pathKey].authenticate = handleAthenticate(data.path.authenticate);
+            }
         } else {
             return null;
         }
@@ -79,7 +83,6 @@ function handlePath(pathInfo, attribute,level) {
     if (pathInfo) {
         let singleton = handleSingleton(pathInfo.singleton);
         let folderName = handleFolder(pathInfo.folder);
-        let depend = handleDepend(pathInfo.depend);
         let fileName = handleFile(pathInfo.file);
         let name = handleName(pathInfo.name);
         switch (attribute) {
@@ -120,17 +123,7 @@ function handlePath(pathInfo, attribute,level) {
                 backInfo = fileName;
             }
             let frontkey = folderInfo || "";
-            let result;
-            if (folderInfo.indexOf("*") > -1) {
-                if (depend) {
-                    result = pathWithConfig(frontkey, backInfo).bind(null, depend);
-                } else {
-                    //TODO: When throw Error we need to log error somewhere. Your code will crash app !
-                    throw Error("'folder' attribute not contain '*' without  'depend' attribute: " + folderInfo);
-                }
-            } else {
-                result = pathWithConfig(frontkey, backInfo).bind(null, null);
-            }
+            let result = pathWithConfig(frontkey, backInfo);
             results.push(result);
         });
         return [results, name];
@@ -164,18 +157,18 @@ function handleName(name) {
     return "";
 }
 
-function handleDepend(depend) {
-    let newDepend = [];
-    if (_.isArray(depend)) {
-        depend.map(function (dependInfo) {
-            newDepend.push(dependInfo)
-        })
-    }
-    if (_.isString(depend)) {
-        newDepend.push(depend);
-    }
-    return depend;
-}
+//function handleDepend(depend) {
+//    let newDepend = [];
+//    if (_.isArray(depend)) {
+//        depend.map(function (dependInfo) {
+//            newDepend.push(dependInfo)
+//        })
+//    }
+//    if (_.isString(depend)) {
+//        newDepend.push(depend);
+//    }
+//    return depend;
+//}
 
 function handleFile(file) {
     if (_.isString(file)) {
@@ -198,30 +191,35 @@ function handlePrefix(prefix) {
     return "";
 }
 
+function handleAthenticate(authenticate){
+    if(_.isBoolean(authenticate)){
+        return authenticate
+    }
+    return false
+}
+
 function pathWithConfig(front, back) {
-    return function makeGlob(key) {
-        let config = arguments[1];
-        let frontArray = front.split("*");
-        let newFront = "";
-        let newArray = [];
-        if (_.isString(key)) {
-            newArray.push(key);
+    return function makeGlob(config,name) {
+        let frontArray = front.split("/");
+        let filterArray = frontArray.filter(function (key) {
+            return key[0] === ":"
+        });
+        let stringPath;
+        if(_.isEmpty(filterArray)) {
+            stringPath = path.normalize(front + back);
         } else {
-            newArray = key;
-        }
-        if (frontArray.length > 1) {
-            frontArray.map(function (frontKey) {
-                let index = frontArray.indexOf(frontKey);
-                if (index < frontArray.length - 1) {
-                    newFront += frontKey + ( config[newArray[index]] || "")
+            frontArray = frontArray.map(function (key) {
+                if (key[0] === ":") {
+                    let configKey = key.slice(1);
+                    return (config[configKey] || "")
                 } else {
-                    newFront += frontKey
+                    return key
                 }
             });
-            newFront = newFront.replace(/\*/g, "");
-            return path.normalize(newFront + back)
-        }
 
-        return path.normalize(front + back);
+            stringPath =  path.normalize(frontArray.join('/') + back)
+        }
+        return stringPath.replace(/\$component/g,name);
+
     }
 }

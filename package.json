@@ -1,11 +1,15 @@
 {
   "name": "arrowjs",
-  "version": "0.3.3",
+  "version": "0.3.6",
   "description": "ArrowJS framework for Node.js",
   "main": "index.js",
   "scripts": {
     "test": "./node_modules/.bin/mocha -u bdd -R spec -t 500 --recursive",
     "watch": "./node_modules/.bin/mocha -u bdd -R spec -t 500 -w"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/arrowjs/ArrowjsCore.git"
   },
   "author": "Techmaster Vietnam <cuong@techmaster.vn>",
   "license": "MIT",
@@ -33,12 +37,8 @@
     "nunjucks": "^2.1.0",
     "passport": "~0.3.0",
     "passport-facebook": "~2.0.0",
-    "passport-github": "~1.0.0",
     "passport-google-oauth": "~0.2.0",
-    "passport-linkedin": "~1.0.0",
     "passport-local": "~1.0.0",
-    "passport-twitter": "~1.0.2",
-    "password-hash": "^1.2.2",
     "pg": "^4.4.3",
     "pg-hstore": "^2.3.2",
     "redis": "^2.3.0",

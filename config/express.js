@@ -58,7 +58,7 @@ module.exports = function (app) {
 
     /** Flash messages */
 
-    app.useFlashMessage();
+    //app.useFlashMessage();
 
     /** Use helmet to secure Express headers */
     app.use(helmet.xframe());

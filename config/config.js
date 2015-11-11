@@ -3,7 +3,6 @@
 module.exports = {
     key: 'site_setting',
     app: {
-        language: 'en_US',
         title: 'ArrowJS',
         description: '',
         keywords: '',

@@ -33,7 +33,6 @@ class ArrowApplication {
         process.env.NODE_ENV = process.env.NODE_ENV || 'development';
 
         let eventEmitter = new EventEmitter();
-        this.modules = [];
         this.beforeFunction = [];
         this._expressApplication = express();
 
@@ -62,18 +61,18 @@ class ArrowApplication {
         //Make redis cache
         let redisConfig = this._config.redis || {};
         let redisFunction = RedisCache(redisConfig);
-        var redisClient,redisSubscriber;
+        var redisClient, redisSubscriber;
 
-        if(redisConfig.type === "fakeredis"){
+        if (redisConfig.type === "fakeredis") {
             redisClient = redisFunction("client");
-            redisSubscriber = redisFunction.bind(null,redisConfig);
+            redisSubscriber = redisFunction.bind(null, redisConfig);
         } else {
             redisClient = redisFunction(redisConfig);
-            redisSubscriber = redisFunction.bind(null,redisConfig);
+            redisSubscriber = redisFunction.bind(null, redisConfig);
         }
 
         this.redisClient = redisClient;
-        this.redisSubscriber =  redisSubscriber;
+        this.redisSubscriber = redisSubscriber;
 
         //TODO: why we assign many properties of ArrowApplication to _expressApplication. It is redundant
         this._expressApplication.arrFolder = this.arrFolder;
@@ -85,7 +84,15 @@ class ArrowApplication {
 
         this._componentList = [];
 
-        this.configManager = new ConfigManager(this,"config");
+        let languagePath = __base + this._config.langPath + '/*.js';
+        this._lang = {};
+        __.getGlobbedFiles(languagePath).forEach(function (file) {
+            this._lang[path.basename(file, '.js')] = require(file);
+        }.bind(this));
+
+        loadingGlobalFunction(this);
+
+        this.configManager = new ConfigManager(this, "config");
         this.configManager.eventHook(eventEmitter);
         this._config = this.configManager._config;
         this.getConfig = this.configManager.getConfig.bind(this.configManager);
@@ -112,7 +119,7 @@ class ArrowApplication {
         Object.keys(this.structure).map(function (managerKey) {
             let key = managerKey;
             let managerName = managerKey + "Manager";
-            this[managerName] = new DefaultManager(this,key);
+            this[managerName] = new DefaultManager(this, key);
             this[managerName].eventHook(eventEmitter);
             this[managerName].loadComponents(key);
             this[key] = this[managerName]["_" + key];
@@ -120,15 +127,6 @@ class ArrowApplication {
         }.bind(this));
     }
 
-    addModule(modulePath) {
-        if (path.isAbsolute(modulePath)) {
-            if (fs.existsFile(modulePath + '/module.js')) {
-                this.modules.push(modulePath);
-            } else {
-                logger.error(modulePath + 'is not Arrow module!');
-            }
-        }
-    }
 
     /**
      * Kick start express application and listen at default port
@@ -149,7 +147,7 @@ class ArrowApplication {
                 setupManager(self);
             })
             .then(function () {
-                loadRouteAndRender(self)
+                loadRouteAndRender(self);
             })
             .then(function (app) {
                 exApp.listen(self._config.port, function () {
@@ -186,23 +184,22 @@ class ArrowApplication {
 //TODO testing render ;
 function loadRouteAndRender(arrow) {
     arrow._componentList.map(function (key) {
+    console.log(arrow[key]);
         Object.keys(arrow[key]).map(function (component) {
             let routeConfig = arrow[key][component]._structure.route;
             if (routeConfig) {
                 Object.keys(routeConfig.path).map(function (second_key) {
+                    let defaultRouteConfig = routeConfig.path[second_key];
                     if (arrow[key][component].routes[second_key]) {
-                        //need testing this problems
-                        if (routeConfig.path[second_key].prefix) {
-                            arrow.use(routeConfig.path[second_key].prefix, overrideViewRender(arrow, arrow[key][component].views,second_key), arrow[key][component].routes[second_key]);
-                        } else {
-                            arrow.use("/", overrideViewRender(arrow, arrow[key][component].views,second_key), arrow[key][component].routes[second_key]);
-                        }
+                        let componentRouteSetting = arrow[key][component].routes[second_key];
+                        let componentName = arrow[key][component].name;
+                        handleComponentRouteSetting(componentRouteSetting, componentName, defaultRouteConfig, arrow, arrow[key][component].views, second_key);
                     } else {
-                        if (routeConfig.path[second_key].prefix) {
-                            arrow.use(routeConfig.path[second_key].prefix, overrideViewRender(arrow, arrow[key][component].views), arrow[key][component].routes);
-                        } else {
-                            arrow.use("/", overrideViewRender(arrow, arrow[key][component].views), arrow[key][component].routes);
-                        }
+
+                        let componentRouteSetting = arrow[key][component].routes;
+                        let componentName = arrow[key][component].name;
+                        //Handle Route Path;
+                        handleComponentRouteSetting(componentRouteSetting, componentName, defaultRouteConfig, arrow, arrow[key][component].views);
                     }
                 });
             }
@@ -255,60 +252,125 @@ function setupManager(app) {
     return null;
 }
 
-function overrideViewRender(application, componentView, key) {
+function handleComponentRouteSetting(componentRouteSetting, componentName, defaultRouteConfig, arrow, view) {
+
+    //Handle Route Path;
+    Object.keys(componentRouteSetting).map(function (path) {
+        let route = express.Router();
+
+        //Check path
+        let routePath = path[0] === '/' ? path : "/" + componentName + "/" + path;
+
+        //handle prefix
+        if(defaultRouteConfig.prefix && defaultRouteConfig.prefix[0] !== "/"){
+            defaultRouteConfig.prefix = "/" + defaultRouteConfig.prefix
+        }
+        let prefix = defaultRouteConfig.prefix || '/';
+
+        let arrayMethod = Object.keys(componentRouteSetting[path]).filter(function (method) {
+            //handle function
+            let routeHandler = componentRouteSetting[path][method].handler;
+            let arrayHandler = [];
+            if (arrayHandler && _.isArray(routeHandler)) {
+                arrayHandler = routeHandler.filter(function (func) {
+                    if (_.isFunction(func)) {
+                        return func
+                    }
+                });
+            } else if (_.isFunction(routeHandler)) {
+                arrayHandler.push(routeHandler)
+            } else {
+                return
+            }
+
+            //Add viewRender
+            if (!_.isEmpty(view)) {
+                arrayHandler.splice(0, 0, overrideViewRender(arrow, view,componentName))
+            }
+
+            //handle Authenticate
+            let authenticate = componentRouteSetting[path][method].authenticate !== undefined ? componentRouteSetting[path][method].authenticate : defaultRouteConfig.authenticate;
+            if (authenticate) {
+                arrayHandler.splice(0, 0, handleAuthenticate(authenticate))
+            }
+
+            //handle role
+            let roles = componentRouteSetting[path][method].role;
+            if (roles) {
+                arrayHandler.splice(0, 0, handleRole(roles))
+            }
+            //Add to route
+            if (method === "param") {
+                if (_.isString(componentRouteSetting[path][method].key) && !_.isArray(componentRouteSetting[path][method].handler)) {
+                    return route.param(componentRouteSetting[path][method].key, componentRouteSetting[path][method].handler);
+                }
+            } else if (method === 'all') {
+                return route.route(routePath)
+                    [method](arrayHandler);
+            } else if (route[method] && ['route', 'use'].indexOf(method) === -1) {
+                return route.route(routePath)
+                    [method](arrayHandler)
+            }
+        });
+        !_.isEmpty(arrayMethod) && arrow.use(prefix, route);
+    });
+}
+
+function overrideViewRender(application, componentView,componentName) {
     return function (req, res, next) {
         // Grab reference of render
         let _render = res.render;
-
-        // Override logic
-        res.render = function (view, options, callback) {
-            var done = callback;
-            var opts = options || {};
-            var req = this.req;
-            var self = this;
-
-
-            // support callback function as second arg
-            if (typeof options === 'function') {
-                done = options;
-                opts = {};
-            }
-
-            // merge res.locals
-            opts._locals = self.locals;
-
-            // default callback to respond
-            done = done || function (err, str) {
-                if (err) return req.next(err);
-                self.send(str);
-            };
-
-            if (application._config.viewExtension && view.indexOf(application._config.viewExtension) === -1) {
-                view += "." + application._config.viewExtension;
-            }
-
-            application.viewTemplateEngine.loaders[0].pathsToNames = {};
-            application.viewTemplateEngine.loaders[0].cache = {};
-            if(key) {
-                application.viewTemplateEngine.loaders[0].searchPaths = componentView[key].map(function (obj) {
-                    return handleView(obj, application);
-                });
-            }else {
-                application.viewTemplateEngine.loaders[0].searchPaths = componentView.map(function (obj) {
-                    return handleView(obj, application);
-                });
-            }
-
-
-            application.viewTemplateEngine.render(view, options, done)
-
-        };
+        let self = this;
+        if (_.isArray(componentView)) {
+            res.render = makeRender(application, componentView,req,res,componentName);
+        } else {
+            Object.keys(componentView).map(function (key) {
+                res[key] = res[key] || {};
+                res[key].render = makeRender(application, componentView[key], req, res,componentName);
+            });
+            res.render = res[Object.keys(componentView)[0]].render
+        }
         next();
     }
 }
 
-function handleView(obj, application) {
-    let miniPath = obj.func(application._config);
+function makeRender(application, componentView, req, res,componentName) {
+    return function (view, options, callback) {
+        var done = callback;
+        var opts = options || {};
+
+        // support callback function as second arg
+        if (typeof options === 'function') {
+            done = options;
+            opts = {};
+        }
+
+        // merge res.locals
+        opts._locals = res.locals || {};
+
+        // default callback to respond
+        done = done || function (err, str) {
+            if (err) return req.next(err);
+            res.send(str);
+        };
+
+        if (application._config.viewExtension && view.indexOf(application._config.viewExtension) === -1) {
+            view += "." + application._config.viewExtension;
+        }
+
+        application.viewTemplateEngine.loaders[0].pathsToNames = {};
+        application.viewTemplateEngine.loaders[0].cache = {};
+        application.viewTemplateEngine.loaders[0].searchPaths = componentView.map(function (obj) {
+            return handleView(obj, application,componentName);
+        });
+
+        application.viewTemplateEngine.render(view, options, done)
+    };
+}
+
+
+function handleView(obj, application,componentName) {
+    let miniPath = obj.func(application._config,componentName);
     let normalizePath;
     if (miniPath[0] === "/") {
         normalizePath = path.normalize(obj.base + "/" + miniPath);
@@ -317,4 +379,23 @@ function handleView(obj, application) {
     }
     return normalizePath
 }
+
+function handleAuthenticate(name) {
+    return function (req, res, next) {
+        next()
+    }
+}
+
+function handleRole(roles) {
+    return function (req, res, next) {
+        next()
+    }
+}
+
+function loadingGlobalFunction(self){
+    global.t = function (key) {
+        return self._lang[self._config.language][key] || "undefined";
+    }
+}
+
 module.exports = ArrowApplication;

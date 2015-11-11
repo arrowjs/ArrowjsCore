@@ -600,6 +600,15 @@ module.exports.getRawConfig = function getRawConfig() {
         fsEx.copySync(path.resolve(__dirname, '..', 'config/session.js'), __base + 'config/session.js');
     }
 
+    //get session.js
+    try {
+        fs.accessSync(__base + 'config/i18n.js');
+        _.assign(conf, require(__base + 'config/i18n'));
+    } catch(err) {
+        fsEx.copySync(path.resolve(__dirname, '..', 'config/i18n.js'), __base + 'config/i18n.js');
+        _.assign(conf, require(__base + 'config/i18n'));
+    }
+
     //get default config
     try {
         fs.accessSync(__base + 'config/env/default.js');

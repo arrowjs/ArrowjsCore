@@ -2,6 +2,7 @@
 
 let getListFile = require('../helper/getListFile');
 let Express = require('express');
+let _ = require('lodash');
 
 module.exports = function routeAttribute(setting, fatherPath, component, application) {
     let files = getListFile(setting, fatherPath, application);
@@ -14,8 +15,9 @@ module.exports = function routeAttribute(setting, fatherPath, component, applica
                         throw Error( link + " : is not a function");
                     } else {
                         try {
-                            routeFunction.call(null, component.routes, component, application)
-                        } catch (err) {
+                            let routeConfig =  routeFunction.call(null, component, application);
+                            _.assign(component.routes,routeConfig);
+                        }catch (err) {
                             throw err
                         }
                     }
@@ -24,16 +26,17 @@ module.exports = function routeAttribute(setting, fatherPath, component, applica
         })
     } else if (files.type === "multi") {
         Object.keys(files).map(function (key) {
+            component.routes[key] = {};
             if (key !== "type") {
-                component.routes[key] = Express.Router();
                 files[key].map(function (link) {
                     let routeFunction = require(link);
                     if (typeof routeFunction !== "function") {
                         throw Error( link + " : is not a function");
                     } else {
                         try {
-                            routeFunction.call(null, component.routes[key], component, application);
-                        } catch (err) {
+                            let routeConfig =  routeFunction.call(null, component, application);
+                            _.assign(component.routes[key],routeConfig);
+                        }catch (err) {
                             throw err
                         }
                     }
