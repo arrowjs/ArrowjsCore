@@ -85,6 +85,14 @@ class ArrowApplication {
 
         this._componentList = [];
 
+        let languagePath = __base + this._config.langPath + '/*.js';
+        this._lang = {};
+        __.getGlobbedFiles(languagePath).forEach(function (file) {
+            this._lang[path.basename(file, '.js')] = require(file);
+        }.bind(this));
+
+        loadingGlobalFunction(this);
+
         this.configManager = new ConfigManager(this, "config");
         this.configManager.eventHook(eventEmitter);
         this._config = this.configManager._config;
@@ -386,6 +394,12 @@ function handleAuthenticate(name) {
 function handleRole(roles) {
     return function (req, res, next) {
         next()
+    }
+}
+
+function loadingGlobalFunction(self){
+    global.t = function (key) {
+        return self._lang[self._config.language][key] || "undefined";
     }
 }
 
