@@ -83,7 +83,6 @@ function handlePath(pathInfo, attribute,level) {
     if (pathInfo) {
         let singleton = handleSingleton(pathInfo.singleton);
         let folderName = handleFolder(pathInfo.folder);
-        let depend = handleDepend(pathInfo.depend);
         let fileName = handleFile(pathInfo.file);
         let name = handleName(pathInfo.name);
         switch (attribute) {
@@ -124,17 +123,7 @@ function handlePath(pathInfo, attribute,level) {
                 backInfo = fileName;
             }
             let frontkey = folderInfo || "";
-            let result;
-            if (folderInfo.indexOf("*") > -1) {
-                if (depend) {
-                    result = pathWithConfig(frontkey, backInfo).bind(null, depend);
-                } else {
-                    //TODO: When throw Error we need to log error somewhere. Your code will crash app !
-                    throw Error("'folder' attribute not contain '*' without  'depend' attribute: " + folderInfo);
-                }
-            } else {
-                result = pathWithConfig(frontkey, backInfo).bind(null, null);
-            }
+            let result = pathWithConfig(frontkey, backInfo);
             results.push(result);
         });
         return [results, name];
@@ -168,18 +157,18 @@ function handleName(name) {
     return "";
 }
 
-function handleDepend(depend) {
-    let newDepend = [];
-    if (_.isArray(depend)) {
-        depend.map(function (dependInfo) {
-            newDepend.push(dependInfo)
-        })
-    }
-    if (_.isString(depend)) {
-        newDepend.push(depend);
-    }
-    return depend;
-}
+//function handleDepend(depend) {
+//    let newDepend = [];
+//    if (_.isArray(depend)) {
+//        depend.map(function (dependInfo) {
+//            newDepend.push(dependInfo)
+//        })
+//    }
+//    if (_.isString(depend)) {
+//        newDepend.push(depend);
+//    }
+//    return depend;
+//}
 
 function handleFile(file) {
     if (_.isString(file)) {
@@ -210,14 +199,14 @@ function handleAthenticate(authenticate){
 }
 
 function pathWithConfig(front, back) {
-    return function makeGlob(key) {
-        let config = arguments[1];
+    return function makeGlob(config,name) {
         let frontArray = front.split("/");
         let filterArray = frontArray.filter(function (key) {
             return key[0] === ":"
         });
+        let stringPath;
         if(_.isEmpty(filterArray)) {
-            return path.normalize(front + back);
+            stringPath = path.normalize(front + back);
         } else {
             frontArray = frontArray.map(function (key) {
                 if (key[0] === ":") {
@@ -227,7 +216,11 @@ function pathWithConfig(front, back) {
                     return key
                 }
             });
-            return path.normalize(frontArray.join('/') + back)
+
+            stringPath =  path.normalize(frontArray.join('/') + back)
         }
+        console.log(stringPath.replace(/\$component/g,name));
+        return stringPath.replace(/\$component/g,name);
+
     }
 }

@@ -265,13 +265,17 @@ function handleComponentRouteSetting(componentRouteSetting, componentName, defau
 
     //Handle Route Path;
     Object.keys(componentRouteSetting).map(function (path) {
+        let route = express.Router();
+
         //Check path
         let routePath = path[0] === '/' ? path : "/" + componentName + "/" + path;
 
         //handle prefix
+        if(defaultRouteConfig.prefix && defaultRouteConfig.prefix[0] !== "/"){
+            defaultRouteConfig.prefix = "/" + defaultRouteConfig.prefix
+        }
         let prefix = defaultRouteConfig.prefix || '/';
 
-        let route = express.Router();
         let arrayMethod = Object.keys(componentRouteSetting[path]).filter(function (method) {
             //handle function
             let routeHandler = componentRouteSetting[path][method].handler;
@@ -290,7 +294,7 @@ function handleComponentRouteSetting(componentRouteSetting, componentName, defau
 
             //Add viewRender
             if (!_.isEmpty(view)) {
-                arrayHandler.splice(0, 0, overrideViewRender(arrow, view))
+                arrayHandler.splice(0, 0, overrideViewRender(arrow, view,componentName))
             }
 
             //handle Authenticate
@@ -321,17 +325,17 @@ function handleComponentRouteSetting(componentRouteSetting, componentName, defau
     });
 }
 
-function overrideViewRender(application, componentView) {
+function overrideViewRender(application, componentView,componentName) {
     return function (req, res, next) {
         // Grab reference of render
         let _render = res.render;
         let self = this;
         if (_.isArray(componentView)) {
-            res.render = makeRender(application, componentView,req,res);
+            res.render = makeRender(application, componentView,req,res,componentName);
         } else {
             Object.keys(componentView).map(function (key) {
                 res[key] = res[key] || {};
-                res[key].render = makeRender(application, componentView[key], req, res);
+                res[key].render = makeRender(application, componentView[key], req, res,componentName);
             });
             res.render = res[Object.keys(componentView)[0]].render
         }
@@ -339,7 +343,7 @@ function overrideViewRender(application, componentView) {
     }
 }
 
-function makeRender(application, componentView, req, res) {
+function makeRender(application, componentView, req, res,componentName) {
     return function (view, options, callback) {
         var done = callback;
         var opts = options || {};
@@ -366,7 +370,7 @@ function makeRender(application, componentView, req, res) {
         application.viewTemplateEngine.loaders[0].pathsToNames = {};
         application.viewTemplateEngine.loaders[0].cache = {};
         application.viewTemplateEngine.loaders[0].searchPaths = componentView.map(function (obj) {
-            return handleView(obj, application);
+            return handleView(obj, application,componentName);
         });
 
         application.viewTemplateEngine.render(view, options, done)
@@ -374,8 +378,8 @@ function makeRender(application, componentView, req, res) {
 }
 
 
-function handleView(obj, application) {
-    let miniPath = obj.func(application._config);
+function handleView(obj, application,componentName) {
+    let miniPath = obj.func(application._config,componentName);
     let normalizePath;
     if (miniPath[0] === "/") {
         normalizePath = path.normalize(obj.base + "/" + miniPath);

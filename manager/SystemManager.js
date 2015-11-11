@@ -138,52 +138,6 @@ class SystemManager extends events.EventEmitter {
             }
             components[key].models.rawQuery = defaultDatabase.query ? defaultDatabase.query.bind(defaultDatabase) : defaultQueryResolve;
         });
-
-        Object.keys(components).map(function (key) {
-            if (_.isArray(components[key].views)) {
-                components[key].render = function (name, ctx, cb) {
-                    if (_app._config.viewExtension && name.indexOf(_app._config.viewExtension) === -1) {
-                        name += "." + _app._config.viewExtension;
-                    }
-                    return new Promise(function (fulfill, reject) {
-                        _app.viewTemplateEngine.loaders[0].pathsToNames = {};
-                        _app.viewTemplateEngine.loaders[0].cache = {};
-                        _app.viewTemplateEngine.loaders[0].searchPaths = components[key].views.map(function (obj) {
-                            return handleView(obj, _app);
-                        });
-                        _app.viewTemplateEngine.render.call(_app.viewTemplateEngine, name, ctx, function (err, html) {
-                            if (err) {
-                                reject(err);
-                            }
-                            fulfill(html);
-                        });
-                    })
-                };
-            } else {
-                Object.keys(components[key].views).map(function (second_key) {
-                    components[key][second_key] = components[key][second_key] || {};
-                    components[key][second_key].render = function (name, ctx, cb) {
-                        if (_app._config.viewExtension && name.indexOf(_app._config.viewExtension) === -1) {
-                            name += "." + _app._config.viewExtension;
-                        }
-                        return new Promise(function (fulfill, reject) {
-                            _app.viewTemplateEngine.loaders[0].pathsToNames = {};
-                            _app.viewTemplateEngine.loaders[0].cache = {};
-                            _app.viewTemplateEngine.loaders[0].searchPaths = components[key][second_key].views.map(function (obj) {
-                                return handleView(obj, _app);
-                            });
-                            _app.viewTemplateEngine.render.call(_app.viewTemplateEngine, name, ctx, function (err, html) {
-                                if (err) {
-                                    reject(err);
-                                }
-                                fulfill(html);
-                            });
-                        })
-                    };
-                })
-            }
-
-        });
         this[privateName] = components;
 
     }
@@ -194,17 +148,6 @@ class SystemManager extends events.EventEmitter {
  * @param application
  * @returns {*}
  */
-function handleView(obj, application) {
-    let miniPath = obj.func(application._config);
-    let normalizePath;
-    if (miniPath[0] === "/") {
-        normalizePath = path.normalize(obj.base + "/" + miniPath);
-    } else {
-        normalizePath = path.normalize(obj.fatherBase + "/" + miniPath)
-    }
-    return normalizePath
-}
-
 
 function getInfo(obj) {
     return JSON.parse(JSON.stringify(obj), function (key, value) {
