@@ -33,7 +33,7 @@ class ArrowApplication {
         process.env.NODE_ENV = process.env.NODE_ENV || 'development';
 
         let eventEmitter = new EventEmitter();
-        this.modules = [];
+        //this.modules = [];
         this.beforeFunction = [];
         this._expressApplication = express();
 
@@ -128,15 +128,15 @@ class ArrowApplication {
         }.bind(this));
     }
 
-    addModule(modulePath) {
-        if (path.isAbsolute(modulePath)) {
-            if (fs.existsFile(modulePath + '/module.js')) {
-                this.modules.push(modulePath);
-            } else {
-                logger.error(modulePath + 'is not Arrow module!');
-            }
-        }
-    }
+    //addModule(modulePath) {
+    //    if (path.isAbsolute(modulePath)) {
+    //        if (fs.existsFile(modulePath + '/module.js')) {
+    //            this.modules.push(modulePath);
+    //        } else {
+    //            logger.error(modulePath + 'is not Arrow module!');
+    //        }
+    //    }
+    //}
 
     /**
      * Kick start express application and listen at default port

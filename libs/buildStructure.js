@@ -219,7 +219,6 @@ function pathWithConfig(front, back) {
 
             stringPath =  path.normalize(frontArray.join('/') + back)
         }
-        console.log(stringPath.replace(/\$component/g,name));
         return stringPath.replace(/\$component/g,name);
 
     }
