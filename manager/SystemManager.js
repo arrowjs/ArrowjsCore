@@ -120,12 +120,12 @@ class SystemManager extends events.EventEmitter {
                 //Logic make order to loading
 
                 if(components[name]._structure.path) {
-                    let data = actionByAttribute(components[name]._structure.model, components[name], paths[name].path, _app);
+                    let data = actionByAttribute(components[name]._structure.path, components[name], paths[name].path, _app);
                     _.assign(components[name], data);
                 }
 
                 if(components[name]._structure.extends) {
-                    let data = actionByAttribute(components[name]._structure.model, components[name], paths[name].path, _app);
+                    let data = actionByAttribute(components[name]._structure.extends, components[name], paths[name].path, _app);
                     _.assign(components[name], data);
                 }
 

@@ -50,7 +50,7 @@ module.exports = function (app) {
 
     /** Express session storage */
 
-    //app.useSession();
+    app.useSession();
 
     /** Use passport session */
 
