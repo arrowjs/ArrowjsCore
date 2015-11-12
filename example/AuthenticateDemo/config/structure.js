@@ -1,8 +1,8 @@
 module.exports = {
-    modules: {
+    features: {
         "path": {
-            "folder": "/modules",
-            "file": "module.js"
+            "folder": "/features",
+            "file": "feature.js"
         },
         extends : {
           system :true
