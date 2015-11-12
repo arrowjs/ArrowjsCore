@@ -63,9 +63,7 @@ module.exports = function (app,config,setting) {
     app.useSession();
 
     /** Use passport session */
-    if (setting && setting.passport) {
-        app.usePassport(app);
-    }
+    app.usePassport(app,setting);
 
     /** Flash messages */
 

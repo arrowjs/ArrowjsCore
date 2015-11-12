@@ -5,19 +5,19 @@ module.exports = function (component,application) {
         "/index" : {
             get : {
                 handler : component.controllers.index,
-                role : 'index'
+                permissions : 'index'
             }
         },
         "/about" : {
             get : {
                 handler : component.controllers.about,
-                role : 'about'
+                permissions : 'about'
             }
         },
         "/post" : {
             get : {
                 handler : component.controllers.post,
-                role : 'post'
+                permissions : 'post'
             }
         },
         "/" : {

@@ -151,7 +151,7 @@ class ArrowApplication {
                 setupManager(self);
             })
             .then(function () {
-                loadRouteAndRender(self,setting);
+                loadRouteAndRender(self, setting);
             })
             .then(function (app) {
                 exApp.listen(self._config.port, function () {
@@ -186,7 +186,7 @@ class ArrowApplication {
  */
 
 //TODO testing render ;
-function loadRouteAndRender(arrow,setting) {
+function loadRouteAndRender(arrow, setting) {
     arrow._componentList.map(function (key) {
         Object.keys(arrow[key]).map(function (component) {
             logger.info("Arrow loaded: '" + key + "' - '" + component + "'");
@@ -197,13 +197,13 @@ function loadRouteAndRender(arrow,setting) {
                     if (arrow[key][component].routes[second_key]) {
                         let componentRouteSetting = arrow[key][component].routes[second_key];
                         let componentName = arrow[key][component].name;
-                        handleComponentRouteSetting(componentRouteSetting, componentName, defaultRouteConfig, arrow, arrow[key][component].views, key,setting);
+                        handleComponentRouteSetting(componentRouteSetting, componentName, defaultRouteConfig, arrow, arrow[key][component].views, key, setting);
                     } else {
 
                         let componentRouteSetting = arrow[key][component].routes;
                         let componentName = arrow[key][component].name;
                         //Handle Route Path;
-                        handleComponentRouteSetting(componentRouteSetting, componentName, defaultRouteConfig, arrow, arrow[key][component].views, key,setting);
+                        handleComponentRouteSetting(componentRouteSetting, componentName, defaultRouteConfig, arrow, arrow[key][component].views, key, setting);
                     }
                 });
             }
@@ -256,7 +256,7 @@ function setupManager(app) {
     return null;
 }
 
-function handleComponentRouteSetting(componentRouteSetting, componentName, defaultRouteConfig, arrow, view, key,setting) {
+function handleComponentRouteSetting(componentRouteSetting, componentName, defaultRouteConfig, arrow, view, key, setting) {
 
     //Handle Route Path;
     Object.keys(componentRouteSetting).map(function (path) {
@@ -294,18 +294,19 @@ function handleComponentRouteSetting(componentRouteSetting, componentName, defau
                 arrayHandler.splice(0, 0, overrideViewRender(arrow, view, componentName))
             }
 
-            //handle Authenticate
-            if(setting && setting.passport) {
-                if (authenticate) {
-                    arrayHandler.splice(0, 0, handleAuthenticate(arrow, authenticate))
-                }
-            }
 
             //handle role
-            if(setting && setting.role) {
-                let role = componentRouteSetting[path][method].role;
-                if (role && !_.isString(authenticate)) {
-                    arrayHandler.splice(0, 0, handleRole(role, componentName, key))
+            if (setting && setting.role) {
+                let permissions = componentRouteSetting[path][method].permissions;
+                if (permissions && !_.isString(authenticate)) {
+                    arrayHandler.splice(0, 0, arrow.passportSetting.handlePermission);
+                    arrayHandler.splice(0, 0, handleRole(arrow, permissions, componentName, key))
+                }
+            }
+            //handle Authenticate
+            if (setting && setting.passport) {
+                if (authenticate) {
+                    arrayHandler.splice(0, 0, handleAuthenticate(arrow, authenticate))
                 }
             }
             //Add to route
@@ -366,9 +367,9 @@ function makeRender(application, componentView, req, res, componentName) {
 
         // default callback to respond
         done = done || function (err, str) {
-            if (err) return req.next(err);
-            res.send(str);
-        };
+                if (err) return req.next(err);
+                res.send(str);
+            };
 
         if (application._config.viewExtension && view.indexOf(application._config.viewExtension) === -1) {
             view += "." + application._config.viewExtension;
@@ -416,23 +417,28 @@ function handleAuthenticate(application, name) {
     }
 }
 
-function handleRole(roles, componentName, key) {
+function handleRole(application, permissions, componentName, key) {
+    let arrayPermissions = [];
+    if (_.isArray(permissions)) {
+        arrayPermissions = permissions
+    } else {
+        arrayPermissions.push(permissions);
+    }
     return function handleRoles(req, res, next) {
-        if (req.session.roles && req.session.roles[key] && req.session.roles[key][componentName]) {
-            let testRole = req.session.roles[key][componentName].filter(function (key) {
-                if (key.name === roles) {
+        req.permissions = req.session.permissions;
+        if (req.permissions && req.permissions[key] && req.permissions[key][componentName]) {
+            let checkedPermission = req.permissions[key][componentName].filter(function (key) {
+                if (arrayPermissions.indexOf(key.name) > -1) {
                     return key
                 }
             });
-            if (_.isEmpty(testRole)) {
-                req.flash.error("You do not have permission to access");
-                res.redirect('/');
-            } else {
-                return next()
+            if (!_.isEmpty(checkedPermission)) {
+                req.hasPermission = true
             }
+        } else {
+            req.hasPermission = false;
         }
-        req.flash.error("You do not have permission to access");
-        res.redirect('/');
+        next();
     }
 }
 
@@ -444,10 +450,10 @@ function loadingGlobalFunction(self) {
 
 
 function addRoles(self) {
-    self.roles = {};
+    self.permissions = {};
     self._componentList.map(function (key) {
         let managerName = key + "Manager";
-        self.roles[key] = self[managerName].getRoles();
+        self.permissions[key] = self[managerName].getPermissions();
     });
 }
 module.exports = ArrowApplication;
