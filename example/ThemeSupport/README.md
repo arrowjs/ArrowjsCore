@@ -84,8 +84,8 @@ front end javascript much better than express.
 From original HTML web template site, we need to change URL of static resources properly so in both development mode
 (without Nginx) and production mode (with Nginx), all static resource will return successfully.
 
-This is typical configuration in nginx.conf to configure Nginx as proxy and serve static resource at folder
-```/YourWebAppPath/public```
+This is typical configuration in nginx.conf to configure Nginx as proxy and serve static resource at folder ```/YourWebAppPath/public```
+
 
 ```
 location / {
