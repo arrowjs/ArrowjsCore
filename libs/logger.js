@@ -28,8 +28,7 @@ const logger = new ( winston.Logger )({
             filename: 'log/exceptions.log'
         }),
         new winston.transports.Console({
-            //prettyPrint: true,
-            level: "error",
+            prettyPrint: true,
             colorize: true,
             silent: false,
             timestamp: false

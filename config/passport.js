@@ -4,7 +4,6 @@
  */
 module.exports = function (passport, application) {
     return {
-        "defaultStrategy": "local",
         serializeUser: function (user, done) {
             done(null, user.id);
         },
