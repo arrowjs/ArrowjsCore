@@ -21,6 +21,13 @@ module.exports = function (passport, application) {
                 res.redirect('/login');
             }
         },
+        handlePermission : function(req,res,next) {
+            if(req.hasPermission) {
+                return  next()
+            }
+            req.flash.error("You do not have permission to access");
+            res.redirect('/');
+        },
         local1: {
             strategy : 'local',
             option: {

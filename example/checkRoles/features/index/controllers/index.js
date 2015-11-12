@@ -14,7 +14,7 @@ module.exports = function (controller,component,application) {
         res.render('role');
     };
     controller.rolePost = function (req,res) {
-        req.session.roles = {
+        req.session.permissions = {
             features : {
                 index :  [{
                     name : "index"
