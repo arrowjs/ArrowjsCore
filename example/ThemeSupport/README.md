@@ -1,8 +1,11 @@
 Theme switching
 ==================
 ## Quick start
-```node server.js``` 
+To start this example
+```node server.js```
+
 Open web browser and navigate to http://localhost:8000
+
 Click on button "Change Theme" to switch between "[clean](http://startbootstrap.com/template-overviews/clean-blog/)" and "[agency](http://startbootstrap.com/template-overviews/agency/)" theme.
 
 Arrowjs.io uses Nunjucks as default template. Theme are set of Nunjucks templates with CSS, JavaScript and images files.
