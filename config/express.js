@@ -5,6 +5,7 @@ let bodyParser = require('body-parser'),
     express = require('express'),
     path = require('path'),
     morgan = require('morgan'),
+    _ = require('lodash'),
     fs = require('fs'),
     helmet = require('helmet'),
     cookieParser = require('cookie-parser'),
@@ -13,19 +14,26 @@ let bodyParser = require('body-parser'),
 let flash = require('connect-flash');
 
 
-module.exports = function (app,setting) {
+module.exports = function (app,config,setting) {
     /**
      * Set folder static resource
      */
-    app.use(express.static(path.resolve(app.arrFolder + app.arrConfig.resource.path), app.arrConfig.resource.option));
+    if (_.isArray(config.resource.path)) {
+        config.resource.path.map(function (link) {
+            app.use(express.static(path.resolve(app.arrFolder + link), config.resource.option));
+        })
+    } else {
+        app.use(express.static(path.resolve(app.arrFolder + config.resource.path), config.resource.option));
+
+    }
 
     /**
      * Set local variable
      */
-    app.locals.title = app.arrConfig.app.title;
-    app.locals.description = app.arrConfig.app.description;
-    app.locals.keywords = app.arrConfig.app.keywords;
-    app.locals.facebookAppId = app.arrConfig.facebook.clientID || "";
+    app.locals.title = config.app.title;
+    app.locals.description = config.app.description;
+    app.locals.keywords = config.app.keywords;
+    app.locals.facebookAppId = config.facebook.clientID || "";
 
     /** Showing stack errors */
     app.set('showStackError', true);
@@ -43,8 +51,8 @@ module.exports = function (app,setting) {
         app.locals.cache = 'memory';
     }
 
-    app.use(bodyParser.urlencoded(app.arrConfig.bodyParser));
-    app.use(bodyParser.json({limit: app.arrConfig.bodyParser.limit}));
+    app.use(bodyParser.urlencoded(config.bodyParser));
+    app.use(bodyParser.json({limit: config.bodyParser.limit}));
     app.use(methodOverride());
 
     /** CookieParser should be above session */

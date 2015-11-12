@@ -7,7 +7,7 @@ module.exports = function (component,application) {
                 handler : component.controllers.loginView
             },
             post : {
-                authenticate: 'local'
+                authenticate: 'local1'
             }
         },
         "/create" : {

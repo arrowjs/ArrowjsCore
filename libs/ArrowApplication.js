@@ -139,7 +139,7 @@ class ArrowApplication {
         /** Init the express application */
         return Promise.resolve()
             .then(function () {
-                expressApp(exApp,setting)
+                expressApp(exApp, exApp.arrConfig ,setting)
             })
             .then(function () {
                 loadPreFunc(exApp, self.beforeFunction)
@@ -213,7 +213,7 @@ function loadRouteAndRender(arrow) {
  * @param app
  * @returns {*}
  */
-function expressApp(app) {
+function expressApp(app,config,setting) {
     return new Promise(function (fulfill, reject) {
         let expressFunction;
         if (fs.existsSync(path.resolve(app.arrFolder + "config/express.js"))) {
@@ -221,7 +221,7 @@ function expressApp(app) {
         } else {
             expressFunction = require("../config/express");
         }
-        fulfill(expressFunction(app));
+        fulfill(expressFunction(app,config,setting));
     });
 }
 
@@ -351,6 +351,10 @@ function makeRender(application, componentView, req, res, componentName) {
         // merge res.locals
         opts._locals = res.locals || {};
 
+        // add some function to view :
+
+        opts.t = t;
+
         // default callback to respond
         done = done || function (err, str) {
                 if (err) return req.next(err);
@@ -367,7 +371,7 @@ function makeRender(application, componentView, req, res, componentName) {
             return handleView(obj, application, componentName);
         });
 
-        application.viewTemplateEngine.render(view, options, done)
+        application.viewTemplateEngine.render(view, opts, done)
     };
 }
 

@@ -4,7 +4,6 @@
  */
 module.exports = function (passport, application) {
     return {
-        "defaultStrategy": "local",
         serializeUser: function (user, done) {
             done(null, user.id);
         },
@@ -22,13 +21,15 @@ module.exports = function (passport, application) {
                 res.redirect('/login');
             }
         },
-        local: {
+        local1: {
+            strategy : 'local',
             option: {
                 successRedirect: '/',
                 failureRedirect: '/login'
-            },
+            }
         },
-        'facebook': {
+        'facebook1': {
+            strategy : 'facebook',
             option: {
                 successRedirect: '/',
                 failureRedirect: 'users/login'
