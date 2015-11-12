@@ -4,30 +4,30 @@ module.exports = {
             "folder": "/modules",
             "file": "module.js"
         },
-        extends : {
-          system :true
-        },
-        model : {
-            path: {
-                folder : "models",
-                file: "*.js"
-            }
-        },
+        //extends : {
+        //  system :true
+        //},
+        //model : {
+        //    path: {
+        //        folder : "models",
+        //        file: "*.js"
+        //    }
+        //},
         controller: {
             path: {
-                folder : "controller",
+                folder : "controllers",
                 file: "*.js"
             }
         },
         view : {
           path : {
-              folder: "view"
+              folder: "views"
           }
         },
         route : {
             path : {
                 file :'route.js'
             }
-        },
+        }
     }
 };

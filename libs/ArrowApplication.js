@@ -185,8 +185,8 @@ class ArrowApplication {
 //TODO testing render ;
 function loadRouteAndRender(arrow) {
     arrow._componentList.map(function (key) {
-    console.log(arrow[key]);
         Object.keys(arrow[key]).map(function (component) {
+            logger.info("Arrow loaded: '" + key + "' - '"  + component + "'");
             let routeConfig = arrow[key][component]._structure.route;
             if (routeConfig) {
                 Object.keys(routeConfig.path).map(function (second_key) {
@@ -339,21 +339,24 @@ function overrideViewRender(application, componentView, componentName) {
 
 function makeRender(application, componentView, req, res, componentName) {
     return function (view, options, callback) {
+        if(req.session.messages) {
+            req.session.messages = []
+        }
         var done = callback;
         var opts = options || {};
+
+        // merge res.locals
+        _.assign(opts,res.locals);
 
         // support callback function as second arg
         if (typeof options === 'function') {
             done = options;
-            opts = {};
+            opts = res.locals || {};
         }
 
-        // merge res.locals
-        opts._locals = res.locals || {};
-
         // add some function to view :
-
         opts.t = t;
+
 
         // default callback to respond
         done = done || function (err, str) {
@@ -371,7 +374,7 @@ function makeRender(application, componentView, req, res, componentName) {
             return handleView(obj, application, componentName);
         });
 
-        application.viewTemplateEngine.render(view, opts, done)
+        application.viewTemplateEngine.render(view, opts, done);
     };
 }
 

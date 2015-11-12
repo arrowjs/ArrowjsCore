@@ -180,6 +180,12 @@ class SystemManager extends events.EventEmitter {
         this[privateName] = components;
 
     }
+
+    getRoles(name) {
+        if (name) {
+            return
+        }
+    }
 }
 /**
  *

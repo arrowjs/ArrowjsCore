@@ -6,9 +6,11 @@ module.exports = function () {
     let app = this;
 //TODO : testing flash messages;
     app.use(function (req, res, next) {
-        //if (!req.session.messages) {
+        res.locals.messages = req.session.messages;
+
+        if (!req.session.messages) {
             req.session.messages = [];
-        //}
+        }
 
         let easyFlash = {
             success: function (content) {
@@ -36,7 +38,7 @@ module.exports = function () {
                 })
             }
         };
-        _.assign(req.flash,easyFlash);
+        _.assign(req.flash, easyFlash);
         next()
     });
     return null;

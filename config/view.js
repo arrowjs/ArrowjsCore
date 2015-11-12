@@ -12,7 +12,7 @@ module.exports = {
         number_item: 20
     },
     theme: "default",
-    viewEngine : {
-
+    addon : {
+        frontendPath : "asadasdasd"
     }
 };
