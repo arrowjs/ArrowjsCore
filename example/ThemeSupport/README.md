@@ -1,16 +1,22 @@
 Theme switching
 ==================
+## Quick start
+```node server.js``` 
+Open web browser and navigate to http://localhost:8000
+Click on button "Change Theme" to switch between "[clean](http://startbootstrap.com/template-overviews/clean-blog/)" and "[agency](http://startbootstrap.com/template-overviews/agency/)" theme.
+
 Arrowjs.io uses Nunjucks as default template. Theme are set of Nunjucks templates with CSS, JavaScript and images files.
+
 
 ## Nunjucks Syntax
 
-[Nunjucks Syntax](https://mozilla.github.io/nunjucks/) is similar syntax with [Twig syntax](http://twig.sensiolabs.org/). Assume that you use WebStorm or PHP Storm to code and highlight by [twig plugin](https://plugins.jetbrains.com/plugin/7303?pr=). If you have pure HTML, CSS,  JavaScript web template, you need to change extension of .html file to .twig so WebStorm or PHPStorm can highlight Nunjucks syntax properly.
+[Nunjucks Syntax](https://mozilla.github.io/nunjucks/) is similar with [Twig syntax](http://twig.sensiolabs.org/). Assume that you use WebStorm or PHP Storm to code and highlight by [twig plugin](https://plugins.jetbrains.com/plugin/7303?pr=). If you have pure HTML, CSS,  JavaScript web template, you need to change extension of .html file to .twig so WebStorm or PHPStorm can highlight Nunjucks syntax properly.
 ![Nunjuck Highlight](help/nunjucksyntax.jpg)
 
 ##Define locations of themes and view templates in configure/structure.js
 
 Theme defines consistent look of web site. While view templates co-exists with controller and routes in feature folder. 
-A feature may have several view templates. Common CMS feature such as blog post will use view templates in theme folder.
+A feature may have several view templates. Common CMS feature such as blog post will use view templates in theme folder. You may buy a commercial theme and change .html to Nunjucks template, add Nunjucks logic then adjust links to static resources.
 
 All themes should be placed in the folder ```/public/themes```.
 In the view section of file ```config/structure.js```,  we define one or more locations of view templates.
