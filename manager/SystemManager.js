@@ -182,9 +182,20 @@ class SystemManager extends events.EventEmitter {
     }
 
     getRoles(name) {
+        let self = this;
+        let privateName = "_" + self.name;
+        let result = {};
         if (name) {
-            return
+            if (self[privateName] && self[privateName][name] && self[privateName][name].roles) {
+                result.name = self[privateName][name].roles || [];
+                return result
+            }
+        } else {
+            Object.keys(self[privateName]).map(function (componentName) {
+                result[componentName] = self[privateName][componentName].roles || [];
+            })
         }
+        return result
     }
 }
 /**

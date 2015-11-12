@@ -1,0 +1,19 @@
+{% extends "layout.twig" %}
+
+{% block content %}
+    <h1>Role</h1>
+    <form action="/" method="post">
+        {% for key,value in roles %}
+            {% for componentName,arrayRole in roles[key] %}
+                {% for role in arrayRole %}
+                <div class="checkbox">
+                    <label for=""><input type="checkbox" value="{{ role.name }}" name="{{ componentName }}[]"/>{{ role.title }}</label>
+                </div>
+                {% endfor %}
+            {% endfor %}
+        {% endfor %}
+
+        <input type="submit"/>
+    </form>
+
+{% endblock %}

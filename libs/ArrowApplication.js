@@ -126,8 +126,8 @@ class ArrowApplication {
             this[key] = this[managerName]["_" + key];
             this._componentList.push(key);
         }.bind(this));
-    }
 
+    }
 
     /**
      * Kick start express application and listen at default port
@@ -139,7 +139,10 @@ class ArrowApplication {
         /** Init the express application */
         return Promise.resolve()
             .then(function () {
-                expressApp(exApp, exApp.arrConfig ,setting)
+                addRoles(self);
+            })
+            .then(function () {
+                expressApp(exApp, exApp.arrConfig, setting)
             })
             .then(function () {
                 loadPreFunc(exApp, self.beforeFunction)
@@ -148,7 +151,7 @@ class ArrowApplication {
                 setupManager(self);
             })
             .then(function () {
-                loadRouteAndRender(self);
+                loadRouteAndRender(self,setting);
             })
             .then(function (app) {
                 exApp.listen(self._config.port, function () {
@@ -183,10 +186,10 @@ class ArrowApplication {
  */
 
 //TODO testing render ;
-function loadRouteAndRender(arrow) {
+function loadRouteAndRender(arrow,setting) {
     arrow._componentList.map(function (key) {
         Object.keys(arrow[key]).map(function (component) {
-            logger.info("Arrow loaded: '" + key + "' - '"  + component + "'");
+            logger.info("Arrow loaded: '" + key + "' - '" + component + "'");
             let routeConfig = arrow[key][component]._structure.route;
             if (routeConfig) {
                 Object.keys(routeConfig.path).map(function (second_key) {
@@ -194,13 +197,13 @@ function loadRouteAndRender(arrow) {
                     if (arrow[key][component].routes[second_key]) {
                         let componentRouteSetting = arrow[key][component].routes[second_key];
                         let componentName = arrow[key][component].name;
-                        handleComponentRouteSetting(componentRouteSetting, componentName, defaultRouteConfig, arrow, arrow[key][component].views, second_key);
+                        handleComponentRouteSetting(componentRouteSetting, componentName, defaultRouteConfig, arrow, arrow[key][component].views, key,setting);
                     } else {
 
                         let componentRouteSetting = arrow[key][component].routes;
                         let componentName = arrow[key][component].name;
                         //Handle Route Path;
-                        handleComponentRouteSetting(componentRouteSetting, componentName, defaultRouteConfig, arrow, arrow[key][component].views);
+                        handleComponentRouteSetting(componentRouteSetting, componentName, defaultRouteConfig, arrow, arrow[key][component].views, key,setting);
                     }
                 });
             }
@@ -213,7 +216,7 @@ function loadRouteAndRender(arrow) {
  * @param app
  * @returns {*}
  */
-function expressApp(app,config,setting) {
+function expressApp(app, config, setting) {
     return new Promise(function (fulfill, reject) {
         let expressFunction;
         if (fs.existsSync(path.resolve(app.arrFolder + "config/express.js"))) {
@@ -221,7 +224,7 @@ function expressApp(app,config,setting) {
         } else {
             expressFunction = require("../config/express");
         }
-        fulfill(expressFunction(app,config,setting));
+        fulfill(expressFunction(app, config, setting));
     });
 }
 
@@ -253,7 +256,7 @@ function setupManager(app) {
     return null;
 }
 
-function handleComponentRouteSetting(componentRouteSetting, componentName, defaultRouteConfig, arrow, view) {
+function handleComponentRouteSetting(componentRouteSetting, componentName, defaultRouteConfig, arrow, view, key,setting) {
 
     //Handle Route Path;
     Object.keys(componentRouteSetting).map(function (path) {
@@ -282,7 +285,7 @@ function handleComponentRouteSetting(componentRouteSetting, componentName, defau
                 });
             } else if (_.isFunction(routeHandler)) {
                 arrayHandler.push(routeHandler)
-            } else if (!_.isString(authenticate)){
+            } else if (!_.isString(authenticate)) {
                 return
             }
 
@@ -292,16 +295,19 @@ function handleComponentRouteSetting(componentRouteSetting, componentName, defau
             }
 
             //handle Authenticate
-            if (authenticate) {
-                arrayHandler.splice(0, 0, handleAuthenticate(arrow, authenticate))
+            if(setting && setting.passport) {
+                if (authenticate) {
+                    arrayHandler.splice(0, 0, handleAuthenticate(arrow, authenticate))
+                }
             }
 
             //handle role
-            let roles = componentRouteSetting[path][method].role;
-            if (roles && !_.isString(authenticate)) {
-                arrayHandler.splice(0, 0, handleRole(roles))
+            if(setting && setting.role) {
+                let role = componentRouteSetting[path][method].role;
+                if (role && !_.isString(authenticate)) {
+                    arrayHandler.splice(0, 0, handleRole(role, componentName, key))
+                }
             }
-
             //Add to route
             if (method === "param") {
                 if (_.isString(componentRouteSetting[path][method].key) && !_.isArray(componentRouteSetting[path][method].handler)) {
@@ -339,14 +345,14 @@ function overrideViewRender(application, componentView, componentName) {
 
 function makeRender(application, componentView, req, res, componentName) {
     return function (view, options, callback) {
-        if(req.session.messages) {
+        if (req.session.messages) {
             req.session.messages = []
         }
         var done = callback;
         var opts = options || {};
 
         // merge res.locals
-        _.assign(opts,res.locals);
+        _.assign(opts, res.locals);
 
         // support callback function as second arg
         if (typeof options === 'function') {
@@ -360,9 +366,9 @@ function makeRender(application, componentView, req, res, componentName) {
 
         // default callback to respond
         done = done || function (err, str) {
-                if (err) return req.next(err);
-                res.send(str);
-            };
+            if (err) return req.next(err);
+            res.send(str);
+        };
 
         if (application._config.viewExtension && view.indexOf(application._config.viewExtension) === -1) {
             view += "." + application._config.viewExtension;
@@ -391,17 +397,17 @@ function handleView(obj, application, componentName) {
 }
 
 function handleAuthenticate(application, name) {
-    let passport  = application.passport;
-    if(_.isString(name)) {
+    let passport = application.passport;
+    if (_.isString(name)) {
         if (application.passportSetting[name]) {
             let strategy = application.passportSetting[name].strategy || name;
             let callback = application.passportSetting[name].callback;
             let option = application.passportSetting[name].option || {};
-            if (callback) return passport.authenticate(strategy, option,callback);
+            if (callback) return passport.authenticate(strategy, option, callback);
             return passport.authenticate(strategy, option);
         }
     } else if (_.isBoolean(name)) {
-        if(application.passportSetting.checkAuthenticate && _.isFunction(application.passportSetting.checkAuthenticate)) {
+        if (application.passportSetting.checkAuthenticate && _.isFunction(application.passportSetting.checkAuthenticate)) {
             return application.passportSetting.checkAuthenticate
         }
     }
@@ -410,9 +416,23 @@ function handleAuthenticate(application, name) {
     }
 }
 
-function handleRole(roles) {
+function handleRole(roles, componentName, key) {
     return function handleRoles(req, res, next) {
-        next()
+        if (req.session.roles && req.session.roles[key] && req.session.roles[key][componentName]) {
+            let testRole = req.session.roles[key][componentName].filter(function (key) {
+                if (key.name === roles) {
+                    return key
+                }
+            });
+            if (_.isEmpty(testRole)) {
+                req.flash.error("You do not have permission to access");
+                res.redirect('/');
+            } else {
+                return next()
+            }
+        }
+        req.flash.error("You do not have permission to access");
+        res.redirect('/');
     }
 }
 
@@ -422,4 +442,12 @@ function loadingGlobalFunction(self) {
     }
 }
 
+
+function addRoles(self) {
+    self.roles = {};
+    self._componentList.map(function (key) {
+        let managerName = key + "Manager";
+        self.roles[key] = self[managerName].getRoles();
+    });
+}
 module.exports = ArrowApplication;
