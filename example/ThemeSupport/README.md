@@ -63,14 +63,7 @@ User may change theme on fly without rebooting Node.js app. Look at method ```co
     }
 ```
 
-## Use Nginx to serve static resources of theme
-
-It is common practice to use Nginx as proxy in front of Node.js web application. Nginx can act as a load balancer to 
-distribute requests to several Node.js web applications behind. Nginx also serves static resource such as images, CSS,
-front end javascript much better than express.
-
-From original HTML web template site, we need to change URL of static resources properly so in both development mode
-(without Nginx) and production mode (with Nginx), all static resource will return successfully.
+## Serve static resources of theme
 
 A view template ```/public/themes/clean/index.twig``` modified from [clean theme](http://startbootstrap.com/template-overviews/clean-blog/) will be rendered when request to front page ```/``` comes.
 index.twig includes header.twig. In header.twig, there are several references to CSS files.
@@ -82,3 +75,32 @@ In ```/config/view.js``` we defined ```resource.path = public``` therefore, we u
 <!-- Custom CSS -->
 <link href="/themes/clean/css/clean-blog.min.css" rel="stylesheet">
 ```
+
+## Use Nginx to serve static resources
+It is common practice to use Nginx as proxy in front of Node.js web application. Nginx can act as a load balancer to 
+distribute requests to several Node.js web applications behind. Nginx also serves static resource such as images, CSS,
+front end javascript much better than express.
+
+From original HTML web template site, we need to change URL of static resources properly so in both development mode
+(without Nginx) and production mode (with Nginx), all static resource will return successfully.
+
+This is typical configuration in nginx.conf to configure Nginx as proxy and serve static resource at folder
+```/YourWebAppPath/public```
+
+```
+location / {
+   proxy_pass http://localhost:8000;
+   proxy_http_version 1.1;
+   proxy_set_header Upgrade $http_upgrade;
+   proxy_set_header Connection 'upgrade';
+   proxy_set_header Host $host;
+   proxy_cache_bypass $http_upgrade;
+}
+
+location ~ ^/(images/|img/|javascript/|js/|css/|stylesheets/|flash/|media/|static/|robots.txt|humans.txt$
+  root /YourWebAppPath/public;
+  access_log off;
+  #expires max;
+}
+```
+For detail see whole nginx.conf at ```/nginx/nginx.conf```
