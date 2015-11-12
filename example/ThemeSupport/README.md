@@ -9,7 +9,8 @@ Arrowjs.io uses Nunjucks as default template. Theme are set of Nunjucks template
 
 ##Define locations of themes and view templates in configure/structure.js
 
-Theme defines consistent look of web site. While view templates associates with custom feature. A feature may have several view templates. Common CMS feature such as blog post will use view templates in theme folder.
+Theme defines consistent look of web site. While view templates co-exists with controller and routes in feature folder. 
+A feature may have several view templates. Common CMS feature such as blog post will use view templates in theme folder.
 
 All themes should be placed in the folder ```/public/themes```.
 In the view section of file ```config/structure.js```,  we define one or more locations of view templates.
@@ -60,4 +61,24 @@ User may change theme on fly without rebooting Node.js app. Look at method ```co
             res.render('change', {theme: application.getConfig('theme')});
         });
     }
+```
+
+## Use Nginx to serve static resources of theme
+
+It is common practice to use Nginx as proxy in front of Node.js web application. Nginx can act as a load balancer to 
+distribute requests to several Node.js web applications behind. Nginx also serves static resource such as images, CSS,
+front end javascript much better than express.
+
+From original HTML web template site, we need to change URL of static resources properly so in both development mode
+(without Nginx) and production mode (with Nginx), all static resource will return successfully.
+
+A view template ```/public/themes/clean/index.twig``` modified from [clean theme](http://startbootstrap.com/template-overviews/clean-blog/) will be rendered when request to front page ```/``` comes.
+index.twig includes header.twig. In header.twig, there are several references to CSS files.
+In ```/config/view.js``` we defined ```resource.path = public``` therefore, we use absolute paths to refer to CSS files:
+
+```
+<link href="/themes/clean/css/bootstrap.min.css" rel="stylesheet">
+
+<!-- Custom CSS -->
+<link href="/themes/clean/css/clean-blog.min.css" rel="stylesheet">
 ```
