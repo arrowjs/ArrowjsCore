@@ -13,7 +13,7 @@ let bodyParser = require('body-parser'),
 let flash = require('connect-flash');
 
 
-module.exports = function (app) {
+module.exports = function (app,setting) {
     /**
      * Set folder static resource
      */
@@ -54,11 +54,10 @@ module.exports = function (app) {
 
     app.useSession();
 
-
-
     /** Use passport session */
-
-    app.usePassport(app);
+    if (setting && setting.passport) {
+        app.usePassport(app);
+    }
 
     /** Flash messages */
 

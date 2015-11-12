@@ -24,11 +24,12 @@ const logger = new ( winston.Logger )({
         })
     ],
     exceptionHandlers: [
-        //new winston.transports.File({
-        //    filename: 'log/exceptions.log'
-        //})
+        new winston.transports.File({
+            filename: 'log/exceptions.log'
+        }),
         new winston.transports.Console({
-            prettyPrint: true,
+            //prettyPrint: true,
+            level: "error",
             colorize: true,
             silent: false,
             timestamp: false

@@ -133,13 +133,13 @@ class ArrowApplication {
      * Kick start express application and listen at default port
      * @returns {Promise.<T>}
      */
-    start() {
+    start(setting) {
         let self = this;
         let exApp = self._expressApplication;
         /** Init the express application */
         return Promise.resolve()
             .then(function () {
-                expressApp(exApp)
+                expressApp(exApp,setting)
             })
             .then(function () {
                 loadPreFunc(exApp, self.beforeFunction)

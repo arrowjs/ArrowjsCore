@@ -8,5 +8,7 @@ let Arrow = require('../..');
 
 let application = new Arrow();
 
-application.start();
+application.start({
+    passport :true
+});
 

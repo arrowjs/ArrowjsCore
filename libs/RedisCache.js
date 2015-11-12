@@ -3,6 +3,7 @@ var redis = require('redis');
 var bluebird = require('bluebird');
 var __ = require('./global_function');
 var fakeRedis = require("fakeredis");
+var logger = require("./logger");
 
 bluebird.promisifyAll(redis.RedisClient.prototype);
 bluebird.promisifyAll(redis.Multi.prototype);
@@ -19,10 +20,10 @@ module.exports = function (config) {
     if (config.type === 'fakeredis') {
         return fakeRedis.createClient;
     }
-    //let client = redis.createClient(config);
-    //client.on('error', function (err) {
-    //    logger.error(err);
-    //});
+    let client = redis.createClient(config);
+    client.on('error', function (err) {
+        logger.error(err.message);
+    });
     return redis.createClient;
 };
 
