@@ -174,12 +174,12 @@ exports.getAllCustomFilter = function (env, viewSetting, app) {
         if (typeof filter === 'object' && !_.isEmpty(filter)) {
             filter.name = filter.name || name;
             if (filter.handler) {
-                filter.handler = filter.handler && filter.handler.bind(app);
+                filter.handler = filter.handler.bind(app);
                 filter.async = filter.async || false;
-                if(filter.type === "sync") {
+                if(filter.async) {
+                    env.addFilter(filter.name,filter.handler,true)
+                } else {
                     env.addFilter(filter.name,filter.handler)
-                } else if (filter.type === "async") {
-                    env.addFilter(filter.name,filter.handler,filter.async)
                 }
             }
         }
