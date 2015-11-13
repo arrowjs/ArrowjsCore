@@ -111,11 +111,35 @@ exports.createNewEnv = function (views, viewEngineConfig) {
     let env;
 
     env = new nunjucks.Environment(new nunjucks.FileSystemLoader(views), viewEngineConfig);
-
-    //env = self.getAllCustomFilter(env);
-    //env = self.getAllGlobalVariable(env);
+    let viewSetting = viewEngineConfig.express.arrConfig;
+    env = self.getAllFunction(env, viewSetting, viewEngineConfig.express._arrApplication);
+    env = self.getAllCustomFilter(env, viewSetting, viewEngineConfig.express._arrApplication);
 
     return env;
+};
+
+/**
+ * Add function to Environment
+ * @param {object} env - Environment to add custom filter
+ * @returns {object}
+ */
+exports.getAllFunction = function (env, viewSetting, app) {
+    let self = this;
+    if (!viewSetting.functionFolder) return env;
+    let functionLinks = self.getGlobbedFiles(path.normalize(__base + viewSetting.functionFolder + "/*.js"));
+    functionLinks.map(function (link) {
+        let viewFunction = require(link);
+        if (typeof viewFunction === 'object' && !_.isEmpty(viewFunction)) {
+            Object.keys(viewFunction).map(function (name) {
+                if (typeof viewFunction[name] === "function") {
+                    env.addGlobal(name, viewFunction[name].bind(app));
+                } else {
+                    env.addGlobal(name, viewFunction[name]);
+                }
+            })
+        }
+    });
+    return env
 };
 
 /**
@@ -123,18 +147,21 @@ exports.createNewEnv = function (views, viewEngineConfig) {
  * @param {object} env - Environment to add custom filter
  * @returns {object}
  */
-exports.getAllCustomFilter = function (env) {
+exports.getAllCustomFilter = function (env, viewSetting, app) {
     let self = this;
-    let custom_filters = self.getOverrideCorePath(__base + 'core/custom_filters/*.js', __base + 'app/custom_filters/*.js', 1);
-    for (let index in custom_filters) {
-        if (custom_filters.hasOwnProperty(index)) {
-            let cf = require(custom_filters[index]);
-            if (typeof cf === 'function') {
-                cf(env);
-            }
+    if (!viewSetting.filterFolder) return env;
+    let filterLinks = self.getGlobbedFiles(path.normalize(__base + viewSetting.filterFolder + "/*.js"));
+    filterLinks.map(function (link) {
+        let filter = require(link);
+        if (typeof filter === 'object' && !_.isEmpty(filter)) {
+            Object.keys(filter).map(function (name) {
+                if (typeof filter[name] === "function") {
+                    env.addFilter(name, filter[name]);
+                }
+            })
         }
-    }
-    return env;
+    });
+    return env
 };
 
 /**

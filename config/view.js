@@ -12,7 +12,7 @@ module.exports = {
         number_item: 20
     },
     theme: "default",
-    addon : {
-        frontendPath : "asadasdasd"
-    }
+    functionFolder : '/extendsView/function',
+    filterFolder : '/extendsView/filter'
+
 };
