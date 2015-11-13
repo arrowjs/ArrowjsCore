@@ -125,8 +125,8 @@ exports.createNewEnv = function (views, viewEngineConfig) {
  */
 exports.getAllFunction = function (env, viewSetting, app) {
     let self = this;
-    if (!viewSetting.functionFolder) return env;
-    let functionLinks = self.getGlobbedFiles(path.normalize(__base + viewSetting.functionFolder + "/*.js"));
+    if (!viewSetting.functionAndVariableFolder) return env;
+    let functionLinks = self.getGlobbedFiles(path.normalize(__base + viewSetting.functionAndVariableFolder + "/*.js"));
     functionLinks.map(function (link) {
         let viewFunction = require(link);
         if (typeof viewFunction === 'object' && !_.isEmpty(viewFunction)) {
