@@ -135,7 +135,7 @@ exports.getAllFunction = function (env, viewSetting, app) {
             env.addGlobal(name, baseFunction[name]);
         }
     });
-    
+
     functionLinks.map(function (link) {
         let viewFunction = require(link);
         if (typeof viewFunction === 'object' && !_.isEmpty(viewFunction)) {
@@ -166,14 +166,22 @@ exports.getAllCustomFilter = function (env, viewSetting, app) {
             env.addFilter(name, baseFilter[name]);
         }
     });
+
     filterLinks.map(function (link) {
+        let array = link.split('/');
+        let name = array[array.length - 1].replace(".js","");
         let filter = require(link);
         if (typeof filter === 'object' && !_.isEmpty(filter)) {
-            Object.keys(filter).map(function (name) {
-                if (typeof filter[name] === "function") {
-                    env.addFilter(name, filter[name]);
+            filter.name = filter.name || name;
+            if (filter.handler) {
+                filter.handler = filter.handler && filter.handler.bind(app);
+                filter.type = filter.type || "sync";
+                if(filter.type === "sync") {
+                    env.addFilter(filter.name,filter.handler)
+                } else if (filter.type === "async") {
+                    env.addFilter(filter.name,filter.handler,true)
                 }
-            })
+            }
         }
     });
     return env

@@ -117,6 +117,8 @@ class ArrowApplication {
             //}
         });
         this.viewTemplateEngine = componentsRender;
+        this._arrRoutes = {};
+        
         Object.keys(this.structure).map(function (managerKey) {
             let key = managerKey;
             let managerName = managerKey + "Manager";
@@ -260,10 +262,10 @@ function handleComponentRouteSetting(componentRouteSetting, componentName, defau
 
     //Handle Route Path;
     let route = express.Router();
-    Object.keys(componentRouteSetting).map(function (path) {
+    Object.keys(componentRouteSetting).map(function (path_name) {
 
-        //Check path
-        let routePath = path[0] === '/' ? path : "/" + componentName + "/" + path;
+        //Check path_name
+        let routePath = path_name[0] === '/' ? path_name : "/" + componentName + "/" + path_name;
 
         //handle prefix
         if (defaultRouteConfig.prefix && defaultRouteConfig.prefix[0] !== "/") {
@@ -271,10 +273,14 @@ function handleComponentRouteSetting(componentRouteSetting, componentName, defau
         }
         let prefix = defaultRouteConfig.prefix || '/';
 
-        let arrayMethod = Object.keys(componentRouteSetting[path]).filter(function (method) {
+        let arrayMethod = Object.keys(componentRouteSetting[path_name]).filter(function (method) {
+            if(componentRouteSetting[path_name][method].name) { 
+                arrow._arrRoutes[componentRouteSetting[path_name][method].name] = path.normalize(prefix + routePath);
+            }
+            
             //handle function
-            let routeHandler = componentRouteSetting[path][method].handler;
-            let authenticate = componentRouteSetting[path][method].authenticate !== undefined ? componentRouteSetting[path][method].authenticate : defaultRouteConfig.authenticate;
+            let routeHandler = componentRouteSetting[path_name][method].handler;
+            let authenticate = componentRouteSetting[path_name][method].authenticate !== undefined ? componentRouteSetting[path_name][method].authenticate : defaultRouteConfig.authenticate;
 
             let arrayHandler = [];
             if (arrayHandler && _.isArray(routeHandler)) {
@@ -297,7 +303,7 @@ function handleComponentRouteSetting(componentRouteSetting, componentName, defau
 
             //handle role
             if (setting && setting.role) {
-                let permissions = componentRouteSetting[path][method].permissions;
+                let permissions = componentRouteSetting[path_name][method].permissions;
                 if (permissions && !_.isString(authenticate)) {
                     arrayHandler.splice(0, 0, arrow.passportSetting.handlePermission);
                     arrayHandler.splice(0, 0, handleRole(arrow, permissions, componentName, key))
@@ -309,10 +315,11 @@ function handleComponentRouteSetting(componentRouteSetting, componentName, defau
                     arrayHandler.splice(0, 0, handleAuthenticate(arrow, authenticate))
                 }
             }
+            
             //Add to route
             if (method === "param") {
-                if (_.isString(componentRouteSetting[path][method].key) && !_.isArray(componentRouteSetting[path][method].handler)) {
-                    return route.param(componentRouteSetting[path][method].key, componentRouteSetting[path][method].handler);
+                if (_.isString(componentRouteSetting[path_name][method].key) && !_.isArray(componentRouteSetting[path_name][method].handler)) {
+                    return route.param(componentRouteSetting[path_name][method].key, componentRouteSetting[path_name][method].handler);
                 }
             } else if (method === 'all') {
                 return route.route(routePath)
