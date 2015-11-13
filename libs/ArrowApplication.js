@@ -361,9 +361,6 @@ function makeRender(application, componentView, req, res, componentName) {
             opts = res.locals || {};
         }
 
-        // add some function to view :
-        opts.t = t;
-
 
         // default callback to respond
         done = done || function (err, str) {

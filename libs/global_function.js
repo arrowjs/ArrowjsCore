@@ -127,6 +127,15 @@ exports.getAllFunction = function (env, viewSetting, app) {
     let self = this;
     if (!viewSetting.functionAndVariableFolder) return env;
     let functionLinks = self.getGlobbedFiles(path.normalize(__base + viewSetting.functionAndVariableFolder + "/*.js"));
+    let baseFunction = require(path.resolve(__dirname, '..', 'templateExtends/function.js'));
+    Object.keys(baseFunction).map(function (name) {
+        if (typeof baseFunction[name] === "function") {
+            env.addGlobal(name, baseFunction[name].bind(app));
+        } else {
+            env.addGlobal(name, baseFunction[name]);
+        }
+    });
+    
     functionLinks.map(function (link) {
         let viewFunction = require(link);
         if (typeof viewFunction === 'object' && !_.isEmpty(viewFunction)) {
@@ -151,6 +160,12 @@ exports.getAllCustomFilter = function (env, viewSetting, app) {
     let self = this;
     if (!viewSetting.filterFolder) return env;
     let filterLinks = self.getGlobbedFiles(path.normalize(__base + viewSetting.filterFolder + "/*.js"));
+    let baseFilter = require(path.resolve(__dirname, '..', 'templateExtends/filter.js'));
+    Object.keys(baseFilter).map(function (name) {
+        if (typeof baseFilter[name] === "function") {
+            env.addFilter(name, baseFilter[name]);
+        }
+    });
     filterLinks.map(function (link) {
         let filter = require(link);
         if (typeof filter === 'object' && !_.isEmpty(filter)) {
