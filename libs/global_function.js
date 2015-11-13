@@ -175,11 +175,11 @@ exports.getAllCustomFilter = function (env, viewSetting, app) {
             filter.name = filter.name || name;
             if (filter.handler) {
                 filter.handler = filter.handler && filter.handler.bind(app);
-                filter.type = filter.type || "sync";
+                filter.async = filter.async || false;
                 if(filter.type === "sync") {
                     env.addFilter(filter.name,filter.handler)
                 } else if (filter.type === "async") {
-                    env.addFilter(filter.name,filter.handler,true)
+                    env.addFilter(filter.name,filter.handler,filter.async)
                 }
             }
         }
