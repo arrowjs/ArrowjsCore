@@ -259,8 +259,8 @@ function setupManager(app) {
 function handleComponentRouteSetting(componentRouteSetting, componentName, defaultRouteConfig, arrow, view, key, setting) {
 
     //Handle Route Path;
+    let route = express.Router();
     Object.keys(componentRouteSetting).map(function (path) {
-        let route = express.Router();
 
         //Check path
         let routePath = path[0] === '/' ? path : "/" + componentName + "/" + path;

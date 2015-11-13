@@ -1,6 +1,6 @@
 'use strict';
 
-let  _ = require('lodash'),
+let _ = require('lodash'),
     glob = require('glob'),
     fs = require('fs'),
     util = require('util'),
@@ -106,11 +106,11 @@ exports.getWidget = function (alias) {
  * @param {array} views - List of loaders
  * @returns {object}
  */
-exports.createNewEnv = function (views,viewEngineConfig) {
+exports.createNewEnv = function (views, viewEngineConfig) {
     let self = this;
     let env;
 
-    env = new nunjucks.Environment(new nunjucks.FileSystemLoader(views),viewEngineConfig);
+    env = new nunjucks.Environment(new nunjucks.FileSystemLoader(views), viewEngineConfig);
 
     //env = self.getAllCustomFilter(env);
     //env = self.getAllGlobalVariable(env);
@@ -129,7 +129,7 @@ exports.getAllCustomFilter = function (env) {
     for (let index in custom_filters) {
         if (custom_filters.hasOwnProperty(index)) {
             let cf = require(custom_filters[index]);
-            if(typeof cf === 'function') {
+            if (typeof cf === 'function') {
                 cf(env);
             }
         }
@@ -508,7 +508,7 @@ module.exports.getOverrideCorePath = function (corePath, appPath, checkIndex) {
     return paths;
 };
 
-module.exports.getOverrideArrayPath = function(arrayPath) {
+module.exports.getOverrideArrayPath = function (arrayPath) {
 
 
 };
@@ -561,7 +561,7 @@ module.exports.getRawConfig = function getRawConfig() {
     try {
         fs.accessSync(__base + 'config/config.js');
         _.assign(conf, require(__base + 'config/config'));
-    } catch(err) {
+    } catch (err) {
         fsEx.copySync(path.resolve(__dirname, '..', 'config/config.js'), __base + 'config/config.js');
         _.assign(conf, require(__base + 'config/config'));
     }
@@ -570,7 +570,7 @@ module.exports.getRawConfig = function getRawConfig() {
     try {
         fs.accessSync(__base + 'config/mail.js');
         _.assign(conf, require(__base + 'config/mail'));
-    } catch(err) {
+    } catch (err) {
         fsEx.copySync(path.resolve(__dirname, '..', 'config/mail.js'), __base + 'config/mail.js');
         _.assign(conf, require(__base + 'config/mail'));
     }
@@ -579,7 +579,7 @@ module.exports.getRawConfig = function getRawConfig() {
     try {
         fs.accessSync(__base + 'config/redis.js');
         _.assign(conf, require(__base + 'config/redis'));
-    } catch(err) {
+    } catch (err) {
         fsEx.copySync(path.resolve(__dirname, '..', 'config/redis.js'), __base + 'config/redis.js');
         _.assign(conf, require(__base + 'config/redis'));
     }
@@ -588,7 +588,7 @@ module.exports.getRawConfig = function getRawConfig() {
     try {
         fs.accessSync(__base + 'config/view.js');
         _.assign(conf, require(__base + 'config/view'));
-    } catch(err) {
+    } catch (err) {
         fsEx.copySync(path.resolve(__dirname, '..', 'config/view.js'), __base + 'config/view.js');
         _.assign(conf, require(__base + 'config/view'));
     }
@@ -596,7 +596,7 @@ module.exports.getRawConfig = function getRawConfig() {
     //get session.js
     try {
         fs.accessSync(__base + 'config/session.js');
-    } catch(err) {
+    } catch (err) {
         fsEx.copySync(path.resolve(__dirname, '..', 'config/session.js'), __base + 'config/session.js');
     }
 
@@ -604,7 +604,7 @@ module.exports.getRawConfig = function getRawConfig() {
     try {
         fs.accessSync(__base + 'config/i18n.js');
         _.assign(conf, require(__base + 'config/i18n'));
-    } catch(err) {
+    } catch (err) {
         fsEx.copySync(path.resolve(__dirname, '..', 'config/i18n.js'), __base + 'config/i18n.js');
         _.assign(conf, require(__base + 'config/i18n'));
     }
@@ -612,7 +612,7 @@ module.exports.getRawConfig = function getRawConfig() {
     //get passport.js
     try {
         fs.accessSync(__base + 'config/passport.js');
-    } catch(err) {
+    } catch (err) {
         fsEx.copySync(path.resolve(__dirname, '..', 'config/passport.js'), __base + 'config/passport.js');
     }
 
@@ -620,19 +620,19 @@ module.exports.getRawConfig = function getRawConfig() {
     this.createDirectory('config/strategies');
     try {
         fs.accessSync(__base + 'config/strategies/local.js');
-    } catch(err) {
+    } catch (err) {
         fsEx.copySync(path.resolve(__dirname, '..', 'config/strategies/local.js'), __base + 'config/strategies/local.js');
     }
 
     try {
         fs.accessSync(__base + 'config/strategies/google.js');
-    } catch(err) {
+    } catch (err) {
         fsEx.copySync(path.resolve(__dirname, '..', 'config/strategies/google.js'), __base + 'config/strategies/google.js');
     }
 
     try {
         fs.accessSync(__base + 'config/strategies/facebook.js');
-    } catch(err) {
+    } catch (err) {
         fsEx.copySync(path.resolve(__dirname, '..', 'config/strategies/facebook.js'), __base + 'config/strategies/facebook.js');
     }
 
@@ -640,7 +640,7 @@ module.exports.getRawConfig = function getRawConfig() {
     try {
         fs.accessSync(__base + 'config/env/default.js');
         _.assign(conf, require(__base + 'config/env/default'));
-    } catch(err) {
+    } catch (err) {
         fsEx.copySync(path.resolve(__dirname, '..', 'config/env/default.js'), __base + 'config/env/default.js');
         _.assign(conf, require(__base + 'config/env/default'));
     }
@@ -650,7 +650,7 @@ module.exports.getRawConfig = function getRawConfig() {
     try {
         fs.accessSync(__base + 'config/env/' + env + ".js");
         _.assign(conf, require(__base + 'config/env/' + env));
-    } catch(err) {
+    } catch (err) {
         fsEx.copySync(path.resolve(__dirname, '..', 'config/env/development.js'), __base + 'config/env/' + env + '.js');
         _.assign(conf, require(__base + 'config/env/' + env));
     }
@@ -665,9 +665,14 @@ module.exports.getStructure = function getStructure() {
     try {
         fs.accessSync(__base + 'config/structure.js');
         _.assign(structure, require(__base + 'config/structure'));
-    } catch(err) {
-        fsEx.copySync(path.resolve(__dirname, '..', 'config/structure.js'), __base + 'config/structure.js');
-        _.assign(structure, require(__base + 'config/structure'));
+    } catch (err) {
+        if (err.code === 'ENOENT') {
+            fsEx.copySync(path.resolve(__dirname, '..', 'config/structure.js'), __base + 'config/structure.js');
+            _.assign(structure, require(__base + 'config/structure'));
+        } else {
+            throw err
+        }
+
     }
     return structure;
 };
