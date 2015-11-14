@@ -32,6 +32,8 @@ class ArrowApplication {
 
         let eventEmitter = new EventEmitter();
         this.beforeFunction = [];
+        this.beforeAuthenticate = [];
+        this.afterAuthenticate = [];
         this._expressApplication = express();
 
         //Move all functions of express to ArrowApplication
@@ -152,6 +154,20 @@ class ArrowApplication {
     before(func) {
         if (typeof func == "function") {
             this.beforeFunction.push(func);
+        }
+    }
+
+    beforeAuthenticate(func) {
+        let self = this;
+        if (typeof func == "function") {
+            self.beforeAuthenticate.push(func.bind(self));
+        }
+    }
+
+    afterAuthenticate(func) {
+        let self = this;
+        if (typeof func == "function") {
+            self.afterAuthenticate.push(func.bind(self));
         }
     }
 }
@@ -288,11 +304,26 @@ function handleComponentRouteSetting(arrow, componentRouteSetting, defaultRouteC
                     arrayHandler.splice(0, 0, handleRole(arrow, permissions, componentName, key))
                 }
             }
+
+            //add middleware after authenticate;
+            if(!_.isEmpty(arrow.afterAuthenticate)) {
+                arrow.afterAuthenticate.map(function (func) {
+                    arrayHandler.splice(0, 0,func)
+                })
+            }
+
             //handle Authenticate
             if (setting && setting.passport) {
                 if (authenticate) {
                     arrayHandler.splice(0, 0, handleAuthenticate(arrow, authenticate))
                 }
+            }
+
+            //add middleware before authenticate;
+            if(!_.isEmpty(arrow.beforeAuthenticate)) {
+                arrow.beforeAuthenticate.map(function (func) {
+                    arrayHandler.splice(0, 0,func)
+                })
             }
 
             //Add to route
