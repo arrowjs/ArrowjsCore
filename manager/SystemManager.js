@@ -157,7 +157,7 @@ class SystemManager extends events.EventEmitter {
                 }
 
                 Object.keys(components[name]._structure).map(function (attribute) {
-                    if (["controller", "view", "path", "helper", "model", "extends", "route"].indexOf(attribute) === -1) {
+                    if (["controller", "view", "path", "action", "model", "extends", "route"].indexOf(attribute) === -1) {
                         let data = actionByAttribute(attribute, components[name], paths[name].path, _app);
                         _.assign(components[name], data);
                     }

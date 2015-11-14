@@ -424,9 +424,30 @@ function handleRole(application, permissions, componentName, key) {
 }
 
 function loadingGlobalFunction(self) {
-    global.t = function (key) {
-        return self._lang[self._config.language][key] || "undefined";
-    }
+    global.ArrowHelper = {};
+    __.getGlobbedFiles(path.resolve(__dirname,"..","helpers/*.js")).map(function (link) {
+       let arrowObj = require(link);
+        Object.keys(arrowObj).map(function (key) {
+            if(_.isFunction(arrowObj[key])) {
+                ArrowHelper[key] =  arrowObj[key].bind(self)
+            } else {
+                ArrowHelper[key] =  arrowObj[key]
+            }
+        })
+    });
+    __.getGlobbedFiles(path.normalize(__base + self._config.ArrowHelper + "*.js")).map(function (link) {
+        let arrowObj = require(link);
+        Object.keys(arrowObj).map(function (key) {
+            if(_.isFunction(arrowObj[key])) {
+                ArrowHelper[key] =  arrowObj[key].bind(self)
+            } else {
+                ArrowHelper[key] =  arrowObj[key]
+            }
+        })
+    });
+
+    //Add some support function
+    global.t = ArrowHelper.t
 }
 
 
