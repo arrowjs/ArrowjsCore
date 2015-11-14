@@ -225,17 +225,29 @@ function handleView(obj, application, componentName) {
 
 
 function makeRender(application, componentView, componentName) {
-    return function (view, options, callback) {
+    return function (req,res, view, options, callback) {
 
+        if (req.session.messages) {
+            req.session.messages = []
+        }
         var done = callback;
         var opts = options || {};
 
+        // merge res.locals
+        _.assign(opts, res.locals);
 
         // support callback function as second arg
         if (typeof options === 'function') {
             done = options;
-            opts = {};
+            opts = res.locals || {};
         }
+
+
+        // default callback to respond
+        done = done || function (err, str) {
+            if (err) return req.next(err);
+            res.send(str);
+        };
 
 
         if (application._config.viewExtension && view.indexOf(application._config.viewExtension) === -1) {
