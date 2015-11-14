@@ -166,8 +166,16 @@ exports.getAllFunction = function (env, viewSetting, app) {
             if (typeof func === 'object' && !_.isEmpty(func)) {
                 func.name = func.name || name;
                 if (func.handler) {
+                    func.async = func.async || false;
                     func.handler = func.handler.bind(app);
-                    env.addGlobal(func.name, func.handler)
+                    if(func.async) {
+                        env.addGlobal(func.name, function () {
+                            var argsAsArray = Array.prototype.slice.call(arguments);
+                            return func.handler.bind.apply(func.handler, [null].concat(argsAsArray))
+                        })
+                    } else {
+                        env.addGlobal(func.name, func.handler);
+                    }
                 }
             }
         }
@@ -184,8 +192,16 @@ exports.getAllFunction = function (env, viewSetting, app) {
             if (typeof func === 'object' && !_.isEmpty(func)) {
                 func.name = func.name || name;
                 if (func.handler) {
+                    func.async = func.async || false;
                     func.handler = func.handler.bind(app);
-                    env.addGlobal(func.name, func.handler)
+                    if(func.async) {
+                        env.addGlobal(func.name, function () {
+                            var argsAsArray = Array.prototype.slice.call(arguments);
+                            return func.handler.bind.apply(func.handler, [null].concat(argsAsArray))
+                        })
+                    } else {
+                        env.addGlobal(func.name, func.handler);
+                    }
                 }
             }
         }

@@ -118,43 +118,43 @@ class SystemManager extends events.EventEmitter {
                 _.assign(components[name], componentConfig);
 
                 //Logic make order to loading
-                if(components[name]._structure.path) {
+                if (components[name]._structure.path) {
                     let data = actionByAttribute("path", components[name], paths[name].path, _app);
                     _.assign(components[name], data);
                 }
 
-                if(components[name]._structure.extends) {
+                if (components[name]._structure.extends) {
                     let data = actionByAttribute("extends", components[name], paths[name].path, _app);
                     _.assign(components[name], data);
                 }
 
-                if(components[name]._structure.model) {
+                if (components[name]._structure.model) {
                     let data = actionByAttribute("model", components[name], paths[name].path, _app);
                     _.assign(components[name], data);
                 }
 
-                if(components[name]._structure.helper) {
+                if (components[name]._structure.helper) {
                     let data = actionByAttribute("helper", components[name], paths[name].path, _app);
                     _.assign(components[name], data);
                 }
 
-                if(components[name]._structure.controller) {
+                if (components[name]._structure.controller) {
                     let data = actionByAttribute("controller", components[name], paths[name].path, _app);
                     _.assign(components[name], data);
                 }
 
-                if(components[name]._structure.view) {
+                if (components[name]._structure.view) {
                     let data = actionByAttribute("view", components[name], paths[name].path, _app);
                     _.assign(components[name], data);
                 }
 
-                if(components[name]._structure.route) {
+                if (components[name]._structure.route) {
                     let data = actionByAttribute("route", components[name], paths[name].path, _app);
                     _.assign(components[name], data);
                 }
 
                 Object.keys(components[name]._structure).map(function (attribute) {
-                    if(["controller","view","path","helper","model","extends","route"].indexOf(attribute) === -1) {
+                    if (["controller", "view", "path", "helper", "model", "extends", "route"].indexOf(attribute) === -1) {
                         let data = actionByAttribute(attribute, components[name], paths[name].path, _app);
                         _.assign(components[name], data);
                     }
@@ -177,9 +177,56 @@ class SystemManager extends events.EventEmitter {
             }
             components[key].models.rawQuery = defaultDatabase.query ? defaultDatabase.query.bind(defaultDatabase) : defaultQueryResolve;
         });
+
+        Object.keys(components).map(function (key) {
+            if (_.isArray(components[key].views)) {
+                components[key].render = function (name, ctx, cb) {
+                    if (_app._config.viewExtension && name.indexOf(_app._config.viewExtension) === -1) {
+                        name += "." + _app._config.viewExtension;
+                    }
+                    return new Promise(function (fulfill, reject) {
+                        _app.viewTemplateEngine.loaders[0].pathsToNames = {};
+                        _app.viewTemplateEngine.loaders[0].cache = {};
+                        _app.viewTemplateEngine.loaders[0].searchPaths = components[key].views.map(function (obj) {
+                            return handleView(obj, _app);
+                        });
+                        _app.viewTemplateEngine.render.call(_app.viewTemplateEngine, name, ctx, function (err, html) {
+                            if (err) {
+                                reject(err);
+                            }
+                            fulfill(html);
+                        });
+                    })
+                };
+            } else {
+                Object.keys(components[key].views).map(function (second_key) {
+                    components[key][second_key] = components[key][second_key] || {};
+                    components[key][second_key].render = function (name, ctx, cb) {
+                        if (_app._config.viewExtension && name.indexOf(_app._config.viewExtension) === -1) {
+                            name += "." + _app._config.viewExtension;
+                        }
+                        return new Promise(function (fulfill, reject) {
+                            _app.viewTemplateEngine.loaders[0].pathsToNames = {};
+                            _app.viewTemplateEngine.loaders[0].cache = {};
+                            _app.viewTemplateEngine.loaders[0].searchPaths = components[key][second_key].views.map(function (obj) {
+                                return handleView(obj, _app);
+                            });
+                            _app.viewTemplateEngine.render.call(_app.viewTemplateEngine, name, ctx, function (err, html) {
+                                if (err) {
+                                    reject(err);
+                                }
+                                fulfill(html);
+                            });
+                        })
+                    };
+                })
+            }
+        });
+
         this[privateName] = components;
 
     }
+
 
     getPermissions(name) {
         let self = this;
@@ -198,6 +245,18 @@ class SystemManager extends events.EventEmitter {
         return result
     }
 }
+
+function handleView(obj, application) {
+    let miniPath = obj.func(application._config);
+    let normalizePath;
+    if (miniPath[0] === "/") {
+        normalizePath = path.normalize(obj.base + "/" + miniPath);
+    } else {
+        normalizePath = path.normalize(obj.fatherBase + "/" + miniPath)
+    }
+    return normalizePath
+}
+
 /**
  *
  * @param obj
