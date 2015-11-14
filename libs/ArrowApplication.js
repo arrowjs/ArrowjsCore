@@ -326,7 +326,7 @@ function overrideViewRender(application, componentView, componentName,component)
         } else {
             Object.keys(componentView).map(function (key) {
                 res[key] = res[key] || {};
-                res[key].render = makeRender(application, componentView[key], req, res, componentName,component);
+                res[key].render = makeRender(application, componentView[key], req, res, componentName,component[key]);
             });
             res.render = res[Object.keys(componentView)[0]].render
         }
