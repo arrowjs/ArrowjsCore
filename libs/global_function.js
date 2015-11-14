@@ -115,6 +115,7 @@ exports.createNewEnv = function (views, viewEngineConfig) {
     env = self.getAllFunction(env, viewSetting, viewEngineConfig.express._arrApplication);
     env = self.getAllCustomFilter(env, viewSetting, viewEngineConfig.express._arrApplication);
     env = self.getAllVariable(env, viewSetting, viewEngineConfig.express._arrApplication);
+    env = self.getAllExtensions(env, viewSetting, viewEngineConfig.express._arrApplication);
 
     return env;
 };
@@ -147,6 +148,27 @@ exports.getAllVariable = function (env, viewSetting, app) {
     return env
 };
 
+
+/**
+ * Add function to Environment
+ * @param {object} env - Environment to add custom filter
+ * @returns {object}
+ */
+
+exports.getAllExtensions = function (env, viewSetting, app) {
+    var self = this;
+    let basePath = path.resolve(__dirname, '..', 'templateExtends/Extensions');
+    let baseFunctionLinks = self.getGlobbedFiles(path.normalize(basePath + "/*.js"));
+
+
+    baseFunctionLinks.map(function (link) {
+        let viewExtension = require(link);
+        let extensionName = path.basename(link, ".js");
+        env.addExtension(extensionName, new viewExtension());
+
+    });
+    return env
+};
 /**
  * Add function to Environment
  * @param {object} env - Environment to add custom filter
@@ -160,8 +182,7 @@ exports.getAllFunction = function (env, viewSetting, app) {
     baseFunctionLinks.map(function (link) {
         let viewFunction = require(link);
         if (typeof viewFunction === 'object' && !_.isEmpty(viewFunction)) {
-            let array = link.split('/');
-            let name = array[array.length - 1].replace(".js", "");
+            let name = path.basename(link, ".js");
             let func = require(link);
             if (typeof func === 'object' && !_.isEmpty(func)) {
                 func.name = func.name || name;
@@ -186,8 +207,7 @@ exports.getAllFunction = function (env, viewSetting, app) {
     functionLinks.map(function (link) {
         let viewFunction = require(link);
         if (typeof viewFunction === 'object' && !_.isEmpty(viewFunction)) {
-            let array = link.split('/');
-            let name = array[array.length - 1].replace(".js", "");
+            let name = path.basename(link, ".js");
             let func = require(link);
             if (typeof func === 'object' && !_.isEmpty(func)) {
                 func.name = func.name || name;
@@ -222,8 +242,7 @@ exports.getAllCustomFilter = function (env, viewSetting, app) {
 
 
     baseFilterLinks.map(function (link) {
-        let array = link.split('/');
-        let name = array[array.length - 1].replace(".js", "");
+        let name = path.basename(link, ".js")
         let filter = require(link);
         if (typeof filter === 'object' && !_.isEmpty(filter)) {
             filter.name = filter.name || name;
@@ -241,8 +260,7 @@ exports.getAllCustomFilter = function (env, viewSetting, app) {
     if (!viewSetting.filterFolder) return env;
     let filterLinks = self.getGlobbedFiles(path.normalize(__base + viewSetting.filterFolder + "/*.js"));
     filterLinks.map(function (link) {
-        let array = link.split('/');
-        let name = array[array.length - 1].replace(".js", "");
+        let name = path.basename(link, ".js");
         let filter = require(link);
         if (typeof filter === 'object' && !_.isEmpty(filter)) {
             filter.name = filter.name || name;
