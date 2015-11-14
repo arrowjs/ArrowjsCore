@@ -20,8 +20,6 @@ let fs = require('fs'),
     buildStructure = require("./buildStructure"),
     ViewEngine = require("../libs/ViewEngine");
 
-//let coreEvent = new EventEmitter();
-
 class ArrowApplication {
 
     /**
@@ -53,10 +51,8 @@ class ArrowApplication {
 
         global.__base = this.arrFolder;
         this._config = __.getRawConfig();  //Read config/config.js into this._config
-        //let structure = __.getStructure();
         this.structure = buildStructure(__.getStructure());
 
-        //this.arrlog = SystemLog;
 
         //Make redis cache
         let redisConfig = this._config.redis || {};
@@ -101,7 +97,7 @@ class ArrowApplication {
 
 
         this._arrRoutes = {};
-        
+
         Object.keys(this.structure).map(function (managerKey) {
             let key = managerKey;
             let managerName = managerKey + "Manager";
@@ -171,24 +167,22 @@ class ArrowApplication {
  */
 
 //TODO testing render ;
-function loadRouteAndRender(arrow, setting) {
+function loadRouteAndRender(arrow, userSetting) {
     arrow._componentList.map(function (key) {
-        Object.keys(arrow[key]).map(function (component) {
-            logger.info("Arrow loaded: '" + key + "' - '" + component + "'");
-            let routeConfig = arrow[key][component]._structure.route;
+        Object.keys(arrow[key]).map(function (componentKey) {
+            logger.info("Arrow loaded: '" + key + "' - '" + componentKey + "'");
+            let routeConfig = arrow[key][componentKey]._structure.route;
             if (routeConfig) {
                 Object.keys(routeConfig.path).map(function (second_key) {
                     let defaultRouteConfig = routeConfig.path[second_key];
-                    if (arrow[key][component].routes[second_key]) {
-                        let componentRouteSetting = arrow[key][component].routes[second_key];
-                        let componentName = arrow[key][component].name;
-                        handleComponentRouteSetting(componentRouteSetting, componentName, defaultRouteConfig, arrow, arrow[key][component].views, key, setting,arrow[key][component]);
+                    if (arrow[key][componentKey].routes[second_key]) {
+                        let componentRouteSetting = arrow[key][componentKey].routes[second_key];
+                        handleComponentRouteSetting(arrow, componentRouteSetting, defaultRouteConfig, key, userSetting, componentKey);
                     } else {
 
-                        let componentRouteSetting = arrow[key][component].routes;
-                        let componentName = arrow[key][component].name;
+                        let componentRouteSetting = arrow[key][componentKey].routes;
                         //Handle Route Path;
-                        handleComponentRouteSetting(componentRouteSetting, componentName, defaultRouteConfig, arrow, arrow[key][component].views, key, setting,arrow[key][component]);
+                        handleComponentRouteSetting(arrow, componentRouteSetting, defaultRouteConfig, key, userSetting, componentKey);
                     }
                 });
             }
@@ -241,8 +235,10 @@ function setupManager(app) {
     return null;
 }
 
-function handleComponentRouteSetting(componentRouteSetting, componentName, defaultRouteConfig, arrow, view, key, setting,component) {
-
+function handleComponentRouteSetting(arrow, componentRouteSetting, defaultRouteConfig, key, setting, componentKey) {
+    let component = arrow[key][componentKey];
+    let componentName = arrow[key][componentKey].name;
+    let viewInfo = arrow[key][componentKey].views;
     //Handle Route Path;
     let route = express.Router();
     Object.keys(componentRouteSetting).map(function (path_name) {
@@ -257,10 +253,10 @@ function handleComponentRouteSetting(componentRouteSetting, componentName, defau
         let prefix = defaultRouteConfig.prefix || '/';
 
         let arrayMethod = Object.keys(componentRouteSetting[path_name]).filter(function (method) {
-            if(componentRouteSetting[path_name][method].name) { 
+            if (componentRouteSetting[path_name][method].name) {
                 arrow._arrRoutes[componentRouteSetting[path_name][method].name] = path.normalize(prefix + routePath);
             }
-            
+
             //handle function
             let routeHandler = componentRouteSetting[path_name][method].handler;
             let authenticate = componentRouteSetting[path_name][method].authenticate !== undefined ? componentRouteSetting[path_name][method].authenticate : defaultRouteConfig.authenticate;
@@ -279,8 +275,8 @@ function handleComponentRouteSetting(componentRouteSetting, componentName, defau
             }
 
             //Add viewRender
-            if (!_.isEmpty(view) && !_.isString(authenticate)) {
-                arrayHandler.splice(0, 0, overrideViewRender(arrow, view, componentName,component))
+            if (!_.isEmpty(viewInfo) && !_.isString(authenticate)) {
+                arrayHandler.splice(0, 0, overrideViewRender(arrow, viewInfo, componentName, component))
             }
 
 
@@ -298,7 +294,7 @@ function handleComponentRouteSetting(componentRouteSetting, componentName, defau
                     arrayHandler.splice(0, 0, handleAuthenticate(arrow, authenticate))
                 }
             }
-            
+
             //Add to route
             if (method === "param") {
                 if (_.isString(componentRouteSetting[path_name][method].key) && !_.isArray(componentRouteSetting[path_name][method].handler)) {
@@ -316,17 +312,17 @@ function handleComponentRouteSetting(componentRouteSetting, componentName, defau
     });
 }
 
-function overrideViewRender(application, componentView, componentName,component) {
+function overrideViewRender(application, componentView, componentName, component) {
     return function (req, res, next) {
         // Grab reference of render
         let _render = res.render;
         let self = this;
         if (_.isArray(componentView)) {
-            res.render = makeRender(application, componentView, req, res, componentName,component);
+            res.render = makeRender(req, res, application, componentView, componentName, component);
         } else {
             Object.keys(componentView).map(function (key) {
                 res[key] = res[key] || {};
-                res[key].render = makeRender(application, componentView[key], req, res, componentName,component[key]);
+                res[key].render = makeRender(req, res, application, componentView[key], componentName, component[key]);
             });
             res.render = res[Object.keys(componentView)[0]].render
         }
@@ -334,7 +330,7 @@ function overrideViewRender(application, componentView, componentName,component)
     }
 }
 
-function makeRender(application, componentView, req, res, componentName,component) {
+function makeRender(req, res, application, componentView, componentName, component) {
     return function (view, options, callback) {
         if (req.session.messages) {
             req.session.messages = []
@@ -350,7 +346,6 @@ function makeRender(application, componentView, req, res, componentName,componen
             done = options;
             opts = res.locals || {};
         }
-
 
         // default callback to respond
         done = done || function (err, str) {

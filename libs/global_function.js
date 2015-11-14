@@ -6,6 +6,7 @@ let _ = require('lodash'),
     util = require('util'),
     fsEx = require('fs-extra'),
     path = require('path'),
+    logger = require('./logger'),
     nunjucks = require('nunjucks');
 
 
@@ -128,7 +129,12 @@ exports.createNewEnv = function (views, viewEngineConfig) {
 
 exports.getAllVariable = function (env, viewSetting, app) {
     if (!viewSetting.variableFile) return env;
-    let userVariable = require(path.normalize(__base + viewSetting.variableFile));
+    let userVariable;
+    try {
+        userVariable = require(path.normalize(__base + viewSetting.variableFile));
+    } catch(err) {
+        logger.warn('Cant find file :' + path.normalize(__base + viewSetting.variableFile))
+    }
     let baseVariable = require(path.resolve(__dirname, '..','templateExtends/variable.js'));
 
     Object.keys(baseVariable).map(function (name) {

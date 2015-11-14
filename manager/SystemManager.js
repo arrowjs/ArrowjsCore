@@ -19,6 +19,7 @@ class SystemManager extends events.EventEmitter {
         this.sub = app.redisSubscriber();
         this._app = app;
         this.name = name;
+        this.viewEngine = null;
         let self = this;
         let updateKey = self._config.redis_event['update_' + self.name] || ('update_' + self.name);
         this.sub.subscribe(self._config.redis_prefix + updateKey);
@@ -180,36 +181,20 @@ class SystemManager extends events.EventEmitter {
             components[key].models.rawQuery = defaultDatabase.query ? defaultDatabase.query.bind(defaultDatabase) : defaultQueryResolve;
         });
 
-        this.viewEngine = null;
-        let selfView = this.viewEngine;
+        let featureViewEngine = this.viewEngine;;
+        let viewEngineSetting = _.assign(_app._config.nunjuckSettings,{ express: self._app._expressApplication});
         Object.keys(components).map(function (key) {
             if (!_.isEmpty(components[key].views)) {
-                selfView = selfView || ViewEngine(_base,{
-                    express: self._app._expressApplication,
-                    autoescape: true,
-                    throwOnUndefined: false,
-                    trimBlocks: false,
-                    lstripBlocks: false,
-                    watch: false,
-                    noCache: true
-                    //tags: {
-                    //    blockStart: '<%',
-                    //    blockEnd: '%>',
-                    //    variableStart: '<$',
-                    //    variableEnd: '$>',
-                    //    commentStart: '<#',
-                    //    commentEnd: '#>'
-                    //}
-                })
+                featureViewEngine = featureViewEngine || ViewEngine(_base,viewEngineSetting);
             }
             if (_.isArray(components[key].views)) {
-                components[key].render = makeRender(_app,components[key].views,key,selfView),
-                components[key].viewEngine = selfView
+                components[key].render = makeRender(featureViewEngine,components[key].views,key)
+                components[key].viewEngine = featureViewEngine
             } else {
                 Object.keys(components[key].views).map(function (second_key) {
                     components[key][second_key] = components[key][second_key] || {};
-                    components[key].render = makeRender(_app,components[key][second_key].views,key,selfView);
-                    components[key][second_key].viewEngine = selfView
+                    components[key][second_key].render = makeRender(featureViewEngine,components[key][second_key].views,key);
+                    components[key][second_key].viewEngine = featureViewEngine
 
                 })
             }
@@ -249,8 +234,16 @@ function handleView(obj, application, componentName) {
     return normalizePath
 }
 
+/**
+ *
+ * @param viewEngine : manager view engine
+ * @param componentView : view folder
+ * @param componentName :
+ * @returns {Function}
+ */
 
-function makeRender(application, componentView, componentName,selfView) {
+function makeRender(viewEngine,componentView, componentName) {
+    let application = viewEngine.express._arrApplication;
     return function (view, options, callback) {
 
         var done = callback;
@@ -267,13 +260,13 @@ function makeRender(application, componentView, componentName,selfView) {
             view += "." + application._config.viewExtension;
         }
 
-        selfView.loaders[0].pathsToNames = {};
-        selfView.loaders[0].cache = {};
-        selfView.loaders[0].searchPaths = componentView.map(function (obj) {
+        viewEngine.loaders[0].pathsToNames = {};
+        viewEngine.loaders[0].cache = {};
+        viewEngine.loaders[0].searchPaths = componentView.map(function (obj) {
             return handleView(obj, application, componentName);
         });
 
-        selfView.render(view, opts, done);
+        viewEngine.render(view, opts, done);
     };
 }
 
