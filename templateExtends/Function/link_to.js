@@ -1,8 +1,8 @@
 "use strict";
 
 module.exports = {
-    t : t,
-    link_to : function (name,option) {
+    name : 'link_to',
+    handler : function (name,option) {
         let route = this._arrRoutes[name];
         Object.keys(option).map(function (key) {
             let newKey = key;
@@ -13,4 +13,4 @@ module.exports = {
         });
         return route;
     }
-};
+}

@@ -12,7 +12,8 @@ module.exports = {
         number_item: 20
     },
     theme: "default",
-    functionAndVariableFolder : '/extendsView/function',
-    filterFolder : '/extendsView/filter'
+    functionFolder : '/extendsView/function',
+    filterFolder : '/extendsView/filter',
+    variableFile : '/extendsView/variable.js'
 
 };

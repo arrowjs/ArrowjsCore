@@ -114,6 +114,7 @@ exports.createNewEnv = function (views, viewEngineConfig) {
     let viewSetting = viewEngineConfig.express.arrConfig;
     env = self.getAllFunction(env, viewSetting, viewEngineConfig.express._arrApplication);
     env = self.getAllCustomFilter(env, viewSetting, viewEngineConfig.express._arrApplication);
+    env = self.getAllVariable(env, viewSetting, viewEngineConfig.express._arrApplication);
 
     return env;
 };
@@ -123,29 +124,70 @@ exports.createNewEnv = function (views, viewEngineConfig) {
  * @param {object} env - Environment to add custom filter
  * @returns {object}
  */
-exports.getAllFunction = function (env, viewSetting, app) {
-    let self = this;
-    if (!viewSetting.functionAndVariableFolder) return env;
-    let functionLinks = self.getGlobbedFiles(path.normalize(__base + viewSetting.functionAndVariableFolder + "/*.js"));
-    let baseFunction = require(path.resolve(__dirname, '..', 'templateExtends/function.js'));
-    Object.keys(baseFunction).map(function (name) {
-        if (typeof baseFunction[name] === "function") {
-            env.addGlobal(name, baseFunction[name].bind(app));
-        } else {
-            env.addGlobal(name, baseFunction[name]);
+
+exports.getAllVariable = function (env, viewSetting, app) {
+    if (!viewSetting.variableFile) return env;
+    let userVariable = require(path.normalize(__base + viewSetting.variableFile));
+    let baseVariable = require(path.resolve(__dirname, '..','templateExtends/variable.js'));
+
+    Object.keys(baseVariable).map(function (name) {
+        if (typeof baseVariable[name] !== "function") {
+            env.addGlobal(name, baseVariable[name]);
         }
     });
 
+
+    if (typeof userVariable === 'object' && !_.isEmpty(userVariable)) {
+        Object.keys(userVariable).map(function (name) {
+            if (typeof userVariable[name] !== "function") {
+                env.addGlobal(name, userVariable[name]);
+            }
+        })
+    }
+    return env
+};
+
+/**
+ * Add function to Environment
+ * @param {object} env - Environment to add custom filter
+ * @returns {object}
+ */
+
+exports.getAllFunction = function (env, viewSetting, app) {
+    let self = this;
+    let basePath = path.resolve(__dirname, '..', 'templateExtends/function');
+    let baseFunctionLinks = self.getGlobbedFiles(path.normalize(basePath + "/*.js"));
+    baseFunctionLinks.map(function (link) {
+        let viewFunction = require(link);
+        if (typeof viewFunction === 'object' && !_.isEmpty(viewFunction)) {
+            let array = link.split('/');
+            let name = array[array.length - 1].replace(".js", "");
+            let func = require(link);
+            if (typeof func === 'object' && !_.isEmpty(func)) {
+                func.name = func.name || name;
+                if (func.handler) {
+                    func.handler = func.handler.bind(app);
+                    env.addGlobal(func.name, func.handler)
+                }
+            }
+        }
+    });
+
+    if (!viewSetting.functionFolder) return env;
+    let functionLinks = self.getGlobbedFiles(path.normalize(__base + viewSetting.functionFolder + "/*.js"));
     functionLinks.map(function (link) {
         let viewFunction = require(link);
         if (typeof viewFunction === 'object' && !_.isEmpty(viewFunction)) {
-            Object.keys(viewFunction).map(function (name) {
-                if (typeof viewFunction[name] === "function") {
-                    env.addGlobal(name, viewFunction[name].bind(app));
-                } else {
-                    env.addGlobal(name, viewFunction[name]);
+            let array = link.split('/');
+            let name = array[array.length - 1].replace(".js", "");
+            let func = require(link);
+            if (typeof func === 'object' && !_.isEmpty(func)) {
+                func.name = func.name || name;
+                if (func.handler) {
+                    func.handler = func.handler.bind(app);
+                    env.addGlobal(func.name, func.handler)
                 }
-            })
+            }
         }
     });
     return env
@@ -158,28 +200,43 @@ exports.getAllFunction = function (env, viewSetting, app) {
  */
 exports.getAllCustomFilter = function (env, viewSetting, app) {
     let self = this;
-    if (!viewSetting.filterFolder) return env;
-    let filterLinks = self.getGlobbedFiles(path.normalize(__base + viewSetting.filterFolder + "/*.js"));
-    let baseFilter = require(path.resolve(__dirname, '..', 'templateExtends/filter.js'));
-    Object.keys(baseFilter).map(function (name) {
-        if (typeof baseFilter[name] === "function") {
-            env.addFilter(name, baseFilter[name]);
-        }
-    });
 
-    filterLinks.map(function (link) {
+    let basePath = path.resolve(__dirname, '..', 'templateExtends/filter');
+    let baseFilterLinks = self.getGlobbedFiles(path.normalize(basePath + "/*.js"));
+
+
+    baseFilterLinks.map(function (link) {
         let array = link.split('/');
-        let name = array[array.length - 1].replace(".js","");
+        let name = array[array.length - 1].replace(".js", "");
         let filter = require(link);
         if (typeof filter === 'object' && !_.isEmpty(filter)) {
             filter.name = filter.name || name;
             if (filter.handler) {
                 filter.handler = filter.handler.bind(app);
                 filter.async = filter.async || false;
-                if(filter.async) {
-                    env.addFilter(filter.name,filter.handler,true)
+                if (filter.async) {
+                    env.addFilter(filter.name, filter.handler, true)
                 } else {
-                    env.addFilter(filter.name,filter.handler)
+                    env.addFilter(filter.name, filter.handler)
+                }
+            }
+        }
+    });
+    if (!viewSetting.filterFolder) return env;
+    let filterLinks = self.getGlobbedFiles(path.normalize(__base + viewSetting.filterFolder + "/*.js"));
+    filterLinks.map(function (link) {
+        let array = link.split('/');
+        let name = array[array.length - 1].replace(".js", "");
+        let filter = require(link);
+        if (typeof filter === 'object' && !_.isEmpty(filter)) {
+            filter.name = filter.name || name;
+            if (filter.handler) {
+                filter.handler = filter.handler.bind(app);
+                filter.async = filter.async || false;
+                if (filter.async) {
+                    env.addFilter(filter.name, filter.handler, true)
+                } else {
+                    env.addFilter(filter.name, filter.handler)
                 }
             }
         }
