@@ -209,6 +209,8 @@ class SystemManager extends events.EventEmitter {
                 Object.keys(components[key].views).map(function (second_key) {
                     components[key][second_key] = components[key][second_key] || {};
                     components[key].render = makeRender(_app,components[key][second_key].views,key,selfView)
+                    components[key][second_key].viewEngine = selfView
+
                 })
             }
         });
