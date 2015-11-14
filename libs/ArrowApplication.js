@@ -99,24 +99,7 @@ class ArrowApplication {
         this.getConfig = this.configManager.getConfig.bind(this.configManager);
         this.setConfig = this.configManager.setConfig.bind(this.configManager);
 
-        let componentsRender = ViewEngine(this.arrFolder, {
-            express: this._expressApplication,
-            autoescape: true,
-            throwOnUndefined: false,
-            trimBlocks: false,
-            lstripBlocks: false,
-            watch: false,
-            noCache: true
-            //tags: {
-            //    blockStart: '<%',
-            //    blockEnd: '%>',
-            //    variableStart: '<$',
-            //    variableEnd: '$>',
-            //    commentStart: '<#',
-            //    commentEnd: '#>'
-            //}
-        });
-        this.viewTemplateEngine = componentsRender;
+
         this._arrRoutes = {};
         
         Object.keys(this.structure).map(function (managerKey) {
@@ -199,13 +182,13 @@ function loadRouteAndRender(arrow, setting) {
                     if (arrow[key][component].routes[second_key]) {
                         let componentRouteSetting = arrow[key][component].routes[second_key];
                         let componentName = arrow[key][component].name;
-                        handleComponentRouteSetting(componentRouteSetting, componentName, defaultRouteConfig, arrow, arrow[key][component].views, key, setting);
+                        handleComponentRouteSetting(componentRouteSetting, componentName, defaultRouteConfig, arrow, arrow[key][component].views, key, setting,arrow[key][component]);
                     } else {
 
                         let componentRouteSetting = arrow[key][component].routes;
                         let componentName = arrow[key][component].name;
                         //Handle Route Path;
-                        handleComponentRouteSetting(componentRouteSetting, componentName, defaultRouteConfig, arrow, arrow[key][component].views, key, setting);
+                        handleComponentRouteSetting(componentRouteSetting, componentName, defaultRouteConfig, arrow, arrow[key][component].views, key, setting,arrow[key][component]);
                     }
                 });
             }
@@ -258,7 +241,7 @@ function setupManager(app) {
     return null;
 }
 
-function handleComponentRouteSetting(componentRouteSetting, componentName, defaultRouteConfig, arrow, view, key, setting) {
+function handleComponentRouteSetting(componentRouteSetting, componentName, defaultRouteConfig, arrow, view, key, setting,component) {
 
     //Handle Route Path;
     let route = express.Router();
@@ -297,7 +280,7 @@ function handleComponentRouteSetting(componentRouteSetting, componentName, defau
 
             //Add viewRender
             if (!_.isEmpty(view) && !_.isString(authenticate)) {
-                arrayHandler.splice(0, 0, overrideViewRender(arrow, view, componentName))
+                arrayHandler.splice(0, 0, overrideViewRender(arrow, view, componentName,component))
             }
 
 
@@ -333,17 +316,17 @@ function handleComponentRouteSetting(componentRouteSetting, componentName, defau
     });
 }
 
-function overrideViewRender(application, componentView, componentName) {
+function overrideViewRender(application, componentView, componentName,component) {
     return function (req, res, next) {
         // Grab reference of render
         let _render = res.render;
         let self = this;
         if (_.isArray(componentView)) {
-            res.render = makeRender(application, componentView, req, res, componentName);
+            res.render = makeRender(application, componentView, req, res, componentName,component);
         } else {
             Object.keys(componentView).map(function (key) {
                 res[key] = res[key] || {};
-                res[key].render = makeRender(application, componentView[key], req, res, componentName);
+                res[key].render = makeRender(application, componentView[key], req, res, componentName,component);
             });
             res.render = res[Object.keys(componentView)[0]].render
         }
@@ -351,7 +334,7 @@ function overrideViewRender(application, componentView, componentName) {
     }
 }
 
-function makeRender(application, componentView, req, res, componentName) {
+function makeRender(application, componentView, req, res, componentName,component) {
     return function (view, options, callback) {
         if (req.session.messages) {
             req.session.messages = []
@@ -378,14 +361,13 @@ function makeRender(application, componentView, req, res, componentName) {
         if (application._config.viewExtension && view.indexOf(application._config.viewExtension) === -1) {
             view += "." + application._config.viewExtension;
         }
-
-        application.viewTemplateEngine.loaders[0].pathsToNames = {};
-        application.viewTemplateEngine.loaders[0].cache = {};
-        application.viewTemplateEngine.loaders[0].searchPaths = componentView.map(function (obj) {
+        component.viewEngine.loaders[0].pathsToNames = {};
+        component.viewEngine.loaders[0].cache = {};
+        component.viewEngine.loaders[0].searchPaths = componentView.map(function (obj) {
             return handleView(obj, application, componentName);
         });
 
-        application.viewTemplateEngine.render(view, opts, done);
+        component.viewEngine.render(view, opts, done);
     };
 }
 

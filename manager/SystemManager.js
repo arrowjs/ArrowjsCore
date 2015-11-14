@@ -6,6 +6,8 @@ let _ = require('lodash');
 let Express = require('express');
 let Database = require("../libs/database");
 let actionByAttribute = require('./handleAttribute/handleFunction');
+let ViewEngine = require("../libs/ViewEngine");
+
 
 class SystemManager extends events.EventEmitter {
     constructor(app, name) {
@@ -178,13 +180,35 @@ class SystemManager extends events.EventEmitter {
             components[key].models.rawQuery = defaultDatabase.query ? defaultDatabase.query.bind(defaultDatabase) : defaultQueryResolve;
         });
 
+        this.viewEngine = null;
+        let selfView = this.viewEngine;
         Object.keys(components).map(function (key) {
+            if (!_.isEmpty(components[key].views)) {
+                selfView = selfView || ViewEngine(_base,{
+                    express: self._app._expressApplication,
+                    autoescape: true,
+                    throwOnUndefined: false,
+                    trimBlocks: false,
+                    lstripBlocks: false,
+                    watch: false,
+                    noCache: true
+                    //tags: {
+                    //    blockStart: '<%',
+                    //    blockEnd: '%>',
+                    //    variableStart: '<$',
+                    //    variableEnd: '$>',
+                    //    commentStart: '<#',
+                    //    commentEnd: '#>'
+                    //}
+                })
+            }
             if (_.isArray(components[key].views)) {
-                components[key].render = makeRender(_app,components[key].views,key)
+                components[key].render = makeRender(_app,components[key].views,key,selfView),
+                components[key].viewEngine = selfView
             } else {
                 Object.keys(components[key].views).map(function (second_key) {
                     components[key][second_key] = components[key][second_key] || {};
-                    components[key].render = makeRender(_app,components[key][second_key].views,key)
+                    components[key].render = makeRender(_app,components[key][second_key].views,key,selfView)
                 })
             }
         });
@@ -224,7 +248,7 @@ function handleView(obj, application, componentName) {
 }
 
 
-function makeRender(application, componentView, componentName) {
+function makeRender(application, componentView, componentName,selfView) {
     return function (view, options, callback) {
 
         var done = callback;
@@ -241,13 +265,13 @@ function makeRender(application, componentView, componentName) {
             view += "." + application._config.viewExtension;
         }
 
-        application.viewTemplateEngine.loaders[0].pathsToNames = {};
-        application.viewTemplateEngine.loaders[0].cache = {};
-        application.viewTemplateEngine.loaders[0].searchPaths = componentView.map(function (obj) {
+        selfView.loaders[0].pathsToNames = {};
+        selfView.loaders[0].cache = {};
+        selfView.loaders[0].searchPaths = componentView.map(function (obj) {
             return handleView(obj, application, componentName);
         });
 
-        application.viewTemplateEngine.render(view, opts, done);
+        selfView.render(view, opts, done);
     };
 }
 
