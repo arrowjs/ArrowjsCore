@@ -17,8 +17,7 @@ let fs = require('fs'),
     EventEmitter = require('events').EventEmitter,
     DefaultManager = require("../manager/DefaultManager"),
     ConfigManager = require("../manager/ConfigManager"),
-    buildStructure = require("./buildStructure"),
-    ViewEngine = require("../libs/ViewEngine");
+    buildStructure = require("./buildStructure");
 
 class ArrowApplication {
 

@@ -181,8 +181,8 @@ class SystemManager extends events.EventEmitter {
             components[key].models.rawQuery = defaultDatabase.query ? defaultDatabase.query.bind(defaultDatabase) : defaultQueryResolve;
         });
 
-        let featureViewEngine = this.viewEngine;;
-        let viewEngineSetting = _.assign(_app._config.nunjuckSettings,{ express: self._app._expressApplication});
+        let featureViewEngine = this.viewEngine;
+        let viewEngineSetting = _.assign(_app._config.nunjuckSettings || {},{ express: self._app._expressApplication});
         Object.keys(components).map(function (key) {
             if (!_.isEmpty(components[key].views)) {
                 featureViewEngine = featureViewEngine || ViewEngine(_base,viewEngineSetting);
