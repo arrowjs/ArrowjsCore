@@ -1,25 +1,8 @@
-ArrowJS for Node.js
+Arrowjs.io Core Examples
 ==================
 
-ArrowJS is framework based on Express.js. It helps you build your web application easier.
-
-```javascript
-    'use strict';
-    const Arrow = require('arrowjs');
-    const application = new Arrow();
-    application._config.port = 80;
-    application.start();
-```
-
-## Installation
-
-To get started with arrowjs install the ```arrowjs``` package:
-
-```sh
-$ npm install arrowjs --save
-```
-
-## Useful links
+In Arrowjs.io Core, we maintain only some simple examples. To understand well about Arrowjs, you may look at following
+links:
 
 * [Arrowjs.io Core examples](https://github.com/arrowjs/examples) 
 * [Documentation](https://github.com/arrowjs/Documents)
