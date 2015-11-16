@@ -10,7 +10,10 @@ class ConfigManager extends SystemManager {
     }
 
     getConfig (key){
-        return this._config[key];
+        if(key) {
+            return this._config[key];
+        }
+        return this._config
     };
 
     setConfig(key,setting){

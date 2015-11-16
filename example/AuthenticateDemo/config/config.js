@@ -3,7 +3,6 @@
 module.exports = {
     key: 'site_setting',
     app: {
-        language: 'en_US',
         title: 'ArrowJS',
         description: '',
         keywords: '',
@@ -14,5 +13,6 @@ module.exports = {
     bodyParser : {
         extended: true,
         limit: '5mb'
-    }
+    },
+    ArrowHelper : "/helpers/"
 };
