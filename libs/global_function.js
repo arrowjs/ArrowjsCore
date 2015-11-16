@@ -163,7 +163,7 @@ exports.getAllVariable = function (env, viewSetting, app) {
 
 exports.getAllExtensions = function (env, viewSetting, app) {
     var self = this;
-    let basePath = path.resolve(__dirname, '..', 'templateExtends/Extensions');
+    let basePath = path.resolve(__dirname, '..', 'templateExtends/extensions');
     let baseFunctionLinks = self.getGlobbedFiles(path.normalize(basePath + "/*.js"));
 
 
