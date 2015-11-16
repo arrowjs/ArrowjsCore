@@ -246,7 +246,6 @@ exports.getAllCustomFilter = function (env, viewSetting, app) {
     let basePath = path.resolve(__dirname, '..', 'templateExtends/filter');
     let baseFilterLinks = self.getGlobbedFiles(path.normalize(basePath + "/*.js"));
 
-
     baseFilterLinks.map(function (link) {
         let name = path.basename(link, ".js")
         let filter = require(link);
