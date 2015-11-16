@@ -15,6 +15,7 @@ let fs = require('fs'),
     utils = require("./utils"),
     __ = require("./global_function"),
     EventEmitter = require('events').EventEmitter,
+    Database = require('./database'),
     DefaultManager = require("../manager/DefaultManager"),
     ConfigManager = require("../manager/ConfigManager"),
     buildStructure = require("./buildStructure");
@@ -108,7 +109,6 @@ class ArrowApplication {
             this[key] = this[managerName]["_" + key];
             this._componentList.push(key);
         }.bind(this));
-
     }
 
     /**
@@ -183,6 +183,18 @@ class ArrowApplication {
 
 //TODO testing render ;
 function loadRouteAndRender(arrow, userSetting) {
+    let defaultDatabase = {};
+    let defaultQueryResolve = function () {
+        return new Promise(function (fulfill, reject) {
+            fulfill("No models")
+        })
+    };
+    if (arrow.models && Object.keys(arrow.models).length > 0) {
+        if (_.isEmpty(defaultDatabase)) {
+            defaultDatabase = Database(arrow);
+        }
+        arrow.models.rawQuery = defaultDatabase.query ? defaultDatabase.query.bind(defaultDatabase) : defaultQueryResolve;
+    }
     arrow._componentList.map(function (key) {
         Object.keys(arrow[key]).map(function (componentKey) {
             logger.info("Arrow loaded: '" + key + "' - '" + componentKey + "'");

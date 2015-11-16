@@ -8,12 +8,7 @@ let _ = require('lodash');
 module.exports = function modelAttribute(setting, fatherPath, component, application) {
     let files = getListFile(setting, fatherPath, application);
     let database = Database(application);
-    let defaultDatabase = {};
-    let defaultQueryResolve = function () {
-        return new Promise(function (fulfill, reject) {
-            fulfill("No models")
-        })
-    };
+
     application.models = application.models || {};
     if (files.type === "single") {
         Object.keys(files).map(function (key) {
@@ -80,10 +75,5 @@ module.exports = function modelAttribute(setting, fatherPath, component, applica
             }
         })
     }
-    if (Object.keys(application.models).length > 0) {
-        if (_.isEmpty(defaultDatabase)) {
-            defaultDatabase = Database(application);
-        }
-        application.models.rawQuery = defaultDatabase.query ? defaultDatabase.query.bind(defaultDatabase) : defaultQueryResolve;
-    }
+
 };
