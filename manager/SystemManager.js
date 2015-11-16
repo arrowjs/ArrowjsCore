@@ -243,7 +243,7 @@ function handleView(obj, application, componentName) {
  */
 
 function makeRender(viewEngine,componentView, componentName) {
-    let application = viewEngine.express._arrApplication;
+    let application = viewEngine.opts.express._arrApplication;
     return function (view, options, callback) {
 
         var done = callback;
@@ -255,8 +255,8 @@ function makeRender(viewEngine,componentView, componentName) {
             done = options;
             opts = {};
         }
-        if (application.arrConfig.viewExtension && view.indexOf(application.arrConfig.viewExtension) === -1) {
-            view += "." + application.arrConfig.viewExtension;
+        if (application._config.viewExtension && view.indexOf(application._config.viewExtension) === -1) {
+            view += "." + application._config.viewExtension;
         }
 
         viewEngine.loaders[0].pathsToNames = {};
