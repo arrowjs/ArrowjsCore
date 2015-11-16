@@ -7,7 +7,7 @@ module.exports = {
             maxAge: 3600
         }
     },
-    viewExtension : "twig",
+    viewExtension : "html",
     pagination: {
         number_item: 20
     },

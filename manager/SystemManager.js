@@ -8,6 +8,7 @@ let Database = require("../libs/database");
 let actionByAttribute = require('./handleAttribute/handleFunction');
 let ViewEngine = require("../libs/ViewEngine");
 
+//let privateVariable = new WeakMap();
 
 class SystemManager extends events.EventEmitter {
     constructor(app, name) {
@@ -220,6 +221,12 @@ class SystemManager extends events.EventEmitter {
             })
         }
         return result
+    }
+
+    getComponent(componentName) {
+        let self = this;
+        let privateName = "_" + self.name;
+        return self[privateName][componentName];
     }
 }
 

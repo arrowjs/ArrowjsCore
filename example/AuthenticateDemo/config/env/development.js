@@ -7,7 +7,7 @@ module.exports = {
         port: '5432',
         database: 'authenticate',
         username: 'postgres',
-        password: '1',
+        password: '',
         dialect: 'postgres',
         logging: false
     },

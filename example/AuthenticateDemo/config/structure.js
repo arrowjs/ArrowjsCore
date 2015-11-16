@@ -7,12 +7,12 @@ module.exports = {
         //extends : {
         //  system :true
         //},
-        //model : {
-        //    path: {
-        //        folder : "models",
-        //        file: "*.js"
-        //    }
-        //},
+        model : {
+            path: {
+                folder : "models",
+                file: "*.js"
+            }
+        },
         controller: {
             path: {
                 folder : "controllers",
