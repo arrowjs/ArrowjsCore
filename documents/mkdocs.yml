@@ -5,7 +5,9 @@ pages:
 - [template_engine.md,Template Engine,Introduction]
 - [template/custom_filter.md,Template Engine,Custom filter]
 - [structure.md,Structure,Basic]
-- [structure/structure.md,Structure,Advance.md]
+- [structure/structure.md,Structure,Advance]
+- [utilities.md,Utilities,Basic]
+- [utilities/logger.md,Utilities,Logger]
 
 
 

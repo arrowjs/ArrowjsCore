@@ -442,8 +442,11 @@ function handleRole(application, permissions, componentName, key) {
                 if (arrayPermissions.indexOf(key.name) > -1) {
                     return key
                 }
+            }).map(function (data) {
+                return data.name
             });
             if (!_.isEmpty(checkedPermission)) {
+                req.permissions = checkedPermission;
                 req.hasPermission = true
             }
         } else {
