@@ -1,0 +1,12 @@
+site_name: ARROW CMS PROJECT
+pages:
+
+- [index.md]
+- [template_engine.md,Template Engine,Introduction]
+- [template/custom_filter.md,Template Engine,Custom filter]
+- [structure.md,Structure,Basic]
+- [structure/structure.md,Structure,Advance.md]
+
+
+
+theme: readthedocs

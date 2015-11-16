@@ -224,7 +224,7 @@ class SystemManager extends events.EventEmitter {
 }
 
 function handleView(obj, application, componentName) {
-    let miniPath = obj.func(application._config, componentName);
+    let miniPath = obj.func(application.arrConfig, componentName);
     let normalizePath;
     if (miniPath[0] === "/") {
         normalizePath = path.normalize(obj.base + "/" + miniPath);
@@ -255,9 +255,8 @@ function makeRender(viewEngine,componentView, componentName) {
             done = options;
             opts = {};
         }
-
-        if (application._config.viewExtension && view.indexOf(application._config.viewExtension) === -1) {
-            view += "." + application._config.viewExtension;
+        if (application.arrConfig.viewExtension && view.indexOf(application.arrConfig.viewExtension) === -1) {
+            view += "." + application.arrConfig.viewExtension;
         }
 
         viewEngine.loaders[0].pathsToNames = {};

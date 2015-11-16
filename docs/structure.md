@@ -1,3 +1,6 @@
+## Basic structure
+
+```
 module.exports = {
     features: {
         "path": {
@@ -32,3 +35,4 @@ module.exports = {
         }
     }
 }
+```
