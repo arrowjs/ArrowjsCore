@@ -224,7 +224,7 @@ class SystemManager extends events.EventEmitter {
 }
 
 function handleView(obj, application, componentName) {
-    let miniPath = obj.func(application.arrConfig, componentName);
+    let miniPath = obj.func(application._config, componentName);
     let normalizePath;
     if (miniPath[0] === "/") {
         normalizePath = path.normalize(obj.base + "/" + miniPath);
