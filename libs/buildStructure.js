@@ -2,6 +2,7 @@
 
 let _ = require("lodash");
 let path = require('path');
+let logger = require('./logger');
 let globalPattern = {};
 
 module.exports = function (struc) {
@@ -104,7 +105,7 @@ function handlePath(pathInfo, attribute,level) {
         switch (level) {
             case 1:
                 if(name) {
-                    console.log('Carefully : Cant set "name" attribute at level 1 in structure.js');
+                    logger.warn('Carefully : Cant set "name" attribute at level 1 in structure.js');
                 }
                 name = "";
                 break;

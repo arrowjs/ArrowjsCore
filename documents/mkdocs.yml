@@ -2,12 +2,18 @@ site_name: ARROW CMS PROJECT
 pages:
 
 - [index.md]
+- [makeFeature.md,Make a feature, Make a feature]
+- [models.md,Models]
+- [session.md,Session]
 - [template_engine.md,Template Engine,Introduction]
 - [template/custom_filter.md,Template Engine,Custom filter]
 - [structure.md,Structure,Basic]
-- [structure/structure.md,Structure,Advance]
+- [structure/advance.md,Structure,Advance]
 - [utilities.md,Utilities,Basic]
 - [utilities/logger.md,Utilities,Logger]
+- [utilities/flash_message.md,Utilities,Flash messages]
+- [utilities/global_function.md,Utilities,Global functions and Variable]
+
 
 
 

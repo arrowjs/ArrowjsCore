@@ -25,9 +25,9 @@ module.exports = function () {
                     content: content
                 })
             },
-            warning: function (content) {
+            warn: function (content) {
                 req.session.messages.push({
-                    type: 'warning',
+                    type: 'warn',
                     content: content
                 })
             },
