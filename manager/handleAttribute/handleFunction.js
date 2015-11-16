@@ -15,7 +15,7 @@ module.exports = function actionByAttribute(attName, component, fatherPath, appl
         case "path" :
             return pathAttribute();
         case "extends":
-            return extendsAttribute(setting);
+            return extendsAttribute(setting,application);
         case "model":
             return modelAttribute(setting, fatherPath, component, application);
         case "route":

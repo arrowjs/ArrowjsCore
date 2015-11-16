@@ -46,7 +46,7 @@ function getDataFromArray(obj, key,level) {
                     newObj.path[pathKey][key] = data[key];
                 }
 
-                if (['controller', "view", "helper", "model", "route"].indexOf(key) > -1) {
+                if (['controller', "view", "action", "model", "route"].indexOf(key) > -1) {
                     if (_.isArray(data[key])) {
                         data[key].map(function (data_key) {
                             if (!data_key.path.singleton) {
@@ -91,7 +91,7 @@ function handlePath(pathInfo, attribute,level) {
                 break;
             case "controller":
                 break;
-            case "helper":
+            case "action":
                 break;
             case "route":
                 break;
