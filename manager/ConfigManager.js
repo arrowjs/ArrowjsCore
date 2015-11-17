@@ -22,6 +22,17 @@ class ConfigManager extends SystemManager {
         return self.setCache().then(self.reload());
     };
 
+    updateConfig(setting){
+        console.log("*****",setting);
+
+        let self = this;
+        if(setting) {
+            _.assign(this._config,setting);
+            return self.setCache().then(self.reload());
+        }
+        return Promise.resolve();
+    };
+
     getCache(){
         let self = this._config;
         return this.pub.getAsync(self.redis_prefix + self.redis_key.configs)

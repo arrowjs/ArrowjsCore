@@ -96,6 +96,7 @@ class ArrowApplication {
         this._config = this.configManager._config;
         this.getConfig = this.configManager.getConfig.bind(this.configManager);
         this.setConfig = this.configManager.setConfig.bind(this.configManager);
+        this.updateConfig = this.configManager.updateConfig.bind(this.configManager);
 
 
         this._arrRoutes = {};
