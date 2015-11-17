@@ -23,8 +23,6 @@ class ConfigManager extends SystemManager {
     };
 
     updateConfig(setting){
-        console.log("*****",setting);
-
         let self = this;
         if(setting) {
             _.assign(this._config,setting);

@@ -196,6 +196,20 @@ function loadRouteAndRender(arrow, userSetting) {
         }
         arrow.models.rawQuery = defaultDatabase.query ? defaultDatabase.query.bind(defaultDatabase) : defaultQueryResolve;
     }
+    //Object.keys(arrow.models).forEach(function (modelName) {
+    //    if ("associate" in arrow.models[modelName]) {
+    //        let association = arrow.models[modelName].associate();
+    //        if(arrow.models[modelName]) {
+    //            console.log(association[modelName]);
+    //            let relation = association[modelName].type;
+    //            if(typeof arrow.models[modelName][relation] === 'function') {
+    //                arrow.models[modelName][relation](arrow.models[modelName],association[modelName].option);
+    //            }
+    //        }
+    //    }
+    //
+    //});
+
     arrow._componentList.map(function (key) {
         Object.keys(arrow[key]).map(function (componentKey) {
             logger.info("Arrow loaded: '" + key + "' - '" + componentKey + "'");
