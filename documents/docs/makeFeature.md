@@ -1,50 +1,122 @@
-Hệ thống feature trong Arrowjs gốc được thiết kế theo mô hình MVC.
-Mỗi feature là một tính năng gồm có *route, model,view,controller*
+Feature
+========================
+Feature represents one unit of feature in web application. A feature consists of Model, View, Controller, Route.
 
-## Tạo thư mục và file cấu hình cho feature:
-Hệ thống Arrowjs cơ bản sẽ load các feature trong thư mục *features*. Hãy tạo ra một folder với tên feature bạn mong muốn, đồng thời tạo kèm file để cấu hình cho feature
+- Model: data structure and data object that is fetched from back end database. In early version, we support Postgresql. Later on we will support MongoDB, MySQL,...
+- View: View template = HTML + Nunjucks syntax, CSS, JavaScript
+- Controller: Javascript file contains handler functions for different HTTP requests
+- Router: Direct HTTP request to appropriate handler functions in controller
+
+
+## Folder structure of feature
+![folder structure of blog feature](./img/folder_feature.jpg)
+
+Folder structure of a feature is governed by [structure.js](./structure.md). In common web application, a feature may have more than one subfolders: 
+
+- *frontend* sub folder: It is customer facing part for end user.
+- *backend* sub folder: It is back office operational part for administrator, operator.
+
+A feature may have only *frontend* sub folder or *backend* subfolder or more than that. Below is extract of controller section in structure.js. There are sub folders *backend* and *frontend*. When you implement new feature, you may skip one of them but creating new sub folder different with *backend* and *frontend* will not be recognized when Arrowjs app parses.
+
+Example of feature that have backend and frontend sub folders.
+
+```
+controller: [
+    {
+        path: {
+            name: "backend",
+            folder: "backend/controllers",
+            file: "*.js"
+        }
+    },
+    {
+        path: {
+            name: "frontend",
+            folder: "frontend/controllers",
+            file: "*.js"
+        }
+    }
+]
+```
+
+Example of feature that has a single, direct sub folder named *controllers*
+
+```
+controller: [
+    {
+        path: {     
+            folder: "controllers",
+            file: "*.js"
+        }
+    }    
+]
+```
+
+
+## Create a feature manually
+In booting process, Arrowjs web application will parse and load all features in folder *features*. Developer can create feature manually or use Yeoman generator to generate scaffold of feature.
+
+To create a feature manually.
 
 ```
     mkdir <name>
     cd <name>
     touch feature.js
 ```
+<name> is real name of feature such as: blog, order, event_calender. Please don't use space in feature name.
 
-Thêm nội dung cho file feature.js
+feature.js is required configuration file for feature.
 
 ```
 'use strict';
 
 module.exports = {
-    name: "index" // nếu không có tên hệ thống tự nhận tên folder làm tên feature
-    title: "Index Module", 
-    author: 'Tran Quoc Cuong',
+    name: "index" // if not exist, Arrowjs will use feature folder name instead
+    title: "Index Module", //display in feature management in back end
+    author: 'Tran Quoc Cuong', 
     version: '0.1.0',
     description: "Hello Arrowjs",
-    permissions: [] // Các quyền  cho các Controller.(active role  = true).
-};
+    permissions: [
+        {
+            name: 'index',  //key of permission
+            title: t('m_users_backend_rule_index')  //description of permission in localized language
+        },
+        {
+            name: 'create',
+            title: t('m_users_backend_rule_create')
+        },] 
+    };
 
 ```
 
-## Tạo controller đầu tiên
 
-Tạo thêm thư mục controller và tạo file controller đầu tiên cho hệ thống. Arrowjs sẽ tự động load toàn bộ các file javascript trong thư mục controller
+
+## Create a controller inside a feature
+In this example, we are going to create a controller sub folder inside a feature then create index.js. index.js contains functions that handles HTTP requests we need map in route.js
 
 ```
     cd <feature name>
-    mkdir controller
+    mkdir controllers
+    cd controllers
     touch index.js
 ```
 
-Nội dung một file index.js
+Below is example index.js that has one handler function responses back to browser "Hello Arrowjs"
+
 ```
 module.exports = function (controller,component,application) {
-     controller.index = function (req,res) {
-        res.send("Hello Arrowjs");
-      };
-    }
+    controller.index = function (req,res) {
+       res.send("Hello Arrowjs");
+    };
+}
 ```
-Với các bạn đã làm quen với Express bạn hoàn toàn có thể gọi được các hàm của trên đối tượng request và response . Ở đây chúng ta gửi ra đoạn text "Hello world".
+Developer can access properties 5 parameters passed in:
+
+- controller > controller object itself
+- component > feature object that contains controller
+- application > Arrowjs application object
+- req > [request object](http://expressjs.com/api.html#req)
+- response > [response object](http://expressjs.com/api.html#res)
 
 ## Tạo route đầu tiên
 
