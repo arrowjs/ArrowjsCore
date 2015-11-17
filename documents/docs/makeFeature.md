@@ -89,8 +89,6 @@ module.exports = {
 
 ```
 
-
-
 ## Create a controller inside a feature
 In this example, we are going to create a controller sub folder inside a feature then create index.js. index.js contains functions that handles HTTP requests we need map in route.js
 
@@ -118,15 +116,14 @@ Developer can access properties 5 parameters passed in:
 - req > [request object](http://expressjs.com/api.html#req)
 - response > [response object](http://expressjs.com/api.html#res)
 
-## Tạo route đầu tiên
+## Create a route inside a feature
 
-Tạo một file route.js ở ngay ngoài thư mục của feature
+If a feature contains several sub folder controllers such as *frontend* and *backend* then we need seperate route.js for each sub folder controller
+
+At one URL path, we can map several HTTP verbs such as: post, get, delete, put. Example of route.js. 
+
 ```
 'use strict';
-
-/**
- * Map final part of URL to equivalent functions in controller
- */
 module.exports = function (component,application) {
     return {
         "/": {
@@ -134,37 +131,32 @@ module.exports = function (component,application) {
                 handler: component.controllers.index
             }
         },
+        "/neworder": {
+            post : {
+                handler: component.controllers.newOrder
+            }
+        }
     }
 };
 ```
 
-## Tạo file layout cho feature
+## Create view template inside a feature
 
-tạo thư mục view trong feature. Hệ thống Arrow sẽ tự động loading các file trong thư mục này khi bạn gọi hàm res.render()
+In fact, a view template is HTML file that include [Nunjucks](http://mozilla.github.io/nunjucks/) syntax. Each page layout needs one view template. Nunjucks allows to [include](http://mozilla.github.io/nunjucks/templating.html#include), [import](http://mozilla.github.io/nunjucks/templating.html#import) and [extend](http://mozilla.github.io/nunjucks/templating.html#extends) a view template.
 
-``` 
-       cd <feature name>
-       mkdir view
-       touch index.html
+If you use PHPStorm or WebStorm, you should use .twig file extension for view template then install [twig plugin](https://plugins.jetbrains.com/plugin/7303?pr=) to highlight Nunjucks syntax.
 
-```
-File view trong ArrowJS tuân thủ một số cú pháp của Nunjucks. Bạn hoàn toàn có thể sử dụng html ở đây.
 
-```
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <title>{{title}}</title>
-</head>
-<body>
-<h1>{{ title }}</h1>
-</body>
-</html>
-```
+## Render HTML and response to browser in handler function
+A common flow in MVC web application is :
 
-## Chỉnh sửa controller để renderView
-Để có thể render bạn có thể gọi res.render hoặc component.render
+- Browser sends a HTTP request to web application
+- Using routes loaded in boot time, Web app maps this request to appropriate handler function
+- Handler function may fetch or update data from or to model then render view
+
+To render view you need to use either [res.render](http://expressjs.com/api.html#res.render) or component.render.
+
+For simplicity, just use res.render
 
 ```
 module.exports = function (controller,component,application) {
@@ -174,17 +166,25 @@ module.exports = function (controller,component,application) {
     }
 ```
 
-Để đẩy dữ liệu từ controller ra view bạn hãy truyền dữ liệu cho nó như sau :
+Use component.render when you want to use promise function
 
 ```
-    res.render("index.html",{ title : "Hello ArrowJS"});
+component.render("index"). then(functiont(html){
+ res.send(html)
+})
 ```
 
-## Tạo Model
+To push data from controller to view:
 
-Core Arrow hỗ trợ mặc định cơ sở dữ liệu PostgreSQL bên cạnh đó bạn có thể sử dụng mySQL, sqlite
+```
+    res.render("index.html", {title : "Hello ArrowJS"});
+```
 
-Cấu trúc môt model đơn giản :
+## Create a model
+Arrowjs uses [Sequelize](http://docs.sequelizejs.com/en/latest/) as Object Relation Mapping between SQL database to models. We, original developers of Arrojws, have been using [Postgresql](http://www.postgresql.org/) 9.4 intensively in several Arrowjs application. However you may use other SQL databases such as MySQL, MariaDB, SQLite and MSSQL.
+Please refer to [Model definition](http://docs.sequelizejs.com/en/latest/docs/models-definition/) in Sequelize to know how to define a model.
+
+Example of User model with three fields: id, username and password:
 
 ```
 var bcrypt = require('bcrypt');
@@ -226,16 +226,17 @@ module.exports = function (sequelize,Datatypes) {
 }
 ```
 
-## Lấy dữ liệu từ model trong controller
+## Get data from model
 
-Trong controller để sử dụng database bạn có thể gọi 
-```
-    component.models.[tên của model].findById // Hàm hỗ trợ của model
-```
-
-Bên cạnh đó để gọi toàn bộ model trong hệ thống bạn có thể dùng cú pháp:
+Find a record by ID
 
 ```
-    application.models.[tên của model].findById // Hàm hỗ trợ của model
+    component.models.[model_name].findById
+```
+
+Get all records in model
+
+```
+    application.models.[model_name].findAll
 ```
 
