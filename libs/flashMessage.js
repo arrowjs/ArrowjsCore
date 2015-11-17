@@ -8,7 +8,7 @@ module.exports = function () {
         res.locals.messages = req.session.flash;
 
         if (!req.session.flash) {
-            req.session.flash = [];
+            req.session.flash = {};
         }
 
         let easyFlash = {

@@ -375,7 +375,7 @@ function overrideViewRender(application, componentView, componentName, component
 function makeRender(req, res, application, componentView, componentName, component) {
     return function (view, options, callback) {
         if (req.session.messages) {
-            req.session.messages = []
+            req.session.messages = {}
         }
         var done = callback;
         var opts = options || {};
