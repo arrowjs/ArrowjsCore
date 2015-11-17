@@ -1,8 +1,12 @@
 "use strict";
-
+let util = require('util');
 module.exports = {
-    "__" : function (key) {
+    "__" : function () {
         let self = this;
-        return self._lang[self._config.language][key] || "undefined";
+        let currentLang = self.getConfig("language");
+
+        var args = Array.prototype.slice.call(arguments);
+        args[0] = self._lang[currentLang][args[0]] || 'Undefined';
+        return util.format.apply(util, args);
     }
 };
