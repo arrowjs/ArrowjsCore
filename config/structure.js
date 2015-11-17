@@ -4,7 +4,7 @@ module.exports = {
             "folder": "/features",
             "file": "feature.js"
         },
-        "extends": {
+        "extend": {
             system: true,
             active: true
         },

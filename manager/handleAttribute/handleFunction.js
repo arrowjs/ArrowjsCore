@@ -14,7 +14,7 @@ module.exports = function actionByAttribute(attName, component, fatherPath, appl
     switch (attName) {
         case "path" :
             return pathAttribute();
-        case "extends":
+        case "extend":
             return extendsAttribute(setting,application);
         case "model":
             return modelAttribute(setting, fatherPath, component, application);
