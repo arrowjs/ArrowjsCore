@@ -2,5 +2,5 @@
 
 module.exports = {
     name : "__",
-    handler : t
+    handler : __
 }
