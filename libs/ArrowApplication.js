@@ -317,9 +317,9 @@ function handleComponentRouteSetting(arrow, componentRouteSetting, defaultRouteC
             }
 
             //add middleware after authenticate;
-            if(!_.isEmpty(arrow.afterAuthenticate)) {
+            if (!_.isEmpty(arrow.afterAuthenticate)) {
                 arrow.afterAuthenticate.map(function (func) {
-                    arrayHandler.splice(0, 0,func)
+                    arrayHandler.splice(0, 0, func)
                 })
             }
 
@@ -331,9 +331,9 @@ function handleComponentRouteSetting(arrow, componentRouteSetting, defaultRouteC
             }
 
             //add middleware before authenticate;
-            if(!_.isEmpty(arrow.beforeAuthenticate)) {
+            if (!_.isEmpty(arrow.beforeAuthenticate)) {
                 arrow.beforeAuthenticate.map(function (func) {
-                    arrayHandler.splice(0, 0,func)
+                    arrayHandler.splice(0, 0, func)
                 })
             }
 
@@ -374,14 +374,15 @@ function overrideViewRender(application, componentView, componentName, component
 
 function makeRender(req, res, application, componentView, componentName, component) {
     return function (view, options, callback) {
-        if (req.session.messages) {
-            req.session.messages = {}
-        }
+
         var done = callback;
         var opts = options || {};
 
         // merge res.locals
         _.assign(opts, res.locals);
+
+        //remove flash message
+        delete req.session.flash;
 
         // support callback function as second arg
         if (typeof options === 'function') {
@@ -391,9 +392,9 @@ function makeRender(req, res, application, componentView, componentName, compone
 
         // default callback to respond
         done = done || function (err, str) {
-                if (err) return req.next(err);
-                res.send(str);
-            };
+            if (err) return req.next(err);
+            res.send(str);
+        };
 
         if (application._config.viewExtension && view.indexOf(application._config.viewExtension) === -1 && view.indexOf(".") === -1) {
             view += "." + application._config.viewExtension;
@@ -470,23 +471,23 @@ function handleRole(application, permissions, componentName, key) {
 
 function loadingGlobalFunction(self) {
     global.ArrowHelper = {};
-    __.getGlobbedFiles(path.resolve(__dirname,"..","helpers/*.js")).map(function (link) {
-       let arrowObj = require(link);
+    __.getGlobbedFiles(path.resolve(__dirname, "..", "helpers/*.js")).map(function (link) {
+        let arrowObj = require(link);
         Object.keys(arrowObj).map(function (key) {
-            if(_.isFunction(arrowObj[key])) {
-                ArrowHelper[key] =  arrowObj[key].bind(self)
+            if (_.isFunction(arrowObj[key])) {
+                ArrowHelper[key] = arrowObj[key].bind(self)
             } else {
-                ArrowHelper[key] =  arrowObj[key]
+                ArrowHelper[key] = arrowObj[key]
             }
         })
     });
     __.getGlobbedFiles(path.normalize(__base + self._config.ArrowHelper + "*.js")).map(function (link) {
         let arrowObj = require(link);
         Object.keys(arrowObj).map(function (key) {
-            if(_.isFunction(arrowObj[key])) {
-                ArrowHelper[key] =  arrowObj[key].bind(self)
+            if (_.isFunction(arrowObj[key])) {
+                ArrowHelper[key] = arrowObj[key].bind(self)
             } else {
-                ArrowHelper[key] =  arrowObj[key]
+                ArrowHelper[key] = arrowObj[key]
             }
         })
     });
