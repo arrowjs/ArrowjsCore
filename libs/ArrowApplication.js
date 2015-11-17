@@ -492,7 +492,7 @@ function loadingGlobalFunction(self) {
     });
 
     //Add some support function
-    global.t = ArrowHelper.t
+    global.__ = ArrowHelper.__
 }
 
 
