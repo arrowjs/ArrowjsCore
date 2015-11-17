@@ -4,20 +4,20 @@
  * Module dependencies.
  */
 let fs = require('fs'),
-    arrowStack = require('./ArrStack'),
+    arrowStack = require('./../libs/ArrStack'),
     path = require('path'),
     express = require('express'),
     _ = require('lodash'),
     Promise = require('bluebird'),
     chalk = require('chalk'),
-    RedisCache = require("./RedisCache"),
-    logger = require("./logger"),
-    utils = require("./utils"),
-    __ = require("./global_function"),
+    RedisCache = require("./../libs/RedisCache"),
+    logger = require("./../libs/logger"),
+    utils = require("./../libs/utils"),
+    __ = require("./../libs/global_function"),
     EventEmitter = require('events').EventEmitter,
     DefaultManager = require("../manager/DefaultManagerPrototype"),
     ConfigManager = require("../manager/ConfigManagerPrototype"),
-    buildStructure = require("./buildStructure");
+    buildStructure = require("./../libs/buildStructure");
 
 class ArrowApplication {
 
@@ -76,9 +76,9 @@ class ArrowApplication {
         this._expressApplication.arrConfig = this._config;
         this._expressApplication.redisCache = this.redisCache;
         this._expressApplication._arrApplication = this;
-        this._expressApplication.usePassport = require("./loadPassport");
-        this._expressApplication.useFlashMessage = require("./flashMessage");
-        this._expressApplication.useSession = require("./useSession");
+        this._expressApplication.usePassport = require("./../libs/loadPassport");
+        this._expressApplication.useFlashMessage = require("./../libs/flashMessage");
+        this._expressApplication.useSession = require("./../libs/useSession");
 
         this._componentList = [];
 

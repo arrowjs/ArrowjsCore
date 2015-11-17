@@ -205,6 +205,10 @@ class SystemManager extends events.EventEmitter {
 
     }
 
+    /**
+     * @param name
+     * @returns {{}}
+     */
 
     getPermissions(name) {
         let self = this;
@@ -223,13 +227,92 @@ class SystemManager extends events.EventEmitter {
         return result
     }
 
+    /**
+     * @param attributeName
+     * @returns {{}}
+     */
+
+    getAttribute(attributeName) {
+        let self = this;
+        let privateName = "_" + self.name;
+        let result = {};
+        if (attributeName && _.isString(attributeName) && self[privateName]) {
+            Object.keys(self[privateName]).map(function (componentName) {
+                if (self[privateName][componentName] && self[privateName][componentName][attributeName]) {
+                    result[componentName] = self[privateName][componentName][attributeName];
+                }
+            });
+        } else {
+            Object.keys(self[privateName]).map(function (componentName) {
+                Object.keys(self[privateName][componentName]).map(function (attributeKey) {
+                    if(attributeKey[0] !== "_" && ["controllers","views","models","action","routes","viewEngine"].indexOf(attributeKey) === -1 && !_.isFunction(self[privateName][componentName][attributeKey])) {
+                        result[componentName] = result[componentName] || {};
+                        result[componentName][attributeKey] = self[privateName][componentName][attributeKey]
+                    }
+                });
+            });
+        }
+        return result
+    }
+
+    /**
+     *
+     * @param componentName
+     * @param name : declare in structure.js
+     * @returns {Array}
+     */
+    getViewFiles(componentName,name){
+        let self = this;
+        let privateName = "_" + self.name;
+        let extension = self._config.viewExtension || "html";
+        let pathFolder = [];
+        let result = [];
+        if (componentName && self[privateName][componentName]){
+            if(name) {
+                if( self[privateName][componentName][name] && self[privateName][componentName][name].views) {
+                    self[privateName][componentName][name].views.map(function (obj) {
+                        let miniPath = handleView(obj,self,componentName);
+                        pathFolder.push(miniPath);
+                    })
+                }
+            } else {
+                if (self[privateName][componentName].views) {
+                    self[privateName][componentName].views.map(function (obj) {
+                        let miniPath = handleView(obj,self,componentName);
+                        pathFolder.push(miniPath);
+                    })
+                }
+            }
+        }
+
+        if(!_.isEmpty(pathFolder)) {
+            pathFolder.map(function (link) {
+                __.getGlobbedFiles(link + "*." + extension).map(function (result_link) {
+                    result.push(result_link)
+                })
+            })
+        }
+        return result
+    }
+
+    /**
+     *
+     * @param componentName
+     * @returns {*}
+     */
     getComponent(componentName) {
         let self = this;
         let privateName = "_" + self.name;
         return self[privateName][componentName];
     }
 }
-
+/**
+ *
+ * @param obj
+ * @param application
+ * @param componentName
+ * @returns {*}
+ */
 function handleView(obj, application, componentName) {
     let miniPath = obj.func(application._config, componentName);
     let normalizePath;

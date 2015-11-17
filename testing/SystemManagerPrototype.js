@@ -5,7 +5,7 @@ let path = require('path');
 let _ = require('lodash');
 let Express = require('express');
 let Database = require("../libs/database");
-let actionByAttribute = require('./handleAttribute/handleFunction');
+let actionByAttribute = require('./../manager/handleAttribute/handleFunction');
 let ViewEngine = require("../libs/ViewEngine");
 let util = require('util');
 

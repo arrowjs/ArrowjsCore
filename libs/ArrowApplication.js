@@ -395,7 +395,7 @@ function makeRender(req, res, application, componentView, componentName, compone
                 res.send(str);
             };
 
-        if (application._config.viewExtension && view.indexOf(application._config.viewExtension) === -1) {
+        if (application._config.viewExtension && view.indexOf(application._config.viewExtension) === -1 && view.indexOf(".") === -1) {
             view += "." + application._config.viewExtension;
         }
         component.viewEngine.loaders[0].pathsToNames = {};
