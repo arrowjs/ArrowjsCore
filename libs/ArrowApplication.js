@@ -196,19 +196,24 @@ function loadRouteAndRender(arrow, userSetting) {
         }
         arrow.models.rawQuery = defaultDatabase.query ? defaultDatabase.query.bind(defaultDatabase) : defaultQueryResolve;
     }
-    //Object.keys(arrow.models).forEach(function (modelName) {
-    //    if ("associate" in arrow.models[modelName]) {
-    //        let association = arrow.models[modelName].associate();
-    //        if(arrow.models[modelName]) {
-    //            console.log(association[modelName]);
-    //            let relation = association[modelName].type;
-    //            if(typeof arrow.models[modelName][relation] === 'function') {
-    //                arrow.models[modelName][relation](arrow.models[modelName],association[modelName].option);
-    //            }
-    //        }
-    //    }
-    //
-    //});
+    Object.keys(arrow.models).forEach(function (modelName) {
+        if ("associate" in arrow.models[modelName]) {
+            let association = arrow.models[modelName].associate();
+            Object.keys(association).map(function (key) {
+                if(arrow.models[key]) {
+                    let relation = association[key].type;
+                    if(typeof arrow.models[modelName][relation] === 'function') {
+                        arrow.models[modelName][relation](arrow.models[key],association[key].option);
+                    }
+                }
+
+            })
+        }
+    });
+
+    if (!_.isEmpty(defaultDatabase)) {
+        defaultDatabase.sync();
+    }
 
     arrow._componentList.map(function (key) {
         Object.keys(arrow[key]).map(function (componentKey) {
@@ -407,9 +412,9 @@ function makeRender(req, res, application, componentView, componentName, compone
 
         // default callback to respond
         done = done || function (err, str) {
-            if (err) return req.next(err);
-            res.send(str);
-        };
+                if (err) return req.next(err);
+                res.send(str);
+            };
 
         if (application._config.viewExtension && view.indexOf(application._config.viewExtension) === -1 && view.indexOf(".") === -1) {
             view += "." + application._config.viewExtension;

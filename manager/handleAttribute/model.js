@@ -31,12 +31,12 @@ module.exports = function modelAttribute(setting, fatherPath, component, applica
                                 component.models[modelName][relation](component.models[key],association[key].option);
                             }
                         }
-                        if(application.models[key]) {
-                            let relation = association[key].type;
-                            if(typeof application.models[modelName][relation] === 'function') {
-                                application.models[modelName][relation](application.models[key],association[key].option);
-                            }
-                        }
+                        //if(application.models[key]) {
+                        //    let relation = association[key].type;
+                        //    if(typeof application.models[modelName][relation] === 'function') {
+                        //        application.models[modelName][relation](application.models[key],association[key].option);
+                        //    }
+                        //}
                     })
                 }
             }
@@ -61,12 +61,12 @@ module.exports = function modelAttribute(setting, fatherPath, component, applica
                                         component.models[key][modelName][relation](component.models[key][key2],association[key2].option);
                                     }
                                 }
-                                if(application.models[key2]) {
-                                    let relation = association[key2].type;
-                                    if(typeof application.models[modelName][relation] === 'function') {
-                                        application.models[modelName][relation](application.models[key2],association[key2].option);
-                                    }
-                                }
+                                //if(application.models[key2]) {
+                                //    let relation = association[key2].type;
+                                //    if(typeof application.models[modelName][relation] === 'function') {
+                                //        application.models[modelName][relation](application.models[key2],association[key2].option);
+                                //    }
+                                //}
                             })
                         }
 
