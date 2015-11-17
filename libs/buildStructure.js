@@ -39,8 +39,8 @@ function getDataFromArray(obj, key,level) {
             newObj.path[pathKey] = {};
             newObj.path[pathKey].path = pathInfo[0];
             Object.keys(data).map(function (key) {
-                if (key === "extends") {
-                    newObj.path[pathKey].extends = data.extends;
+                if (key === "extend") {
+                    newObj.path[pathKey].extend = data.extend;
                 }
 
                 if (typeof data.key === 'function') {
@@ -61,7 +61,7 @@ function getDataFromArray(obj, key,level) {
                     }
                     newObj.path[pathKey][key] = getDataFromArray(data[key], key ,2);
                 } else {
-                    if (key !== "extends" && key !== "path" && typeof data.key === 'object') {
+                    if (key !== "extend" && key !== "path" && typeof data.key === 'object') {
                         newObj.path[pathKey][key] = data[key]
                     }
                 }

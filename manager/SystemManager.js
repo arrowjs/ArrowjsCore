@@ -127,8 +127,8 @@ class SystemManager extends events.EventEmitter {
                     _.assign(components[name], data);
                 }
 
-                if (components[name]._structure.extends) {
-                    let data = actionByAttribute("extends", components[name], paths[name].path, _app);
+                if (components[name]._structure.extend) {
+                    let data = actionByAttribute("extend", components[name], paths[name].path, _app);
                     _.assign(components[name], data);
                 }
 
