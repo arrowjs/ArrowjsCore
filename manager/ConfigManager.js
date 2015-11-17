@@ -10,10 +10,24 @@ class ConfigManager extends SystemManager {
     }
 
     getConfig (key){
-        if(key) {
-            return this._config[key];
+        if(_.isString(key)) {
+            if(key.indexOf(".") > 0) {
+                let arrayKey = key.split(".");
+                let self = this._config;
+                let result ;
+                arrayKey.map(function (name) {
+                    if(self[name]) {
+                        result = self[name];
+                        self = self[name];
+                    }
+                });
+                return result
+            } else {
+                return this._config[key];
+            }
+        } else {
+            return this._config;
         }
-        return this._config
     };
 
     setConfig(key,setting){
@@ -37,13 +51,6 @@ class ConfigManager extends SystemManager {
             .then(function (data) {
                 if(data) {
                     let conf = JSON.parse(data);
-                    //if(self.raw_config || self.raw_config.length > 0) {
-                    //    self.raw_config.map(function (key) {
-                    //        if(conf[key]) {
-                    //            delete conf[key];
-                    //        }
-                    //    })
-                    //}
                     _.assign(this._config,conf);
                 }
                 return(this._config);
