@@ -5,11 +5,12 @@ let _ = require('lodash');
 module.exports = function () {
     let app = this;
     app.use(function (req, res, next) {
-        res.locals.messages = req.session.flash;
 
         if (!req.session.flash) {
             req.session.flash = {};
         }
+
+        res.locals.messages = req.session.flash ;
 
         let easyFlash = {
             success: function (content) {

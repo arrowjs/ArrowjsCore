@@ -256,7 +256,6 @@ class SystemManager extends events.EventEmitter {
     }
 
     /**
-     *
      * @param componentName
      * @param name : declare in structure.js
      * @returns {Array}
