@@ -10,7 +10,6 @@ let bodyParser = require('body-parser'),
     helmet = require('helmet'),
     cookieParser = require('cookie-parser');
 
-let flash = require('connect-flash');
 
 
 module.exports = function (app,config,setting) {
@@ -58,16 +57,12 @@ module.exports = function (app,config,setting) {
     app.use(cookieParser());
 
     /** Express session storage */
-
     app.useSession();
 
     /** Use passport session */
-    app.usePassport(app,setting);
+    app.usePassport(setting);
 
     /** Flash messages */
-
-    app.use(flash());
-
     app.useFlashMessage();
 
     /** Use helmet to secure Express headers */
@@ -84,9 +79,6 @@ module.exports = function (app,config,setting) {
         res.locals.path = req.protocol + '://' + req.headers.host;
         res.locals.route = req.url;
 
-        if (req.user) {
-            res.locals.__user = req.user;
-        }
         next();
     });
 

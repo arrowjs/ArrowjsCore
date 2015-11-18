@@ -72,14 +72,9 @@ class ArrowApplication {
         this.redisClient = redisClient;
         this.redisSubscriber = redisSubscriber;
 
-        //TODO: why we assign many properties of ArrowApplication to _expressApplication. It is redundant
-        this._expressApplication.arrFolder = this.arrFolder;
-        this._expressApplication.arrConfig = this._config;
-        this._expressApplication.redisCache = this.redisCache;
-        this._expressApplication._arrApplication = this;
-        this._expressApplication.usePassport = require("./loadPassport");
-        this._expressApplication.useFlashMessage = require("./flashMessage");
-        this._expressApplication.useSession = require("./useSession");
+        this.usePassport = require("./loadPassport");
+        this.useFlashMessage = require("./flashMessage");
+        this.useSession = require("./useSession");
 
         this._componentList = [];
 
@@ -132,7 +127,6 @@ class ArrowApplication {
      */
     start(setting) {
         let self = this;
-        let exApp = self._expressApplication;
         /** Init the express application */
         return Promise.resolve()
             .then(function () {
@@ -152,10 +146,7 @@ class ArrowApplication {
                 }
             })
             .then(function () {
-                expressApp(exApp, exApp.arrConfig, setting)
-            })
-            .then(function () {
-                loadPreFunc(exApp, self.beforeFunction)
+                expressApp(self,self.getConfig(), setting)
             })
             .then(function () {
                 setupManager(self);
@@ -164,32 +155,17 @@ class ArrowApplication {
                 loadRouteAndRender(self, setting);
             })
             .then(function (app) {
-                exApp.listen(self._config.port, function () {
+                self.listen(self.getConfig("port"), function () {
                     logger.info('Application loaded using the "' + process.env.NODE_ENV + '" environment configuration');
-                    logger.info('Application started on port ' + self._config.port, ', Process ID: ' + process.pid);
+                    logger.info('Application started on port ' + self.getConfig("port"), ', Process ID: ' + process.pid);
                 });
                 return app;
             });
 
     }
-
-    /**
-     * Add function that will execute before authentication task
-     * @param func
-     */
-
-
-
-    before(func) {
-        if (typeof func == "function") {
-            this.beforeFunction.push(func);
-        }
-    }
-
 }
 
 /**
- *
  * Supporting functions
  */
 
@@ -211,21 +187,23 @@ function loadRouteAndRender(arrow, userSetting) {
             defaultDatabase = Database(arrow);
         }
         arrow.models.rawQuery = defaultDatabase.query ? defaultDatabase.query.bind(defaultDatabase) : defaultQueryResolve;
-    }
-    Object.keys(arrow.models).forEach(function (modelName) {
-        if ("associate" in arrow.models[modelName]) {
-            let association = arrow.models[modelName].associate();
-            Object.keys(association).map(function (key) {
-                if (arrow.models[key]) {
-                    let relation = association[key].type;
-                    if (typeof arrow.models[modelName][relation] === 'function') {
-                        arrow.models[modelName][relation](arrow.models[key], association[key].option);
+        Object.keys(arrow.models).forEach(function (modelName) {
+            if ("associate" in arrow.models[modelName]) {
+                let association = arrow.models[modelName].associate();
+                Object.keys(association).map(function (key) {
+                    if (arrow.models[key]) {
+                        let relation = association[key].type;
+                        if (typeof arrow.models[modelName][relation] === 'function') {
+                            arrow.models[modelName][relation](arrow.models[key], association[key].option);
+                        }
                     }
-                }
 
-            })
-        }
-    });
+                })
+            }
+        });
+
+    }
+
 
     if (!_.isEmpty(defaultDatabase)) {
         defaultDatabase.sync();
