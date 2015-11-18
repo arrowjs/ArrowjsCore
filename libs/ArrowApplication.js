@@ -120,7 +120,6 @@ class ArrowApplication {
     }
 
     afterAuthenticate(func) {
-        console.log("Asd")
         let self = this;
         if (typeof func == "function") {
             self.afterAuth.push(func.bind(self));
