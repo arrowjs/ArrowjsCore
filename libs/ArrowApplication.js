@@ -88,7 +88,6 @@ class ArrowApplication {
 
         this.configManager = new ConfigManager(this, "config");
         this.configManager.eventHook(eventEmitter);
-        this._config = this.configManager._config;
         this.getConfig = this.configManager.getConfig.bind(this.configManager);
         this.setConfig = this.configManager.setConfig.bind(this.configManager);
         this.updateConfig = this.configManager.updateConfig.bind(this.configManager);

@@ -13,27 +13,24 @@ let ViewEngine = require("../libs/ViewEngine");
 class SystemManager extends events.EventEmitter {
     constructor(app, name) {
         super();
-        this._config = app._config;
-        this.arrFolder = app.arrFolder;
-        this.structure = app.structure;
         this.pub = app.redisClient;
         this.sub = app.redisSubscriber();
         this._app = app;
+        //this._config = app._config;
         this.name = name;
         this.viewEngine = null;
         let self = this;
-        let updateKey = self._config.redis_event['update_' + self.name] || ('update_' + self.name);
-        this.sub.subscribe(self._config.redis_prefix + updateKey);
+        let updateKey = app._config.redis_event['update_' + self.name] || ('update_' + self.name);
+        this.sub.subscribe(app._config.redis_prefix + updateKey);
 
         this.sub.on("message", function (demo) {
             self.getCache();
         });
-
     }
 
     getCache() {
         let self = this;
-        return this.pub.getAsync(self._config.redis_prefix + self._config.redis_key[self.name] || self.name)
+        return this.pub.getAsync(self._app._config.redis_prefix + self._app._config.redis_key[self.name] || self.name)
             .then(function (data) {
                 if (data) {
                     let cache = JSON.parse(data);
@@ -52,9 +49,9 @@ class SystemManager extends events.EventEmitter {
 
         if (self["_" + self.name]) {
             let data = getInfo(self["_" + self.name]);
-            return this.pub.setAsync(self._config.redis_prefix + self._config.redis_key[self.name] || self.name, JSON.stringify(data));
+            return this.pub.setAsync(self._app._config.redis_prefix + self._app._config.redis_key[self.name] || self.name, JSON.stringify(data));
         } else {
-            return this.pub.setAsync(self._config.redis_prefix + self._config.redis_key[self.name] || self.name, null);
+            return this.pub.setAsync(self._app._config.redis_prefix + self._app._config.redis_key[self.name] || self.name, null);
         }
     }
 
@@ -62,8 +59,8 @@ class SystemManager extends events.EventEmitter {
         let self = this;
         return self.getCache().then(function (a) {
             let name = self.name;
-            let updateKey = self._config.redis_event['update_' + self.name] || ('update_' + self.name);
-            return self.pub.publishAsync(self._config.redis_prefix + updateKey, "update " + name)
+            let updateKey = self._app._config.redis_event['update_' + self.name] || ('update_' + self.name);
+            return self.pub.publishAsync(self._app._config.redis_prefix + updateKey, "update " + name)
         })
     }
 
@@ -73,8 +70,8 @@ class SystemManager extends events.EventEmitter {
 
     loadComponents() {
         let self = this;
-        let struc = this.structure[self.name];
-        let _base = this.arrFolder;
+        let struc = self._app.structure[self.name];
+        let _base = self._app.arrFolder;
         let privateName = "_" + self.name;
         let components = {};
         let _app = this._app;
@@ -82,7 +79,7 @@ class SystemManager extends events.EventEmitter {
         if (struc.type === "single") {
             Object.keys(struc.path).map(function (id) {
                 struc.path[id].path.map(function (globMaker) {
-                    let componentGlobLink = path.normalize(_base + globMaker(self._config));
+                    let componentGlobLink = path.normalize(_base + globMaker(self._app._config));
                     let listComponents = __.getGlobbedFiles(componentGlobLink);
                     let componentFolder = componentGlobLink.slice(0, componentGlobLink.indexOf('*'));
                     listComponents.forEach(function (link) {
@@ -263,7 +260,7 @@ class SystemManager extends events.EventEmitter {
     getViewFiles(componentName,name){
         let self = this;
         let privateName = "_" + self.name;
-        let extension = self._config.viewExtension || "html";
+        let extension = self._app._config.viewExtension || "html";
         let pathFolder = [];
         let result = [];
         if (componentName && self[privateName][componentName]){
