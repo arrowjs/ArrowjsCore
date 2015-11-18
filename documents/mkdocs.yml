@@ -5,6 +5,7 @@ pages:
 - [makeFeature.md,Make a feature, Make a feature]
 - [models.md,Models]
 - [session.md,Session]
+- [guidelines.md,Guideline]
 - [template_engine.md,Template Engine,Introduction]
 - [template/custom_filter.md,Template Engine,Custom filter]
 - [structure.md,Structure,Basic]
