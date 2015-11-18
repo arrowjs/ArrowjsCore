@@ -1,7 +1,7 @@
 'use strict';
 let fs = require('fs');
 let passport = require("passport");
-let __ = require('./global_function');
+let __ = require('../../libs/global_function');
 let path = require('path');
 
 module.exports = function loadPassport(setting) {

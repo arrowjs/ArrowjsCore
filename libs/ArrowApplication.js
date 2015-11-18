@@ -48,6 +48,9 @@ class ArrowApplication {
         }
 
         //TODO: arrowStack(2) 2 is very ad-hoc number, let's explain why !
+        // 0 : location of this file
+        // 1 : location of index.js (module file)
+        // 2 : location of server.js file
         let requester = arrowStack(2);
         this.arrFolder = path.dirname(requester) + '/';
 
@@ -73,9 +76,10 @@ class ArrowApplication {
         this.redisClient = redisClient;
         this.redisSubscriber = redisSubscriber;
 
-        this.usePassport = require("./loadPassport");
-        this.useFlashMessage = require("./flashMessage");
-        this.useSession = require("./useSession");
+        this.usePassport = require("../config/middleware/loadPassport");
+        this.useFlashMessage = require("../config/middleware/flashMessage");
+        this.useSession = require("../config/middleware/useSession");
+        this.serveStatic = require("../config/middleware/staticResource");
 
         this._componentList = [];
 
@@ -157,9 +161,6 @@ class ArrowApplication {
                 expressApp(self,self.getConfig(), setting)
             })
             .then(function () {
-                setupManager(self);
-            })
-            .then(function () {
                 loadRouteAndRender(self, setting);
             })
             .then(function (app) {
@@ -177,12 +178,12 @@ class ArrowApplication {
  * Supporting functions
  */
 
-/**
- * Load routers
- * @param arrow
- */
 
-//TODO testing render ;
+/**
+ *
+ * @param arrow
+ * @param userSetting
+ */
 function loadRouteAndRender(arrow, userSetting) {
     let defaultDatabase = {};
     let defaultQueryResolve = function () {
@@ -271,17 +272,17 @@ function loadPreFunc(app, beforeFunc) {
  * @param app
  * @returns {null}
  */
-function setupManager(app) {
-    try {
-        fs.accessSync(path.resolve(app.arrFolder + "config/manager.js"));
-        let setupManager = require(app.arrFolder + "config/manager");
-        setupManager(app);
-    } catch (err) {
-        //TODO: put error handling here
-
-    }
-    return null;
-}
+//function setupManager(app) {
+//    try {
+//        fs.accessSync(path.resolve(app.arrFolder + "config/manager.js"));
+//        let setupManager = require(app.arrFolder + "config/manager");
+//        setupManager(app);
+//    } catch (err) {
+//
+//
+//    }
+//    return null;
+//}
 
 /**
  *

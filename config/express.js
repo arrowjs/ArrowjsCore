@@ -2,11 +2,7 @@
 
 let bodyParser = require('body-parser'),
     methodOverride = require('method-override'),
-    express = require('express'),
-    path = require('path'),
     morgan = require('morgan'),
-    _ = require('lodash'),
-    fs = require('fs'),
     helmet = require('helmet'),
     cookieParser = require('cookie-parser');
 
@@ -16,14 +12,7 @@ module.exports = function (app,config,setting) {
     /**
      * Set folder static resource
      */
-    if (_.isArray(config.resource.path)) {
-        config.resource.path.map(function (link) {
-            app.use(express.static(path.resolve(app.arrFolder + link), config.resource.option));
-        })
-    } else {
-        app.use(express.static(path.resolve(app.arrFolder + config.resource.path), config.resource.option));
-
-    }
+    app.serveStatic();
 
     /**
      * Set local variable
