@@ -136,6 +136,7 @@ class ArrowApplication {
         /** Init the express application */
         return Promise.resolve()
             .then(function () {
+                addRoles(self);
                 if (self.getConfig("redis.type") !== "fakeredis") {
                     //TODO : testing auto load config if use redis
                     let resolve = self.configManager.getCache();
@@ -149,7 +150,6 @@ class ArrowApplication {
                 } else {
                     return Promise.resolve();
                 }
-                //addRoles(self);
             })
             .then(function () {
                 expressApp(exApp, exApp.arrConfig, setting)
