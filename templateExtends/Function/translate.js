@@ -1,6 +1,6 @@
 "use strict";
 
 module.exports = {
-    name : "t",
-    handler : t
+    name : "__",
+    handler : __
 }
