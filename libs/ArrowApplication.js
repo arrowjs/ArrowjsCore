@@ -204,20 +204,6 @@ function loadRouteAndRender(arrow, userSetting) {
             databaseFunction.associate(arrow.models)
         }
 
-        //Object.keys(arrow.models).forEach(function (modelName) {
-        //    if ("associate" in arrow.models[modelName]) {
-        //        let association = arrow.models[modelName].associate();
-        //        Object.keys(association).map(function (key) {
-        //            if (arrow.models[key]) {
-        //                let relation = association[key].type;
-        //                if (typeof arrow.models[modelName][relation] === 'function') {
-        //                    arrow.models[modelName][relation](arrow.models[key], association[key].option);
-        //                }
-        //            }
-        //
-        //        })
-        //    }
-        //});
     }
 
 
