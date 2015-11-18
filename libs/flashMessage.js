@@ -2,8 +2,12 @@
 
 let _ = require('lodash');
 
+let flash = require('connect-flash');
+
 module.exports = function () {
     let app = this;
+    app.use(flash());
+
     app.use(function (req, res, next) {
 
         if (!req.session.flash) {

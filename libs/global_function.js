@@ -107,16 +107,16 @@ exports.getWidget = function (alias) {
  * @param {array} views - List of loaders
  * @returns {object}
  */
-exports.createNewEnv = function (views, viewEngineConfig) {
+exports.createNewEnv = function (views, viewEngineConfig,application) {
     let self = this;
     let env;
 
     env = new nunjucks.Environment(new nunjucks.FileSystemLoader(views), viewEngineConfig);
-    let viewSetting = viewEngineConfig.express.arrConfig;
-    env = self.getAllFunction(env, viewSetting, viewEngineConfig.express._arrApplication);
-    env = self.getAllCustomFilter(env, viewSetting, viewEngineConfig.express._arrApplication);
-    env = self.getAllVariable(env, viewSetting, viewEngineConfig.express._arrApplication);
-    env = self.getAllExtensions(env, viewSetting, viewEngineConfig.express._arrApplication);
+    let viewSetting = application.getConfig();
+    env = self.getAllFunction(env, viewSetting,application);
+    env = self.getAllCustomFilter(env, viewSetting, application);
+    env = self.getAllVariable(env, viewSetting, application);
+    env = self.getAllExtensions(env, viewSetting, application);
 
     return env;
 };
@@ -207,7 +207,6 @@ exports.getAllFunction = function (env, viewSetting, app) {
             }
         }
     });
-
     if (!viewSetting.functionFolder) return env;
     let functionLinks = self.getGlobbedFiles(path.normalize(__base + viewSetting.functionFolder + "/*.js"));
     functionLinks.map(function (link) {

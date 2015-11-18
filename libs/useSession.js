@@ -5,10 +5,10 @@ var session = require('express-session'),
 module.exports = function useSession() {
     let app = this;
     let sessionConfig = require(app.arrFolder + 'config/session');
-    if(app.arrConfig.redis.type !== "fakeredis") {
+    if(app.getConfig("redis.type") !== "fakeredis") {
         sessionConfig.store = sessionConfig.store || new RedisStore({
-            host: app.arrConfig.redis.host,
-            port: app.arrConfig.redis.port,
+            host: app.getConfig("redis.host"),
+            port: app.getConfig("redis.port"),
             client: app.redisClient,
             prefix: sessionConfig.redis_prefix || 'sess:'
         })

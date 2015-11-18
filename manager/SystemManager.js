@@ -183,10 +183,10 @@ class SystemManager extends events.EventEmitter {
         });
 
         let featureViewEngine = this.viewEngine;
-        let viewEngineSetting = _.assign(_app._config.nunjuckSettings || {},{ express: self._app._expressApplication});
+        let viewEngineSetting = _.assign(_app._config.nunjuckSettings || {},{ express: _app._expressApplication});
         Object.keys(components).map(function (key) {
             if (!_.isEmpty(components[key].views)) {
-                featureViewEngine = featureViewEngine || ViewEngine(_base,viewEngineSetting);
+                featureViewEngine = featureViewEngine || ViewEngine(_base,viewEngineSetting,_app);
             }
             if (_.isArray(components[key].views)) {
                 components[key].render = makeRender(featureViewEngine,components[key].views,key)
