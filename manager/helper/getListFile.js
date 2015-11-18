@@ -1,7 +1,13 @@
 "use strict";
 let __ = require('../../libs/global_function');
 let path = require('path');
-
+/**
+ * Get list file by glob
+ * @param componentSetting
+ * @param fatherPath
+ * @param application
+ * @returns {{}}
+ */
 module.exports = function getListFile(componentSetting, fatherPath, application) {
     let files = {};
     let componentPath = componentSetting.path;

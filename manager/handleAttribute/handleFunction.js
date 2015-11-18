@@ -9,6 +9,14 @@ let actionAttribute = require('./action');
 let controllerAttribute = require('./controller');
 let otherAttribute = require('./other');
 
+/**
+ * Get config by attribute of feature
+ * @param attName
+ * @param component
+ * @param fatherPath
+ * @param application
+ * @returns {*}
+ */
 module.exports = function actionByAttribute(attName, component, fatherPath, application) {
     let setting = component._structure[attName];
     switch (attName) {

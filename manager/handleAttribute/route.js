@@ -4,6 +4,13 @@ let getListFile = require('../helper/getListFile');
 let Express = require('express');
 let _ = require('lodash');
 
+/**
+ * Get all route.
+ * @param setting
+ * @param fatherPath
+ * @param component
+ * @param application
+ */
 module.exports = function routeAttribute(setting, fatherPath, component, application) {
     let files = getListFile(setting, fatherPath, application);
     if (files.type === "single") {

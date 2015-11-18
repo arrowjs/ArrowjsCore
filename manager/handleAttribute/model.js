@@ -5,6 +5,13 @@ let Database = require("../../libs/database");
 let path = require('path');
 let _ = require('lodash');
 
+/**
+ * Add model to application and component
+ * @param setting
+ * @param fatherPath
+ * @param component
+ * @param application
+ */
 module.exports = function modelAttribute(setting, fatherPath, component, application) {
     let files = getListFile(setting, fatherPath, application);
     let database = Database(application);
