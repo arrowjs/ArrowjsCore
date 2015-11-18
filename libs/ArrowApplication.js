@@ -122,7 +122,20 @@ class ArrowApplication {
         /** Init the express application */
         return Promise.resolve()
             .then(function () {
-                addRoles(self);
+                if (self.getConfig("redis.type") !== "fakeredis") {
+                    //TODO : testing auto load config if use redis
+                    let resolve = self.configManager.getCache();
+                    self._componentList.map(function (key) {
+                        let managerName = key + "Manager";
+                        resolve = resolve.then(function () {
+                            return self[managerName].getCache()
+                        })
+                    })
+                    return resolve
+                } else {
+                    return Promise.resolve();
+                }
+                //addRoles(self);
             })
             .then(function () {
                 expressApp(exApp, exApp.arrConfig, setting)
@@ -200,10 +213,10 @@ function loadRouteAndRender(arrow, userSetting) {
         if ("associate" in arrow.models[modelName]) {
             let association = arrow.models[modelName].associate();
             Object.keys(association).map(function (key) {
-                if(arrow.models[key]) {
+                if (arrow.models[key]) {
                     let relation = association[key].type;
-                    if(typeof arrow.models[modelName][relation] === 'function') {
-                        arrow.models[modelName][relation](arrow.models[key],association[key].option);
+                    if (typeof arrow.models[modelName][relation] === 'function') {
+                        arrow.models[modelName][relation](arrow.models[key], association[key].option);
                     }
                 }
 
@@ -412,9 +425,9 @@ function makeRender(req, res, application, componentView, componentName, compone
 
         // default callback to respond
         done = done || function (err, str) {
-                if (err) return req.next(err);
-                res.send(str);
-            };
+            if (err) return req.next(err);
+            res.send(str);
+        };
 
         if (application._config.viewExtension && view.indexOf(application._config.viewExtension) === -1 && view.indexOf(".") === -1) {
             view += "." + application._config.viewExtension;
