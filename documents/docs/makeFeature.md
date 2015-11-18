@@ -161,7 +161,7 @@ For simplicity, just use res.render
 ```
 module.exports = function (controller,component,application) {
      controller.index = function (req,res) {
-        res.render("index.html");
+        res.render("index.twig");
       };
     }
 ```
@@ -177,7 +177,7 @@ component.render("index"). then(functiont(html){
 To push data from controller to view:
 
 ```
-    res.render("index.html", {title : "Hello ArrowJS"});
+    res.render("index.twig", {title : "Hello ArrowJS"});
 ```
 
 ## Create a model
