@@ -15,3 +15,7 @@ classMethods: {
     }
 }
 ```
+
+There are several [relation and associate types](http://docs.sequelizejs.com/en/latest/docs/associations/)
+
+1- 
