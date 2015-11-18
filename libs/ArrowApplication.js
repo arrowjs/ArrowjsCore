@@ -32,8 +32,8 @@ class ArrowApplication {
 
         let eventEmitter = new EventEmitter();
         this.beforeFunction = [];
-        this.beforeAuthenticate = [];
-        this.afterAuthenticate = [];
+        this.beforeAuth = [];
+        this.afterAuth = [];
         this._expressApplication = express();
 
         //Move all functions of express to ArrowApplication
@@ -112,6 +112,21 @@ class ArrowApplication {
         }.bind(this));
     }
 
+    beforeAuthenticate(func) {
+        let self = this;
+        if (typeof func == "function") {
+            self.beforeAuth.push(func.bind(self));
+        }
+    }
+
+    afterAuthenticate(func) {
+        console.log("Asd")
+        let self = this;
+        if (typeof func == "function") {
+            self.afterAuth.push(func.bind(self));
+        }
+    }
+
     /**
      * Kick start express application and listen at default port
      * @returns {Promise.<T>}
@@ -164,25 +179,14 @@ class ArrowApplication {
      * @param func
      */
 
+
+
     before(func) {
         if (typeof func == "function") {
             this.beforeFunction.push(func);
         }
     }
 
-    beforeAuthenticate(func) {
-        let self = this;
-        if (typeof func == "function") {
-            self.beforeAuthenticate.push(func.bind(self));
-        }
-    }
-
-    afterAuthenticate(func) {
-        let self = this;
-        if (typeof func == "function") {
-            self.afterAuthenticate.push(func.bind(self));
-        }
-    }
 }
 
 /**
@@ -350,8 +354,8 @@ function handleComponentRouteSetting(arrow, componentRouteSetting, defaultRouteC
             }
 
             //add middleware after authenticate;
-            if (!_.isEmpty(arrow.afterAuthenticate)) {
-                arrow.afterAuthenticate.map(function (func) {
+            if (!_.isEmpty(arrow.afterAuth)) {
+                arrow.afterAuth.map(function (func) {
                     arrayHandler.splice(0, 0, func)
                 })
             }
@@ -364,8 +368,8 @@ function handleComponentRouteSetting(arrow, componentRouteSetting, defaultRouteC
             }
 
             //add middleware before authenticate;
-            if (!_.isEmpty(arrow.beforeAuthenticate)) {
-                arrow.beforeAuthenticate.map(function (func) {
+            if (!_.isEmpty(arrow.beforeAuth)) {
+                arrow.beforeAuth.map(function (func) {
                     arrayHandler.splice(0, 0, func)
                 })
             }
