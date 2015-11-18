@@ -47,7 +47,8 @@ class ArrowApplication {
             }
         }
 
-        let requester = arrowStack(2);  //Why arrowStack(2)?
+        //TODO: arrowStack(2) 2 is very ad-hoc number, let's explain why !
+        let requester = arrowStack(2);
         this.arrFolder = path.dirname(requester) + '/';
 
 
@@ -72,7 +73,7 @@ class ArrowApplication {
         this.redisClient = redisClient;
         this.redisSubscriber = redisSubscriber;
 
-        //TODO: why we assign many properties of ArrowApplication to _expressApplication. It is redundant
+        //TODO: why we assign many properties of ArrowApplication to _expressApplication. It is redundant AN
         this._expressApplication.arrFolder = this.arrFolder;
         this._expressApplication.arrConfig = this._config;
         this._expressApplication.redisCache = this.redisCache;
@@ -112,6 +113,10 @@ class ArrowApplication {
         }.bind(this));
     }
 
+    /**
+     *
+     * @param func
+     */
     beforeAuthenticate(func) {
         let self = this;
         if (typeof func == "function") {
@@ -119,6 +124,10 @@ class ArrowApplication {
         }
     }
 
+    /**
+     *
+     * @param func
+     */
     afterAuthenticate(func) {
         let self = this;
         if (typeof func == "function") {
@@ -177,8 +186,6 @@ class ArrowApplication {
      * Add function that will execute before authentication task
      * @param func
      */
-
-
 
     before(func) {
         if (typeof func == "function") {
@@ -286,18 +293,32 @@ function loadPreFunc(app, beforeFunc) {
     })
 }
 
-
+/**
+ *
+ * @param app
+ * @returns {null}
+ */
 function setupManager(app) {
     try {
         fs.accessSync(path.resolve(app.arrFolder + "config/manager.js"));
         let setupManager = require(app.arrFolder + "config/manager");
         setupManager(app);
     } catch (err) {
+        //TODO: put error handling here
 
     }
     return null;
 }
 
+/**
+ *
+ * @param arrow
+ * @param componentRouteSetting
+ * @param defaultRouteConfig
+ * @param key
+ * @param setting
+ * @param componentKey
+ */
 function handleComponentRouteSetting(arrow, componentRouteSetting, defaultRouteConfig, key, setting, componentKey) {
     let component = arrow[key][componentKey];
     let componentName = arrow[key][componentKey].name;
@@ -389,7 +410,14 @@ function handleComponentRouteSetting(arrow, componentRouteSetting, defaultRouteC
         !_.isEmpty(arrayMethod) && arrow.use(prefix, route);
     });
 }
-
+/**
+ * 
+ * @param application
+ * @param componentView
+ * @param componentName
+ * @param component
+ * @returns {Function}
+ */
 function overrideViewRender(application, componentView, componentName, component) {
     return function (req, res, next) {
         // Grab reference of render
@@ -428,9 +456,9 @@ function makeRender(req, res, application, componentView, componentName, compone
 
         // default callback to respond
         done = done || function (err, str) {
-            if (err) return req.next(err);
-            res.send(str);
-        };
+                if (err) return req.next(err);
+                res.send(str);
+            };
 
         if (application._config.viewExtension && view.indexOf(application._config.viewExtension) === -1 && view.indexOf(".") === -1) {
             view += "." + application._config.viewExtension;
