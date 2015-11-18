@@ -195,21 +195,29 @@ function loadRouteAndRender(arrow, userSetting) {
             defaultDatabase = Database(arrow);
         }
         arrow.models.rawQuery = defaultDatabase.query ? defaultDatabase.query.bind(defaultDatabase) : defaultQueryResolve;
-        Object.keys(arrow.models).forEach(function (modelName) {
-            if ("associate" in arrow.models[modelName]) {
-                let association = arrow.models[modelName].associate();
-                Object.keys(association).map(function (key) {
-                    if (arrow.models[key]) {
-                        let relation = association[key].type;
-                        if (typeof arrow.models[modelName][relation] === 'function') {
-                            arrow.models[modelName][relation](arrow.models[key], association[key].option);
-                        }
-                    }
 
-                })
-            }
-        });
+        //New way to associate db:
 
+        let databaseFunction = require(arrow.arrFolder + "config/database");
+
+        if (databaseFunction.associate) {
+            databaseFunction.associate(arrow.models)
+        }
+
+        //Object.keys(arrow.models).forEach(function (modelName) {
+        //    if ("associate" in arrow.models[modelName]) {
+        //        let association = arrow.models[modelName].associate();
+        //        Object.keys(association).map(function (key) {
+        //            if (arrow.models[key]) {
+        //                let relation = association[key].type;
+        //                if (typeof arrow.models[modelName][relation] === 'function') {
+        //                    arrow.models[modelName][relation](arrow.models[key], association[key].option);
+        //                }
+        //            }
+        //
+        //        })
+        //    }
+        //});
     }
 
 
