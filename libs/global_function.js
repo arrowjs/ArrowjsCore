@@ -761,6 +761,13 @@ module.exports.getRawConfig = function getRawConfig() {
         fsEx.copySync(path.resolve(__dirname, '..', 'config/passport.js'), __base + 'config/passport.js');
     }
 
+    //get database.js
+    try {
+        fs.accessSync(__base + 'config/database.js');
+    } catch (err) {
+        fsEx.copySync(path.resolve(__dirname, '..', 'config/database.js'), __base + 'config/database.js');
+    }
+
     //setup strategy
     this.createDirectory('config/strategies');
     try {
