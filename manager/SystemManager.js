@@ -8,7 +8,7 @@ let Database = require("../libs/database");
 let actionByAttribute = require('./handleAttribute/handleFunction');
 let ViewEngine = require("../libs/ViewEngine");
 
-//let privateVariable = new WeakMap();
+//TODO: Explain purpose, in,out parameters for every function. Use jsDoc format !
 
 class SystemManager extends events.EventEmitter {
     constructor(app, name) {

@@ -7,6 +7,8 @@ Feature represents one unit of feature in web application. A feature consists of
 - Controller: Javascript file contains handler functions for different HTTP requests
 - Router: Direct HTTP request to appropriate handler functions in controller
 
+![image](./img/arrow_application.jpg)
+
 
 ## Folder structure of feature
 ![folder structure of blog feature](./img/folder_feature.jpg)
@@ -227,16 +229,17 @@ module.exports = function (sequelize,Datatypes) {
 ```
 
 ## Get data from model
+Please refer to section [Querying of Sequelizejs](http://docs.sequelizejs.com/en/latest/docs/querying/) for detail. Below are just some simple examples:
 
 Find a record by ID
 
 ```
-    component.models.[model_name].findById
+    component.models.[model_name].findById(id)
 ```
 
 Get all records in model
 
 ```
-    application.models.[model_name].findAll
+    application.models.[model_name].findAll(condition)
 ```
 
