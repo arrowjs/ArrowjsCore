@@ -2,6 +2,13 @@
 
 let getListFunction = require('../helper/getListFunction');
 
+/**
+ * Get function to find layout folder
+ * @param setting
+ * @param fatherPath
+ * @param component
+ * @param application
+ */
 module.exports = function viewAttribute(setting, fatherPath, component, application) {
     let functions = getListFunction(setting, fatherPath, application);
     if (functions.type === "single") {

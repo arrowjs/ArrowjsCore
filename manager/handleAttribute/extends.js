@@ -1,4 +1,11 @@
 "use strict";
+
+/**
+ * Add extends to feature
+ * @param setting
+ * @param application
+ * @returns {{}}
+ */
 module.exports = function extendsAttribute(setting,application) {
     let newSetting = {};
     Object.keys(setting).map(function (key) {

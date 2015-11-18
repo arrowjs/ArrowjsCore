@@ -9,6 +9,11 @@ class ConfigManager extends SystemManager {
         super(app,name);
     }
 
+    /**
+     * Get system config by key
+     * @param key
+     * @returns {*}
+     */
     getConfig (key){
         if(_.isString(key)) {
             if(key.indexOf(".") > 0) {
@@ -29,13 +34,22 @@ class ConfigManager extends SystemManager {
             return this._app._config;
         }
     };
-
+    /**
+     * Set config 
+     * @param key
+     * @param setting
+     * @returns {*|Promise.<T>}
+     */
     setConfig(key,setting){
         this._app._config[key] = setting;
         let self = this;
         return self.setCache().then(self.reload());
     };
-
+    /**
+     * Set multi config
+     * @param setting
+     * @returns {*}
+     */
     updateConfig(setting){
         let self = this;
         if(setting) {
