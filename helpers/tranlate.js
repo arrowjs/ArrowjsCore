@@ -1,5 +1,9 @@
 "use strict";
 let util = require('util');
+/**
+ * Export global functions
+ * @type {{__: Function}}
+ */
 module.exports = {
     "__" : function () {
         let self = this;

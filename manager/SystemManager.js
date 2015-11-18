@@ -8,8 +8,9 @@ let Database = require("../libs/database");
 let actionByAttribute = require('./handleAttribute/handleFunction');
 let ViewEngine = require("../libs/ViewEngine");
 
-//TODO: Explain purpose, in,out parameters for every function. Use jsDoc format !
-
+/**
+ * Base SystemManager class
+ */
 class SystemManager extends events.EventEmitter {
     constructor(app, name) {
         super();
@@ -28,6 +29,10 @@ class SystemManager extends events.EventEmitter {
         });
     }
 
+    /**
+     * Get all feature config from cache (Redis)
+     * @returns {Promise.<T>}
+     */
     getCache() {
         let self = this;
         return this.pub.getAsync(self._app._config.redis_prefix + self._app._config.redis_key[self.name] || self.name)
@@ -44,6 +49,10 @@ class SystemManager extends events.EventEmitter {
             }.bind(this));
     }
 
+    /**
+     * Set all feature config to cache
+     * @returns {*}
+     */
     setCache() {
         let self = this;
 
@@ -55,6 +64,10 @@ class SystemManager extends events.EventEmitter {
         }
     }
 
+    /**
+     * Get data from cache and sync cluster
+     * @returns {Promise.<T>}
+     */
     reload() {
         let self = this;
         return self.getCache().then(function (a) {
@@ -64,10 +77,17 @@ class SystemManager extends events.EventEmitter {
         })
     }
 
+    /**
+     * ArrowApplication use singleton events
+     * @param events
+     */
     eventHook(events) {
         this._events = events._events
     }
 
+    /**
+     * Load view,controller,model of feature
+     */
     loadComponents() {
         let self = this;
         let struc = self._app.structure[self.name];
@@ -203,6 +223,7 @@ class SystemManager extends events.EventEmitter {
     }
 
     /**
+     * Get permission of one feature or all feature
      * @param name
      * @returns {{}}
      */
@@ -225,6 +246,7 @@ class SystemManager extends events.EventEmitter {
     }
 
     /**
+     * Get feature attribute
      * @param attributeName
      * @returns {{}}
      */

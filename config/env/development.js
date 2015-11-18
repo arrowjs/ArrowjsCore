@@ -1,7 +1,7 @@
 'use strict';
 
 module.exports = {
-    port: process.env.PORT || 3333,
+    port: process.env.PORT || 8000,
     db: {
         host: 'localhost',
         port: '5432',
@@ -24,7 +24,7 @@ module.exports = {
     google: {
         clientID: process.env.GOOGLE_ID || 'CONSUMER_KEY',
         clientSecret: process.env.GOOGLE_SECRET || 'CONSUMER_SECRET',
-        callbackURL: 'http://techmaster.vn/auth/google/callback'
+        callbackURL: '/auth/google/callback'
     },
     mailer: {
         from: process.env.MAILER_FROM || 'MAILER_FROM',
