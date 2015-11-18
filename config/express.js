@@ -8,8 +8,7 @@ let bodyParser = require('body-parser'),
     _ = require('lodash'),
     fs = require('fs'),
     helmet = require('helmet'),
-    cookieParser = require('cookie-parser'),
-    arrowStack = require('../libs/ArrStack').stack;
+    cookieParser = require('cookie-parser');
 
 let flash = require('connect-flash');
 
@@ -80,7 +79,7 @@ module.exports = function (app,config,setting) {
 
     /** Passing the variables to environment locals */
     app.use(function (req, res, next) {
-        res.locals.hasOwnProperty = Object.hasOwnProperty;
+        //res.locals.hasOwnProperty = Object.hasOwnProperty;
         res.locals.url = req.protocol + '://' + req.headers.host + req.url;
         res.locals.path = req.protocol + '://' + req.headers.host;
         res.locals.route = req.url;
