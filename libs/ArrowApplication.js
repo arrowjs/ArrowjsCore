@@ -11,13 +11,13 @@ let fs = require('fs'),
     Promise = require('bluebird'),
     RedisCache = require("./RedisCache"),
     logger = require("./logger"),
-    utils = require("./utils"),
     __ = require("./global_function"),
     EventEmitter = require('events').EventEmitter,
     Database = require('./database'),
     DefaultManager = require("../manager/DefaultManager"),
     ConfigManager = require("../manager/ConfigManager"),
-    buildStructure = require("./buildStructure");
+    buildStructure = require("./buildStructure"),
+    loadingLanguage = require("./i18n").loadLanguage;
 
 class ArrowApplication {
 
@@ -52,11 +52,13 @@ class ArrowApplication {
         let requester = arrowStack(2);
         this.arrFolder = path.dirname(requester) + '/';
 
-
         global.__base = this.arrFolder;
         this._config = __.getRawConfig();  //Read config/config.js into this._config
         this.structure = buildStructure(__.getStructure());
 
+        if(this._config.long_stack) {
+            require('longjohn')
+        }
 
         //Make redis cache
         let redisConfig = this._config.redis || {};
@@ -81,11 +83,7 @@ class ArrowApplication {
 
         this._componentList = [];
 
-        let languagePath = __base + this._config.langPath + '/*.js';
-        this._lang = {};
-        __.getGlobbedFiles(languagePath).forEach(function (file) {
-            this._lang[path.basename(file, '.js')] = require(file);
-        }.bind(this));
+        loadingLanguage(this._config);
 
         loadingGlobalFunction(this);
 
@@ -94,7 +92,6 @@ class ArrowApplication {
         this.getConfig = this.configManager.getConfig.bind(this.configManager);
         this.setConfig = this.configManager.setConfig.bind(this.configManager);
         this.updateConfig = this.configManager.updateConfig.bind(this.configManager);
-
 
         this._arrRoutes = {};
 
@@ -149,7 +146,7 @@ class ArrowApplication {
                         resolve = resolve.then(function () {
                             return self[managerName].getCache()
                         })
-                    })
+                    });
                     return resolve
                 } else {
                     return Promise.resolve();
@@ -249,38 +246,6 @@ function expressApp(app, config, setting) {
     });
 }
 
-/**
- *
- * @param app
- * @param beforeFunc
- * @returns {*}
- */
-function loadPreFunc(app, beforeFunc) {
-    return new Promise(function (fulfill, reject) {
-        beforeFunc.map(function (func) {
-            func(app);
-        });
-
-        fulfill(app)
-    })
-}
-
-/**
- *
- * @param app
- * @returns {null}
- */
-//function setupManager(app) {
-//    try {
-//        fs.accessSync(path.resolve(app.arrFolder + "config/manager.js"));
-//        let setupManager = require(app.arrFolder + "config/manager");
-//        setupManager(app);
-//    } catch (err) {
-//
-//
-//    }
-//    return null;
-//}
 
 /**
  *

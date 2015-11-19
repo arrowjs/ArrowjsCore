@@ -1,6 +1,7 @@
 'use strict';
 
 module.exports = {
+    long_stack : true,
     port: process.env.PORT || 8000,
     db: {
         host: 'localhost',

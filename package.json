@@ -28,6 +28,7 @@
     "glob": "^5.0.15",
     "helmet": "0.14.0",
     "lodash": "^3.10.1",
+    "longjohn": "^0.2.10",
     "method-override": "^2.3.5",
     "morgan": "~1.6.1",
     "nunjucks": "^2.1.0",
