@@ -4,6 +4,10 @@ let _ = require('lodash');
 
 let flash = require('connect-flash');
 
+/**
+ * Using middleware flash message;
+ * @returns {null}
+ */
 module.exports = function () {
     let app = this;
     app.use(flash());
