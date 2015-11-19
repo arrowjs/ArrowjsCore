@@ -6,8 +6,6 @@ let bodyParser = require('body-parser'),
     helmet = require('helmet'),
     cookieParser = require('cookie-parser');
 
-
-
 module.exports = function (app,config,setting) {
     /**
      * Set folder static resource
