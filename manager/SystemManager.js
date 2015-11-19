@@ -4,6 +4,7 @@ let events = require('events');
 let path = require('path');
 let _ = require('lodash');
 let Express = require('express');
+let Promise = require('bluebird');
 let Database = require("../libs/database");
 let actionByAttribute = require('./handleAttribute/handleFunction');
 let ViewEngine = require("../libs/ViewEngine");
@@ -206,12 +207,12 @@ class SystemManager extends events.EventEmitter {
                 featureViewEngine = featureViewEngine || ViewEngine(_base,viewEngineSetting,_app);
             }
             if (_.isArray(components[key].views)) {
-                components[key].render = makeRender(featureViewEngine,components[key].views,key,_app);
+                components[key].render = Promise.promisify(makeRender(featureViewEngine,components[key].views,key,_app));
                 components[key].viewEngine = featureViewEngine
             } else {
                 Object.keys(components[key].views).map(function (second_key) {
                     components[key][second_key] = components[key][second_key] || {};
-                    components[key][second_key].render = makeRender(featureViewEngine,components[key][second_key].views,key,_app);
+                    components[key][second_key].render =  Promise.promisify(makeRender(featureViewEngine,components[key][second_key].views,key,_app));
                     components[key][second_key].viewEngine = featureViewEngine
 
                 })
