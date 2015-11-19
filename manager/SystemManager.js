@@ -206,12 +206,12 @@ class SystemManager extends events.EventEmitter {
                 featureViewEngine = featureViewEngine || ViewEngine(_base,viewEngineSetting,_app);
             }
             if (_.isArray(components[key].views)) {
-                components[key].render = makeRender(featureViewEngine,components[key].views,key)
+                components[key].render = makeRender(featureViewEngine,components[key].views,key,_app);
                 components[key].viewEngine = featureViewEngine
             } else {
                 Object.keys(components[key].views).map(function (second_key) {
                     components[key][second_key] = components[key][second_key] || {};
-                    components[key][second_key].render = makeRender(featureViewEngine,components[key][second_key].views,key);
+                    components[key][second_key].render = makeRender(featureViewEngine,components[key][second_key].views,key,_app);
                     components[key][second_key].viewEngine = featureViewEngine
 
                 })
@@ -350,8 +350,7 @@ function handleView(obj, application, componentName) {
  * @returns {Function}
  */
 
-function makeRender(viewEngine,componentView, componentName) {
-    let application = viewEngine.opts.express._arrApplication;
+function makeRender(viewEngine,componentView, componentName,application) {
     return function (view, options, callback) {
 
         var done = callback;
