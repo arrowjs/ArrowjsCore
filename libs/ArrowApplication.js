@@ -22,7 +22,10 @@ let fs = require('fs'),
     cluster = require('cluster'),
     socketRedisAdapter = require('socket.io-redis'),
     loadingLanguage = require("./i18n").loadLanguage;
-
+/**
+ * Singleton object. It is heart of Arrowjs.io web app. it wraps Express and adds following functions:
+ * support Redis, multi-languages, passport, check permission and socket.io / websocket
+ */
 class ArrowApplication {
 
     /**
@@ -33,10 +36,9 @@ class ArrowApplication {
         //if NODE_ENV does not exist, use development by default
         process.env.NODE_ENV = process.env.NODE_ENV || 'development';
 
-        let eventEmitter = new EventEmitter();
-        this.beforeAuth = [];
-        this.afterAuth = [];
-        this._expressApplication = express();
+        this.beforeAuth = [];  //add middle-wares before user authenticates
+        this.afterAuth = [];   //add middle-ware after user authenticates
+        this._expressApplication = express();  //wrap express object
 
         //Move all functions of express to ArrowApplication
         //So we can call ArrowApplication.listen(port)
@@ -49,17 +51,22 @@ class ArrowApplication {
             }
         }
 
-        //TODO: arrowStack(2) 2 is very ad-hoc number, let's explain why !
         // 0 : location of this file
         // 1 : location of index.js (module file)
         // 2 : location of server.js file
         let requester = arrowStack(2);
         this.arrFolder = path.dirname(requester) + '/';
 
+        //assign current Arrowjs application folder to global variable
         global.__base = this.arrFolder;
-        this._config = __.getRawConfig();  //Read config/config.js into this._config
+
+        //Read config/config.js into this._config
+        this._config = __.getRawConfig();
+
+        //Read and parse config/structure.js
         this.structure = buildStructure(__.getStructure());
 
+        //display longer stack trace in console
         if (this._config.long_stack) {
             require('longjohn')
         }
@@ -69,6 +76,10 @@ class ArrowApplication {
         let redisFunction = RedisCache(redisConfig);
         var redisClient, redisSubscriber;
 
+        /* In config/env/development.js , section Redis:
+         if real Redis server is not available, set type = 'fakeredis'
+         if real Redis server present, set type = 'redis', host and port correctly
+        */
         if (redisConfig.type === "fakeredis") {
             redisClient = redisFunction("client");
             redisSubscriber = redisFunction.bind(null, redisConfig);
@@ -80,25 +91,42 @@ class ArrowApplication {
         this.redisClient = redisClient;
         this.redisSubscriber = redisSubscriber;
 
+        //Add passport and its authentication strategies
         this.usePassport = require("../config/middleware/loadPassport");
+
+        //Display flash message when user reloads view
         this.useFlashMessage = require("../config/middleware/flashMessage");
+
+        //Use middleware express-session to store user session
         this.useSession = require("../config/middleware/useSession");
+
+        //Serve static resources when not using Nginx.
+        //See config/view.js section resource
         this.serveStatic = require("../config/middleware/staticResource");
 
-        this._componentList = [];
-
+        //Load available languages. See config/i18n.js and folder /lang
         loadingLanguage(this._config);
 
+        //Bind all global functions to ArrowApplication object
         loadingGlobalFunction(this);
 
+
         this.configManager = new ConfigManager(this, "config");
+
+        //Share eventEmitter among all kinds of Managers. This helps Manager object notifies each other
+        //when configuration is changed
+        let eventEmitter = new EventEmitter();
+
+        //subscribes to get notification from shared eventEmitter object
         this.configManager.eventHook(eventEmitter);
+
+        //Create shortcut call
         this.getConfig = this.configManager.getConfig.bind(this.configManager);
         this.setConfig = this.configManager.setConfig.bind(this.configManager);
         this.updateConfig = this.configManager.updateConfig.bind(this.configManager);
 
-        this._arrRoutes = {};
-
+        //_componentList contains name property of composite features, singleton features, widgets, plugins
+        this._componentList = [];
         Object.keys(this.structure).map(function (managerKey) {
             let key = managerKey;
             let managerName = managerKey + "Manager";
@@ -108,6 +136,9 @@ class ArrowApplication {
             this[key] = this[managerName]["_" + key];
             this._componentList.push(key);
         }.bind(this));
+
+        //Declare _arrRoutes to store all routes of features
+        this._arrRoutes = {};
     }
 
     /**
@@ -398,7 +429,16 @@ function overrideViewRender(application, componentView, componentName, component
         next();
     }
 }
-
+/**
+ *
+ * @param req
+ * @param res
+ * @param application
+ * @param componentView
+ * @param componentName
+ * @param component
+ * @returns {Function}
+ */
 function makeRender(req, res, application, componentView, componentName, component) {
     return function (view, options, callback) {
 
@@ -436,7 +476,13 @@ function makeRender(req, res, application, componentView, componentName, compone
     };
 }
 
-
+/**
+ *
+ * @param obj
+ * @param application
+ * @param componentName
+ * @returns {*}
+ */
 function handleView(obj, application, componentName) {
     let miniPath = obj.func(application._config, componentName);
     let normalizePath;
@@ -467,7 +513,14 @@ function handleAuthenticate(application, name) {
         next()
     }
 }
-
+/**
+ *
+ * @param application
+ * @param permissions
+ * @param componentName
+ * @param key
+ * @returns {handleRoles}
+ */
 function handleRole(application, permissions, componentName, key) {
     let arrayPermissions = [];
     if (_.isArray(permissions)) {
@@ -495,7 +548,12 @@ function handleRole(application, permissions, componentName, key) {
         next();
     }
 }
-
+/**
+ * Load global functions then append to global.ArrowHelper
+ * bind global function to ArrowApplication object so dev can this keyword in that function to refer
+ * ArrowApplication object
+ * @param self: ArrowApplication object
+ */
 function loadingGlobalFunction(self) {
     global.ArrowHelper = {};
     __.getGlobbedFiles(path.resolve(__dirname, "..", "helpers/*.js")).map(function (link) {

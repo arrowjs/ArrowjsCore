@@ -12,9 +12,7 @@ module.exports = function (struc) {
     });
     return arrStruc
 };
-/*
 
-*/
 function getDataFromArray(obj, key,level) {
     let newObj = {};
     let wrapArray = [];
