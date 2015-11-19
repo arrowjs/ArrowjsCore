@@ -3,7 +3,7 @@
 <html lang="en">
 <head>
 	<meta charset="utf-8">
-	<title>Arrowjs Core Index</title>
+	<title>Arrowjs Core Source: manager/ConfigManager.js</title>
 
 	<!--[if lt IE 9]>
 	<script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
@@ -48,35 +48,97 @@
 <div class="row">
 
 	
-	<div class="col-md-8">
+	<div class="col-md-12">
 	
 		<div id="main">
-    		<h1 class="page-title">Index</h1>
+    		<h1 class="page-title">Source: manager/ConfigManager.js</h1>
 			
 
-	
-	<span class="page-title">Index</span>
-	
-	
+		<h1 class="page-title">Source: manager/ConfigManager.js</h1>
+    
+<section>
+	<article>
+		<pre
+			class="sunlight-highlight-javascript linenums">"use strict";
 
+let SystemManager = require('./SystemManager');
+let __ = require('../libs/global_function');
+let _ = require('lodash');
+/**
+ * Manage configurations. Extends from SystemManager
+ */
+class ConfigManager extends SystemManager {
+    constructor(app,name){
+        super(app,name);
+    }
 
+    getConfig (key){
+        if(_.isString(key)) {
+            if(key.indexOf(".") > 0) {
+                let arrayKey = key.split(".");
+                let self = this._app._config;
+                let result ;
+                arrayKey.map(function (name) {
+                    if(self[name]) {
+                        result = self[name];
+                        self = self[name];
+                    }
+                });
+                return result
+            } else {
+                return this._app._config[key];
+            }
+        } else {
+            return this._app._config;
+        }
+    };
 
+    setConfig(key,setting){
+        this._app._config[key] = setting;
+        let self = this;
+        return self.setCache().then(self.reload());
+    };
 
+    updateConfig(setting){
+        let self = this;
+        if(setting) {
+            _.assign(this._app._config,setting);
+            return self.setCache().then(self.reload());
+        }
+        return Promise.resolve();
+    };
 
+    getCache(){
+        let self = this._app._config;
+        return this.pub.getAsync(self.redis_prefix + self.redis_key.configs)
+            .then(function (data) {
+                if(data) {
+                    let conf = JSON.parse(data);
+                    _.assign(this._app._config,conf);
+                }
+                return(this._app._config);
+            }.bind(this))
+            .catch(function (err) {
+                log("Config Manager Class: ",err);
+                return err
+            }.bind(this));
+    }
 
+    reload(){
+        let self = this;
+        return self.getCache().then(function () {
+            return self.pub.publishAsync(self._app._config.redis_prefix + self._app._config.redis_event.update_config,"Update config")
+        })
+    }
+    setCache() {
+        let self = this._app._config;
+        return this.pub.setAsync(self.redis_prefix + self.redis_key.configs,JSON.stringify(self))
+    }
+}
 
-
-
-
-
-	
-	
-
-
-
-
-
-
+module.exports = ConfigManager;</pre>
+	</article>
+</section>
 
 
 
@@ -87,10 +149,6 @@
 
 	<div class="clearfix"></div>
 
-	
-		<div class="col-md-3">
-			<div id="toc" class="col-md-3"></div>
-		</div>
 	
 
 </div>

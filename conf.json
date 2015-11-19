@@ -11,7 +11,6 @@
       "helpers",
       "libs",
       "manager",
-      "middleware",
       "templateExtends"
     ],
     "exclude": [
@@ -26,8 +25,8 @@
   },
   "plugins": [],
   "templates": {
-    "cleverLinks": false,
-    "monospaceLinks": false,
+    "cleverLinks": true,
+    "monospaceLinks": true,
     "systemName": "Arrowjs Core",
     "footer": "Developed by Techmaster Vietnam",
     "copyright": "MIT license",
