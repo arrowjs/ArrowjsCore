@@ -9,7 +9,7 @@ let actionByAttribute = require('./handleAttribute/handleFunction');
 let ViewEngine = require("../libs/ViewEngine");
 
 /**
- * Base SystemManager class
+ * Class is base class for FeatureManager, ThemeManager...
  */
 class SystemManager extends events.EventEmitter {
     constructor(app, name) {
