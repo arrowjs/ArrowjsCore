@@ -6,7 +6,8 @@ module.exports = function (grunt) {
                 options: {
                     destination: 'apidocs',
                     configure: './conf.json',
-                    template: 'node_modules/ink-docstrap/template'
+                    template: 'node_modules/ink-docstrap/template',
+                    recurse: true
                 }
             }
         }
