@@ -1,6 +1,9 @@
 'use strict';
 /**
- * Module init function.
+ * Setting passport
+ * @param passport
+ * @param application
+ * @returns {{serializeUser: Function, deserializeUser: Function, checkAuthenticate: Function, handlePermission: Function, local1: {strategy: string, option: {successRedirect: string, failureRedirect: string}}, facebook1: {strategy: string, option: {successRedirect: string, failureRedirect: string}}}}
  */
 module.exports = function (passport, application) {
     return {

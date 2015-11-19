@@ -4,6 +4,10 @@ let passport = require("passport");
 let __ = require('../../libs/global_function');
 let path = require('path');
 
+/**
+ * Use middleware passport
+ * @param setting
+ */
 module.exports = function loadPassport(setting) {
     let app = this;
     let passportConfig = require(__base + 'config/passport.js')(passport, app);

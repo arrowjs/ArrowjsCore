@@ -202,23 +202,23 @@ exports.getAllGlobalVariable = function (env) {
     return env;
 };
 
-/**
- * Send mail with provided options
- * @param {object} mailOptions
- * @returns {Promise}
- */
-exports.sendMail = function (mailOptions) {
-    return new Promise(function (fulfill, reject) {
-        __mailSender.sendMail(mailOptions, function (err, info) {
-
-            if (err) {
-                reject(err);
-            } else {
-                fulfill(info);
-            }
-        });
-    });
-};
+///**
+// * Send mail with provided options
+// * @param {object} mailOptions
+// * @returns {Promise}
+// */
+//exports.sendMail = function (mailOptions) {
+//    return new Promise(function (fulfill, reject) {
+//        __mailSender.sendMail(mailOptions, function (err, info) {
+//
+//            if (err) {
+//                reject(err);
+//            } else {
+//                fulfill(info);
+//            }
+//        });
+//    });
+//};
 
 /**
  * Get files by glob patterns
@@ -341,19 +341,19 @@ module.exports.getRawConfig = function getRawConfig() {
             throw err
         }
     }
-
-    //get mail.js
-    try {
-        fs.accessSync(__base + 'config/mail.js');
-        _.assign(conf, require(__base + 'config/mail'));
-    } catch (err) {
-        if (err.code === 'ENOENT') {
-            fsEx.copySync(path.resolve(__dirname, '..', 'config/mail.js'), __base + 'config/mail.js');
-            _.assign(conf, require(__base + 'config/mail'));
-        } else {
-            throw err
-        }
-    }
+    //
+    ////get mail.js
+    //try {
+    //    fs.accessSync(__base + 'config/mail.js');
+    //    _.assign(conf, require(__base + 'config/mail'));
+    //} catch (err) {
+    //    if (err.code === 'ENOENT') {
+    //        fsEx.copySync(path.resolve(__dirname, '..', 'config/mail.js'), __base + 'config/mail.js');
+    //        _.assign(conf, require(__base + 'config/mail'));
+    //    } else {
+    //        throw err
+    //    }
+    //}
 
     //get redis.js
     try {

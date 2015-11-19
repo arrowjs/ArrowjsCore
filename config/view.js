@@ -1,5 +1,9 @@
 "use strict";
 
+/**
+ * Base config nunjucks and static resource
+ * @type {{resource: {path: string, option: {maxAge: number}}, viewExtension: string, pagination: {number_item: number}, theme: string, functionFolder: string, filterFolder: string, variableFile: string, nunjuckSettings: {autoescape: boolean, throwOnUndefined: boolean, trimBlocks: boolean, lstripBlocks: boolean, watch: boolean, noCache: boolean}}}
+ */
 module.exports = {
     resource : {
         path : 'public',

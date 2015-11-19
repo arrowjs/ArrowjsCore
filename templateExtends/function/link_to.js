@@ -1,5 +1,9 @@
 "use strict";
 
+/**
+ * Support make link base route name
+ * @type {{name: string, handler: Function}}
+ */
 module.exports = {
     name : 'link_to',
     handler : function (name,option) {
