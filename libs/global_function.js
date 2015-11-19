@@ -329,6 +329,19 @@ module.exports.getRawConfig = function getRawConfig() {
         }
     }
 
+    //get websocket.js
+    try {
+        fs.accessSync(__base + 'config/websocket.js');
+        _.assign(conf, require(__base + 'config/websocket'));
+    } catch (err) {
+        if (err.code === 'ENOENT') {
+            fsEx.copySync(path.resolve(__dirname, '..', 'config/websocket.js'), __base + 'config/websocket.js');
+            _.assign(conf, require(__base + 'config/websocket'));
+        } else {
+            throw err
+        }
+    }
+
     //get mail.js
     try {
         fs.accessSync(__base + 'config/mail.js');
@@ -469,7 +482,7 @@ module.exports.getRawConfig = function getRawConfig() {
             fsEx.copySync(path.resolve(__dirname, '..', 'config/env/development.js'), __base + 'config/env/' + env + '.js');
             _.assign(conf, require(__base + 'config/env/' + env));
         } else {
-            throw err
+            th
         }
     }
     return conf

@@ -17,6 +17,10 @@ let fs = require('fs'),
     DefaultManager = require("../manager/DefaultManager"),
     ConfigManager = require("../manager/ConfigManager"),
     buildStructure = require("./buildStructure"),
+    socket_io = require('socket.io'),
+    http = require('http'),
+    cluster = require('cluster'),
+    socketRedisAdapter = require('socket.io-redis'),
     loadingLanguage = require("./i18n").loadLanguage;
 
 class ArrowApplication {
@@ -56,7 +60,7 @@ class ArrowApplication {
         this._config = __.getRawConfig();  //Read config/config.js into this._config
         this.structure = buildStructure(__.getStructure());
 
-        if(this._config.long_stack) {
+        if (this._config.long_stack) {
             require('longjohn')
         }
 
@@ -153,13 +157,31 @@ class ArrowApplication {
                 }
             })
             .then(function () {
-                expressApp(self,self.getConfig(), setting)
+                return expressApp(self, self.getConfig(), setting)
             })
             .then(function () {
-                loadRouteAndRender(self, setting);
+                return loadRouteAndRender(self, setting);
             })
             .then(function (app) {
-                self.listen(self.getConfig("port"), function () {
+                let server = http.createServer(self._expressApplication);
+
+                if (self.getConfig('websocket_enable') && self.getConfig('websocket_folder')) {
+                    let io = socket_io(server);
+                    if (self.getConfig('redis.type') !== 'fakeredis') {
+                        let redisConf = {host: self.getConfig('redis.host'), port: self.getConfig('redis.port')};
+                        io.adapter(socketRedisAdapter(redisConf));
+                    }
+                    self.io = io;
+
+                    __.getGlobbedFiles(path.normalize(self.arrFolder + self.getConfig('websocket_folder'))).map(function (link) {
+                        let socketFunction = require(link);
+                        if(_.isFunction(socketFunction)) {
+                            socketFunction(io);
+                        }
+                    })
+                }
+
+                server.listen(self.getConfig("port"), function () {
                     logger.info('Application loaded using the "' + process.env.NODE_ENV + '" environment configuration');
                     logger.info('Application started on port ' + self.getConfig("port"), ', Process ID: ' + process.pid);
                 });
@@ -209,7 +231,9 @@ function loadRouteAndRender(arrow, userSetting) {
 
     arrow._componentList.map(function (key) {
         Object.keys(arrow[key]).map(function (componentKey) {
-            logger.info("Arrow loaded: '" + key + "' - '" + componentKey + "'");
+            if (cluster.isMaster) {
+                logger.info("Arrow loaded: '" + key + "' - '" + componentKey + "'");
+            }
             let routeConfig = arrow[key][componentKey]._structure.route;
             if (routeConfig) {
                 Object.keys(routeConfig.path).map(function (second_key) {
@@ -297,7 +321,7 @@ function handleComponentRouteSetting(arrow, componentRouteSetting, defaultRouteC
 
             //Add viewRender
             if (!_.isEmpty(viewInfo) && !_.isString(authenticate)) {
-                arrayHandler.splice(0, 0, overrideViewRender(arrow, viewInfo, componentName, component))
+                arrayHandler.splice(0, 0, overrideViewRender(arrow, viewInfo, componentName, component, key))
             }
 
 
@@ -348,16 +372,18 @@ function handleComponentRouteSetting(arrow, componentRouteSetting, defaultRouteC
     });
 }
 /**
- * 
+ *
  * @param application
  * @param componentView
  * @param componentName
  * @param component
  * @returns {Function}
  */
-function overrideViewRender(application, componentView, componentName, component) {
+function overrideViewRender(application, componentView, componentName, component, key) {
     return function (req, res, next) {
         // Grab reference of render
+        req.arrowUrl = key + "." + componentName;
+
         let _render = res.render;
         let self = this;
         if (_.isArray(componentView)) {
@@ -393,9 +419,9 @@ function makeRender(req, res, application, componentView, componentName, compone
 
         // default callback to respond
         done = done || function (err, str) {
-                if (err) return req.next(err);
-                res.send(str);
-            };
+            if (err) return req.next(err);
+            res.send(str);
+        };
 
         if (application._config.viewExtension && view.indexOf(application._config.viewExtension) === -1 && view.indexOf(".") === -1) {
             view += "." + application._config.viewExtension;
