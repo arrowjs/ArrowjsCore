@@ -132,6 +132,7 @@ class ArrowApplication {
             let managerName = managerKey + "Manager";
             this[managerName] = new DefaultManager(this, key);
             this[managerName].eventHook(eventEmitter);
+            //load sub components of
             this[managerName].loadComponents(key);
             this[key] = this[managerName]["_" + key];
             this._componentList.push(key);
@@ -142,7 +143,9 @@ class ArrowApplication {
     }
 
     /**
-     *
+     * When user requests an URL, execute this function before server checks in session if user has authenticates
+     * If web app does not require authentication, beforeAuthenticate and afterAuthenticate are same. <br>
+     * beforeAuthenticate > authenticate > afterAuthenticate
      * @param func
      */
     beforeAuthenticate(func) {
@@ -153,7 +156,8 @@ class ArrowApplication {
     }
 
     /**
-     *
+     * When user requests an URL, execute this function after server checks in session if user has authenticates
+     * This function always runs regardless user has authenticated or not
      * @param func
      */
     afterAuthenticate(func) {
@@ -165,11 +169,11 @@ class ArrowApplication {
 
     /**
      * Kick start express application and listen at default port
-     * @returns {Promise.<T>}
+     * @param setting - passport: boolean, role: boolean
      */
     start(setting) {
         let self = this;
-        /** Init the express application */
+
         return Promise.resolve()
             .then(function () {
                 addRoles(self);
@@ -188,10 +192,11 @@ class ArrowApplication {
                 }
             })
             .then(function () {
-                return expressApp(self, self.getConfig(), setting)
+                //init Express app
+                return configureExpressApp(self, self.getConfig(), setting)
             })
             .then(function () {
-                return loadRouteAndRender(self, setting);
+                return loadModel_Route_Render(self, setting);
             })
             .then(function (app) {
                 let server = http.createServer(self._expressApplication);
@@ -232,17 +237,19 @@ class ArrowApplication {
  * @param arrow
  * @param userSetting
  */
-function loadRouteAndRender(arrow, userSetting) {
+function loadModel_Route_Render(arrow, userSetting) {
+
     let defaultDatabase = {};
-    let defaultQueryResolve = function () {
-        return new Promise(function (fulfill, reject) {
-            fulfill("No models")
-        })
-    };
+
     if (arrow.models && Object.keys(arrow.models).length > 0) {
         if (_.isEmpty(defaultDatabase)) {
             defaultDatabase = Database(arrow);
         }
+        let defaultQueryResolve = function () {
+            return new Promise(function (fulfill, reject) {
+                fulfill("No models")
+            })
+        };
         arrow.models.rawQuery = defaultDatabase.query ? defaultDatabase.query.bind(defaultDatabase) : defaultQueryResolve;
 
         //New way to associate db:
@@ -273,7 +280,6 @@ function loadRouteAndRender(arrow, userSetting) {
                         let componentRouteSetting = arrow[key][componentKey].routes[second_key];
                         handleComponentRouteSetting(arrow, componentRouteSetting, defaultRouteConfig, key, userSetting, componentKey);
                     } else {
-
                         let componentRouteSetting = arrow[key][componentKey].routes;
                         //Handle Route Path;
                         handleComponentRouteSetting(arrow, componentRouteSetting, defaultRouteConfig, key, userSetting, componentKey);
@@ -285,11 +291,12 @@ function loadRouteAndRender(arrow, userSetting) {
 }
 
 /**
- *
- * @param app
- * @returns {*}
+ * Run /config/express.js to configure Express object
+ * @param app - ArrowApplication object
+ * @param config - this.configManager.getConfig
+ * @param setting - parameters in application.start(setting);
  */
-function expressApp(app, config, setting) {
+function configureExpressApp(app, config, setting) {
     return new Promise(function (fulfill, reject) {
         let expressFunction;
         if (fs.existsSync(path.resolve(app.arrFolder + "config/express.js"))) {

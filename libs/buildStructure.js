@@ -8,12 +8,18 @@ let globalPattern = {};
 module.exports = function (struc) {
     let arrStruc = {};
     Object.keys(struc).map(function (key) {
-        arrStruc[key] = getDataFromArray(struc[key], key,1);
+        arrStruc[key] = parseConfig_Structure(struc[key], key,1);
     });
     return arrStruc
 };
-
-function getDataFromArray(obj, key,level) {
+/**
+ * Parse key-value in /config/structure.js
+ * @param obj
+ * @param key
+ * @param level
+ * @returns {{}}
+ */
+function parseConfig_Structure(obj, key,level) {
     let newObj = {};
     let wrapArray = [];
     if (_.isArray(obj)) {
@@ -23,13 +29,14 @@ function getDataFromArray(obj, key,level) {
     }
     let baseObject = wrapArray[0];
     newObj.path = {};
-    newObj.type = "single";
+    newObj.type = "single";  //When feature has one namespace
     wrapArray.map(function (data, index) {
         //handle path
         if (data.path) {
             data = _.assign(baseObject, data);
             let pathInfo = handlePath(data.path, key,level);
 
+            //When feature has more than one namespace
             if (!_.isEmpty(pathInfo[1])) {
                 newObj.type = "multi";
             }
@@ -57,7 +64,7 @@ function getDataFromArray(obj, key,level) {
                             data[key].path.singleton = true;
                         }
                     }
-                    newObj.path[pathKey][key] = getDataFromArray(data[key], key ,2);
+                    newObj.path[pathKey][key] = parseConfig_Structure(data[key], key ,2);
                 } else {
                     if (key !== "extend" && key !== "path" && typeof data.key === 'object') {
                         newObj.path[pathKey][key] = data[key]
