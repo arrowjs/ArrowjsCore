@@ -1,2 +1,0 @@
-## Advance structure settings
-
