@@ -3,7 +3,9 @@
 let express = require('express');
 let  _ = require('lodash');
 let path = require('path');
-
+/**
+ * Support serve static resource
+ */
 module.exports = function serveStatic() {
     let app = this;
     let config = app._config;

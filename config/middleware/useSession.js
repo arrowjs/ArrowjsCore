@@ -2,6 +2,9 @@
 var session = require('express-session'),
     RedisStore = require('connect-redis')(session);
 
+/**
+ * Support express session
+ */
 module.exports = function useSession() {
     let app = this;
     let sessionConfig = require(app.arrFolder + 'config/session');

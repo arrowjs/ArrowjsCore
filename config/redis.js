@@ -1,5 +1,9 @@
 "use strict";
 
+/**
+ * Setting redis;
+ * @type {{redis_prefix: string, redis_key: {configs: string, features: string, backend_menus: string, plugins: string}, redis_event: {update_config: string, update_feature: string}}}
+ */
 module.exports = {
     redis_prefix: 'arrowjs_',
     redis_key : {
