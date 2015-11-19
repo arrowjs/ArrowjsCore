@@ -4,7 +4,7 @@ let util = require('util');
 let lang = require("../libs/i18n");
 
 /**
- * Export global functions
+ * Translate function ;
  * @type {{__: Function}}
  */
 module.exports = {

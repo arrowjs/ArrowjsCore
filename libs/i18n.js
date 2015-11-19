@@ -7,6 +7,10 @@ let path = require('path');
 
 module.exports = lang;
 
+/**
+ * Loading language file.
+ * @param config
+ */
 module.exports.loadLanguage = function (config) {
     let languagePath = __base + config.langPath + '/*.js';
     __.getGlobbedFiles(languagePath).forEach(function (file) {

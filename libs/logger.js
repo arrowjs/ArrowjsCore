@@ -9,6 +9,9 @@ if (!fs.existsSync(logDir)) {
     // Create the directory if it does not exist
     fs.mkdirSync(logDir);
 }
+/**
+ * Setting logger
+ */
 const logger = new ( winston.Logger )({
     transports: [
         new winston.transports.Console({
