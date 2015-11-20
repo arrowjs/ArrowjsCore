@@ -23,7 +23,14 @@ const logger = new ( winston.Logger )({
         new winston.transports.File({
             level: env === 'development' ? 'debug' : 'info',
             filename: logDir + '/logs.log',
-            maxsize: 1024 * 1024 * 10 // 10MB
+            maxsize: 1024 * 1024 * 10, // 10MB
+            name : "default-log"
+        }),
+        new winston.transports.File({
+            level : "error",
+            filename: logDir + '/error.log',
+            maxsize: 1024 * 1024 * 10, // 10MB
+            name : "error-log"
         })
     ],
     exceptionHandlers: [
