@@ -30,7 +30,9 @@ class ConfigManager extends SystemManager {
                 arrayKey.map(function (name) {
                     if (self[name]) {
                         result = self[name];
-                        self = self[name];
+                        self = result;
+                    } else {
+                        result = null
                     }
                 });
                 return result

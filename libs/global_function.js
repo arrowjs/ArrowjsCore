@@ -16,9 +16,7 @@ const _ = require('lodash'),
  */
 exports.createNewEnv = function (views, viewEngineConfig, application) {
     let self = this;
-    let env;
-
-    env = new nunjucks.Environment(new nunjucks.FileSystemLoader(views), viewEngineConfig);
+    let env = new nunjucks.Environment(new nunjucks.FileSystemLoader(views), viewEngineConfig);
     let viewSetting = application.getConfig();
     env = self.getAllFunction(env, viewSetting, application);
     env = self.getAllCustomFilter(env, viewSetting, application);
@@ -341,19 +339,19 @@ module.exports.getRawConfig = function getRawConfig() {
             throw err
         }
     }
-    //
-    ////get mail.js
-    //try {
-    //    fs.accessSync(__base + 'config/mail.js');
-    //    _.assign(conf, require(__base + 'config/mail'));
-    //} catch (err) {
-    //    if (err.code === 'ENOENT') {
-    //        fsEx.copySync(path.resolve(__dirname, '..', 'config/mail.js'), __base + 'config/mail.js');
-    //        _.assign(conf, require(__base + 'config/mail'));
-    //    } else {
-    //        throw err
-    //    }
-    //}
+
+    //get error.js
+    try {
+        fs.accessSync(__base + 'config/error.js');
+        _.assign(conf, require(__base + 'config/error'));
+    } catch (err) {
+        if (err.code === 'ENOENT') {
+            fsEx.copySync(path.resolve(__dirname, '..', 'config/error.js'), __base + 'config/error.js');
+            _.assign(conf, require(__base + 'config/error'));
+        } else {
+            throw err
+        }
+    }
 
     //get redis.js
     try {

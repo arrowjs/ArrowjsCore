@@ -1,7 +1,10 @@
 "use strict";
 
 let morgan = require('morgan');
-
+let bodyParser = require("../").bodyParser,
+    methodOverride = require("../").methodOverride,
+    sercurity = require("../").sercurity,
+    cookieParser = require("../").cookieParse;
 
 /**
  * Setting for express
@@ -12,10 +15,7 @@ let morgan = require('morgan');
  */
 
 module.exports = function (app, config, setting) {
-    let bodyParser = Arrow.bodyParser,
-        methodOverride = Arrow.methodOverride,
-        sercurity = Arrow.sercurity,
-        cookieParser = Arrow.cookieParse;
+
     /**
      * Set folder static resource
      */

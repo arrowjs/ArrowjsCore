@@ -22,11 +22,14 @@ const fs = require('fs'),
     http = require('http'),
     cluster = require('cluster'),
     socketRedisAdapter = require('socket.io-redis'),
+    ViewEngine = require("../libs/ViewEngine"),
     loadingLanguage = require("./i18n").loadLanguage;
 /**
  * Singleton object. It is heart of Arrowjs.io web app. it wraps Express and adds following functions:
  * support Redis, multi-languages, passport, check permission and socket.io / websocket
  */
+
+let arrowErrorLink = {};
 class ArrowApplication {
 
     /**
@@ -80,7 +83,7 @@ class ArrowApplication {
         /* In config/env/development.js , section Redis:
          if real Redis server is not available, set type = 'fakeredis'
          if real Redis server present, set type = 'redis', host and port correctly
-        */
+         */
         if (redisConfig.type === "fakeredis") {
             redisClient = redisFunction("client");
             redisSubscriber = redisFunction.bind(null, redisConfig);
@@ -112,7 +115,6 @@ class ArrowApplication {
         //Bind all global functions to ArrowApplication object
         loadingGlobalFunction(this);
 
-
         this.configManager = new ConfigManager(this, "config");
 
         //Share eventEmitter among all kinds of Managers. This helps Manager object notifies each other
@@ -126,6 +128,14 @@ class ArrowApplication {
         this.getConfig = this.configManager.getConfig.bind(this.configManager);
         this.setConfig = this.configManager.setConfig.bind(this.configManager);
         this.updateConfig = this.configManager.updateConfig.bind(this.configManager);
+
+        let viewEngineSetting = _.assign(this._config.nunjuckSettings || {}, {express: this._expressApplication});
+        let applicationView = ViewEngine(this.arrFolder, viewEngineSetting, this);
+        this.applicationENV = applicationView;
+
+        this.render = this.applicationENV.render.bind(applicationView);
+
+        this.renderString = applicationView.renderString.bind(applicationView);
 
         //_componentList contains name property of composite features, singleton features, widgets, plugins
         this._componentList = [];
@@ -175,6 +185,8 @@ class ArrowApplication {
      */
     start(setting) {
         let self = this;
+        
+        self.arrowSettings = setting;
 
         return Promise.resolve()
             .then(function () {
@@ -198,7 +210,13 @@ class ArrowApplication {
                 return configureExpressApp(self, self.getConfig(), setting)
             })
             .then(function () {
+                return circuit_breaker(self)
+            })
+            .then(function () {
                 return loadModel_Route_Render(self, setting);
+            })
+            .then(function () {
+                return handleError(self)
             })
             .then(function (app) {
                 let server = http.createServer(self._expressApplication);
@@ -213,7 +231,7 @@ class ArrowApplication {
 
                     __.getGlobbedFiles(path.normalize(self.arrFolder + self.getConfig('websocket_folder'))).map(function (link) {
                         let socketFunction = require(link);
-                        if(_.isFunction(socketFunction)) {
+                        if (_.isFunction(socketFunction)) {
                             socketFunction(io);
                         }
                     })
@@ -591,18 +609,6 @@ function loadingGlobalFunction(self) {
     //Add some support function
     global.__ = ArrowHelper.__;
 
-    //Export node_module from Core node_module  to App node_module
-    global.Arrow = {};
-    Arrow.Promise = Promise;
-    Arrow._ = _;
-    Arrow.glob = require('glob');
-    Arrow.cookieParse = require('cookie-parser');
-    Arrow.bodyParser = require('body-parser');
-    Arrow.methodOverride = require('method-override');
-    Arrow.fs =  require('fs-extra');
-    Arrow.sercurity =  require('helmet');
-    Arrow.log = logger;
-
 }
 
 
@@ -613,4 +619,123 @@ function addRoles(self) {
         self.permissions[key] = self[managerName].getPermissions();
     });
 }
+
+function circuit_breaker(app) {
+    if (app.getConfig('fault_tolerant.enable')) {
+        app.use(function (req, res, next) {
+            if (arrowErrorLink[req.url]) {
+                let redirectLink = app.getConfig('fault_tolerant.redirect');
+                redirectLink = _.isString(redirectLink) ? redirectLink : "404";
+                res.redirect(path.normalize(path.sep + redirectLink));
+            } else {
+                next();
+            }
+        })
+    }
+    return app
+}
+
+function handleError(app) {
+    /** Assume 'not found' in the error msg is a 404.
+     * This is somewhat silly, but valid, you can do whatever you like, set properties, use instanceof etc.
+     */
+    app.use(function (err, req, res, next) {
+        // If the error object doesn't exists
+        let error = {};
+        if (!err) return next();
+        if (app.getConfig('fault_tolerant.enable')) {
+            arrowErrorLink[req.url] = true;
+            error[req.url] = {};
+            error[req.url].error = err.stack;
+            error[req.url].time = Date.now();
+            let arrayInfo = app.getConfig('fault_tolerant.logdata');
+            if (_.isArray(arrayInfo)) {
+                arrayInfo.map(function (key) {
+                    error[req.url][key] = req[key];
+                })
+            }
+
+        } else {
+            error.error = err.stack;
+            error[req.url].time = Date.now();
+            let arrayInfo = app.getConfig('fault_tolerant.logdata');
+            if (_.isArray(arrayInfo)) {
+                arrayInfo.map(function (key) {
+                    error[key] = req[key];
+                })
+            }
+        }
+        if(app.getConfig('fault_tolerant.log')) {
+            logger.error(error);
+        }
+
+        let renderSetting = app.getConfig('fault_tolerant.render');
+        if (_.isString(renderSetting)) {
+            let arrayPart = renderSetting.split(path.sep);
+            arrayPart = arrayPart.map(function (key) {
+                if (key[0] === ":") {
+                    key = key.replace(":", "");
+                    return app.getConfig(key);
+                } else {
+                    return key
+                }
+            });
+            let link = arrayPart.join(path.sep);
+            app.render(link, { error :error }, function (err, html) {
+                if (err) {
+                    res.send(err)
+                }
+                res.send(html)
+            });
+        } else {
+            res.send(error)
+        }
+    });
+
+    if (app.getConfig("error")) {
+        Object.keys(app.getConfig("error")).map(function (link) {
+            let errorConfig = app.getConfig("error");
+            if (errorConfig[link].render) {
+                if (_.isString(errorConfig[link].render)) {
+                    let newLink = "";
+                    let arrayPart = [];
+                    if (_.isString(errorConfig[link].render)) {
+                        arrayPart = errorConfig[link].render.split(path.sep);
+                        arrayPart = arrayPart.map(function (key) {
+                            if (key[0] === ":") {
+                                key = key.replace(":", "");
+                                return app.getConfig(key);
+                            } else {
+                                return key
+                            }
+                        })
+                    }
+                    newLink = arrayPart.join(path.sep);
+                    app.get(path.normalize(path.sep + link + `(.${app.getConfig('viewExtension')})?`), function (req, res) {
+                        app.render(newLink, function (err, html) {
+                            if (err) {
+                                res.send(err)
+                            }
+                            res.send(html)
+                        });
+                    })
+                } else if (_.isObject(errorConfig[link].render)) {
+                    app.get(link, function (req, res) {
+                        res.send(errorConfig[link].render)
+                    })
+                } else if (_.isNumber(errorConfig[link].render)) {
+                    app.get(link, function (req, res) {
+                        res.sendStatus(errorConfig[link].render)
+                    })
+                } else {
+                    app.get(link, function (req, res) {
+                        res.send(link)
+                    })
+                }
+            }
+
+        })
+    }
+}
+
 module.exports = ArrowApplication;
