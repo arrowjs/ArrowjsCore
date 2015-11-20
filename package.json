@@ -23,7 +23,6 @@
     "express": "~4.13.3",
     "express-session": "1.12.1",
     "fakeredis": "^0.3.4",
-    "formidable": "~1.0.16",
     "fs-extra": "0.26.2",
     "glob": "^5.0.15",
     "helmet": "0.14.0",

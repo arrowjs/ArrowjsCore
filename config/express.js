@@ -1,10 +1,7 @@
 "use strict";
 
-let bodyParser = require('body-parser'),
-    methodOverride = require('method-override'),
-    morgan = require('morgan'),
-    helmet = require('helmet'),
-    cookieParser = require('cookie-parser');
+let morgan = require('morgan');
+
 
 /**
  * Setting for express
@@ -13,7 +10,12 @@ let bodyParser = require('body-parser'),
  * @param setting : user setting
  * @returns {*}
  */
-module.exports = function (app,config,setting) {
+
+module.exports = function (app, config, setting) {
+    let bodyParser = Arrow.bodyParser,
+        methodOverride = Arrow.methodOverride,
+        sercurity = Arrow.sercurity,
+        cookieParser = Arrow.cookieParse;
     /**
      * Set folder static resource
      */
@@ -60,10 +62,10 @@ module.exports = function (app,config,setting) {
     app.useFlashMessage();
 
     /** Use helmet to secure Express headers */
-    app.use(helmet.xframe());
-    app.use(helmet.xssFilter());
-    app.use(helmet.nosniff());
-    app.use(helmet.ienoopen());
+    app.use(sercurity.xframe());
+    app.use(sercurity.xssFilter());
+    app.use(sercurity.nosniff());
+    app.use(sercurity.ienoopen());
     app.disable('x-powered-by');
 
     /** Passing the variables to environment locals */
