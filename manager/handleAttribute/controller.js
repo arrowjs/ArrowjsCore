@@ -1,6 +1,6 @@
 "use strict";
 
-let getListFile = require('../helper/getListFile');
+const getListFile = require('../helper/getListFile');
 /**
  * Get controller from file
  * @param setting

@@ -1,8 +1,8 @@
 "use strict";
 
-let _ = require("lodash");
-let path = require('path');
-let logger = require('./logger');
+const _ = require("lodash"),
+    path = require('path'),
+    logger = require('./logger');
 let globalPattern = {};
 
 module.exports = function (struc) {

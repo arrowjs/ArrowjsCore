@@ -1,9 +1,9 @@
 "use strict";
 
-let __ =  require('./global_function');
+const __ =  require('./global_function'),
+     path = require('path');
 
 let lang = {};
-let path = require('path');
 
 module.exports = lang;
 

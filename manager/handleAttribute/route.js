@@ -1,8 +1,7 @@
 "use strict";
 
-let getListFile = require('../helper/getListFile');
-let Express = require('express');
-let _ = require('lodash');
+const getListFile = require('../helper/getListFile'),
+     _ = require('lodash');
 
 /**
  * Get all route.

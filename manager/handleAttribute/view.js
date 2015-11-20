@@ -1,6 +1,6 @@
 "use strict";
 
-let getListFunction = require('../helper/getListFunction');
+const getListFunction = require('../helper/getListFunction');
 
 /**
  * Get function to find layout folder

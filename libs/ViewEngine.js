@@ -1,5 +1,5 @@
 "use strict";
-let __ = require('../libs/global_function');
+const __ = require('./global_function');
 
 /**
  * Create nunjucks environment.

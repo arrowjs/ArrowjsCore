@@ -1,13 +1,12 @@
 "use strict";
-let __ = require('../libs/global_function');
-let events = require('events');
-let path = require('path');
-let _ = require('lodash');
-let Express = require('express');
-let Promise = require('bluebird');
-let Database = require("../libs/database");
-let actionByAttribute = require('./handleAttribute/handleFunction');
-let ViewEngine = require("../libs/ViewEngine");
+const __ = require('../libs/global_function'),
+    events = require('events'),
+    path = require('path'),
+    _ = require('lodash'),
+    Promise = require('bluebird'),
+    Database = require("../libs/database"),
+    actionByAttribute = require('./handleAttribute/handleFunction'),
+    ViewEngine = require("../libs/ViewEngine");
 
 /**
  * Class is base class for FeatureManager, ThemeManager...
@@ -199,18 +198,18 @@ class SystemManager extends events.EventEmitter {
         });
 
         let featureViewEngine = this.viewEngine;
-        let viewEngineSetting = _.assign(_app._config.nunjuckSettings || {},{ express: _app._expressApplication});
+        let viewEngineSetting = _.assign(_app._config.nunjuckSettings || {}, {express: _app._expressApplication});
         Object.keys(components).map(function (key) {
             if (!_.isEmpty(components[key].views)) {
-                featureViewEngine = featureViewEngine || ViewEngine(_base,viewEngineSetting,_app);
+                featureViewEngine = featureViewEngine || ViewEngine(_base, viewEngineSetting, _app);
             }
             if (_.isArray(components[key].views)) {
-                components[key].render = Promise.promisify(makeRender(featureViewEngine,components[key].views,key,_app));
+                components[key].render = Promise.promisify(makeRender(featureViewEngine, components[key].views, key, _app));
                 components[key].viewEngine = featureViewEngine
             } else {
                 Object.keys(components[key].views).map(function (second_key) {
                     components[key][second_key] = components[key][second_key] || {};
-                    components[key][second_key].render =  Promise.promisify(makeRender(featureViewEngine,components[key][second_key].views,key,_app));
+                    components[key][second_key].render = Promise.promisify(makeRender(featureViewEngine, components[key][second_key].views, key, _app));
                     components[key][second_key].viewEngine = featureViewEngine
 
                 })
@@ -263,7 +262,7 @@ class SystemManager extends events.EventEmitter {
         } else {
             Object.keys(self[privateName]).map(function (componentName) {
                 Object.keys(self[privateName][componentName]).map(function (attributeKey) {
-                    if(attributeKey[0] !== "_" && ["controllers","views","models","action","routes","viewEngine"].indexOf(attributeKey) === -1 && !_.isFunction(self[privateName][componentName][attributeKey])) {
+                    if (attributeKey[0] !== "_" && ["controllers", "views", "models", "action", "routes", "viewEngine"].indexOf(attributeKey) === -1 && !_.isFunction(self[privateName][componentName][attributeKey])) {
                         result[componentName] = result[componentName] || {};
                         result[componentName][attributeKey] = self[privateName][componentName][attributeKey]
                     }
@@ -278,31 +277,31 @@ class SystemManager extends events.EventEmitter {
      * @param name : declare in structure.js
      * @returns {Array}
      */
-    getViewFiles(componentName,name){
+    getViewFiles(componentName, name) {
         let self = this;
         let privateName = "_" + self.name;
         let extension = self._app._config.viewExtension || "html";
         let pathFolder = [];
         let result = [];
-        if (componentName && self[privateName][componentName]){
-            if(name) {
-                if( self[privateName][componentName][name] && self[privateName][componentName][name].views) {
+        if (componentName && self[privateName][componentName]) {
+            if (name) {
+                if (self[privateName][componentName][name] && self[privateName][componentName][name].views) {
                     self[privateName][componentName][name].views.map(function (obj) {
-                        let miniPath = handleView(obj,self,componentName);
+                        let miniPath = handleView(obj, self, componentName);
                         pathFolder.push(miniPath);
                     })
                 }
             } else {
                 if (self[privateName][componentName].views) {
                     self[privateName][componentName].views.map(function (obj) {
-                        let miniPath = handleView(obj,self,componentName);
+                        let miniPath = handleView(obj, self, componentName);
                         pathFolder.push(miniPath);
                     })
                 }
             }
         }
 
-        if(!_.isEmpty(pathFolder)) {
+        if (!_.isEmpty(pathFolder)) {
             pathFolder.map(function (link) {
                 __.getGlobbedFiles(link + "*." + extension).map(function (result_link) {
                     result.push(result_link)
@@ -349,7 +348,7 @@ function handleView(obj, application, componentName) {
  * @returns {Function}
  */
 
-function makeRender(viewEngine,componentView, componentName,application) {
+function makeRender(viewEngine, componentView, componentName, application) {
     return function (view, options, callback) {
 
         var done = callback;

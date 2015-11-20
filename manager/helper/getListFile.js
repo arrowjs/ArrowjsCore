@@ -1,6 +1,6 @@
 "use strict";
-let __ = require('../../libs/global_function');
-let path = require('path');
+const __ = require('../../libs/global_function'),
+     path = require('path');
 /**
  * Get list file by glob
  * @param componentSetting

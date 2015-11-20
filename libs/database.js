@@ -1,7 +1,7 @@
 "use strict";
 
-let Sequelize = require('sequelize');
-let logger = require('./logger');
+const Sequelize = require('sequelize'),
+     logger = require('./logger');
 let sequelize;
 
 //TODO : If db.database = mongo call mongoose
