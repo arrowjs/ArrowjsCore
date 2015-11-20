@@ -23,6 +23,8 @@ const fs = require('fs'),
     cluster = require('cluster'),
     socketRedisAdapter = require('socket.io-redis'),
     ViewEngine = require("../libs/ViewEngine"),
+    request = require('request'),
+    zmq = require('zmq'),
     loadingLanguage = require("./i18n").loadLanguage;
 /**
  * Singleton object. It is heart of Arrowjs.io web app. it wraps Express and adds following functions:
@@ -43,6 +45,9 @@ class ArrowApplication {
         this.beforeAuth = [];  //add middle-wares before user authenticates
         this.afterAuth = [];   //add middle-ware after user authenticates
         this._expressApplication = express();  //wrap express object
+
+        global.Arrow = {};
+        Arrow.request = request;
 
         //Move all functions of express to ArrowApplication
         //So we can call ArrowApplication.listen(port)
@@ -185,10 +190,13 @@ class ArrowApplication {
      */
     start(setting) {
         let self = this;
-        
+
         self.arrowSettings = setting;
 
         return Promise.resolve()
+            .then(function () {
+                loadServices(self)
+            })
             .then(function () {
                 addRoles(self);
                 if (self.getConfig("redis.type") !== "fakeredis") {
@@ -281,9 +289,7 @@ function loadModel_Route_Render(arrow, userSetting) {
         if (databaseFunction.associate) {
             databaseFunction.associate(arrow.models)
         }
-
     }
-
 
     if (!_.isEmpty(defaultDatabase)) {
         defaultDatabase.sync();
@@ -620,6 +626,11 @@ function addRoles(self) {
     });
 }
 
+/**
+ * Redirect url when meet same error.
+ * @param app
+ * @returns {*}
+ */
 function circuit_breaker(app) {
     if (app.getConfig('fault_tolerant.enable')) {
         app.use(function (req, res, next) {
@@ -635,6 +646,10 @@ function circuit_breaker(app) {
     return app
 }
 
+/**
+ * Handle Error and redirect error
+ * @param app
+ */
 function handleError(app) {
     /** Assume 'not found' in the error msg is a 404.
      * This is somewhat silly, but valid, you can do whatever you like, set properties, use instanceof etc.
@@ -737,5 +752,57 @@ function handleError(app) {
         })
     }
 }
+
+
+function loadServices(app) {
+    //let serviceConfig = app.getConfig('services');
+    //
+    //app.services = {};
+    //
+    //if(serviceConfig) {
+    //    Object.keys(serviceConfig).map(function (serviceName) {
+    //        app.services[serviceName] = {};
+    //        let service;
+    //
+    //        if (serviceConfig[serviceName].protocol && serviceConfig[serviceName].host && serviceConfig[serviceName].port && serviceConfig[serviceName].type) {
+    //            if(serviceConfig[serviceName].connect_type) {
+    //                service =  zmq.socket(serviceConfig[serviceName].type);
+    //                let connectString = serviceConfig[serviceName].protocol + "://" + serviceConfig[serviceName].host + ":" + serviceConfig[serviceName].port;
+    //                service[serviceConfig[serviceName].connect_type](connectString, function (err) {
+    //                    if(err)
+    //                        console.log(err);
+    //                    else
+    //                        console.log('Listening on ' + serviceConfig[serviceName].port)
+    //                })
+    //            }
+    //        }
+    //        if(serviceConfig[serviceName].type === "pub") {
+    //            setInterval(function(){
+    //                //if you pass an array, send() uses SENDMORE flag automatically
+    //                service.send(["A", "We do not want to see this"]);
+    //                //if you want, you can set it explicitly
+    //                service.send("B", zmq.ZMQ_SNDMORE);
+    //                service.send("We would like to see this");
+    //            }, 500);
+    //        }
+    //
+    //        if(serviceConfig[serviceName].type === "sub") {
+    //            service.subscribe("B");
+    //            service.on('message', function() {
+    //                var msg = [];
+    //                Array.prototype.slice.call(arguments).forEach(function(arg) {
+    //                    msg.push(arg.toString());
+    //                });
+    //
+    //                console.log(msg);
+    //            })
+    //        }
+    //        app.services[serviceName] = service;
+    //    })
+    //}
+
+    return app;
+}
+
 
 module.exports = ArrowApplication;

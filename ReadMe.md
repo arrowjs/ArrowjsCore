@@ -7,7 +7,6 @@ ArrowJS is framework based on Express.js. It helps you build your web applicatio
     'use strict';
     const Arrow = require('arrowjs');
     const application = new Arrow();
-    application._config.port = 80;
     application.start();
 ```
 

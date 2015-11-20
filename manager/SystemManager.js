@@ -100,14 +100,20 @@ class SystemManager extends events.EventEmitter {
                 struc.path[id].path.map(function (globMaker) {
                     let componentGlobLink = path.normalize(_base + globMaker(self._app._config));
                     let listComponents = __.getGlobbedFiles(componentGlobLink);
-                    let componentFolder = componentGlobLink.slice(0, componentGlobLink.indexOf('*'));
+                    let componentFolder;
+                    if (componentGlobLink.indexOf('*') > -1) {
+                        componentFolder = componentGlobLink.slice(0, componentGlobLink.indexOf('*'));
+                    } else {
+                        componentFolder = path.dirname(componentGlobLink)
+                    }
+
                     listComponents.forEach(function (link) {
                         let nodeList = path.relative(componentGlobLink, link).split(path.sep).filter(function (node) {
                             return (node !== "..")
                         });
                         let componentConfigFunction = require(link);
                         if (typeof componentConfigFunction === "object") {
-                            let componentName = componentConfigFunction.name || nodeList[0];
+                            let componentName = componentConfigFunction.name || nodeList[0] || self.name;
                             paths[componentName] = paths[componentName] || {};
                             paths[componentName].configFile = link;
                             paths[componentName].path = componentFolder + nodeList[0];
@@ -118,7 +124,6 @@ class SystemManager extends events.EventEmitter {
                 });
             })
         }
-
         Object.keys(paths).map(function (name) {
             let id = paths[name].strucID;
             if (id) {
@@ -132,7 +137,7 @@ class SystemManager extends events.EventEmitter {
                 components[name].routes = {};
                 components[name].models = {};
                 components[name].views = [];
-                //components[name].helpers = {};
+                components[name].actions = {};
                 let componentConfig = require(paths[name].configFile);
                 _.assign(components[name], componentConfig);
 
@@ -152,8 +157,8 @@ class SystemManager extends events.EventEmitter {
                     _.assign(components[name], data);
                 }
 
-                if (components[name]._structure.helper) {
-                    let data = actionByAttribute("helper", components[name], paths[name].path, _app);
+                if (components[name]._structure.action) {
+                    let data = actionByAttribute("action", components[name], paths[name].path, _app);
                     _.assign(components[name], data);
                 }
 
@@ -180,7 +185,6 @@ class SystemManager extends events.EventEmitter {
                 });
             }
         });
-
         //handle Database
         let defaultDatabase = {};
         let defaultQueryResolve = function () {
@@ -215,7 +219,6 @@ class SystemManager extends events.EventEmitter {
                 })
             }
         });
-
         this[privateName] = components;
 
     }
