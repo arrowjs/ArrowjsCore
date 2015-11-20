@@ -1,6 +1,7 @@
 "use strict";
 
-const getListFile = require('../helper/getListFile');
+const getListFile = require('../helper/getListFile'),
+    _ = require('lodash');
 /**
  * Get action from file
  * @param setting
@@ -9,6 +10,8 @@ const getListFile = require('../helper/getListFile');
  * @param application
  */
 module.exports = function actionAttribute(setting, fatherPath, component, application) {
+    application.actions = application.actions || {};
+    application.actions[component.name] = {};
     let files = getListFile(setting, fatherPath, application);
     if (files.type === "single") {
         Object.keys(files).map(function (key) {
@@ -27,10 +30,12 @@ module.exports = function actionAttribute(setting, fatherPath, component, applic
                 })
             }
         })
+        _.assign(application.actions[component.name],component.actions);
     } else if (files.type === "multi") {
         Object.keys(files).map(function (key) {
             if (key !== "type") {
                 component.actions[key] = {};
+                application.actions[component.name][key] = {};
                 files[key].map(function (link) {
                     let actionFunction = require(link);
                     if (typeof actionFunction !== "function") {
@@ -42,7 +47,8 @@ module.exports = function actionAttribute(setting, fatherPath, component, applic
                             throw err
                         }
                     }
-                })
+                });
+                _.assign(application.actions[component.name][key],component.actions[key]);
             }
         })
     }
