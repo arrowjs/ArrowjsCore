@@ -52,7 +52,6 @@ class SystemManager extends events.EventEmitter {
 
     /**
      * Set all feature config to cache
-     * @returns {*}
      */
     setCache() {
         let self = this;
@@ -67,7 +66,6 @@ class SystemManager extends events.EventEmitter {
 
     /**
      * Get data from cache and sync cluster
-     * @returns {Promise.<T>}
      */
     reload() {
         let self = this;
@@ -87,10 +85,11 @@ class SystemManager extends events.EventEmitter {
     }
 
     /**
-     * Load view,controller,model of feature
+     * Load views, controllers and models of a feature
      */
     loadComponents() {
         let self = this;
+        //See /config/structure.js and /lib/buildStructure.js
         let struc = self._app.structure[self.name];
         let _base = self._app.arrFolder;
         let privateName = "_" + self.name;
@@ -109,8 +108,7 @@ class SystemManager extends events.EventEmitter {
                         });
                         let componentConfigFunction = require(link);
                         if (typeof componentConfigFunction === "object") {
-                            let componentConfig = componentConfigFunction;
-                            let componentName = componentConfig.name || nodeList[0];
+                            let componentName = componentConfigFunction.name || nodeList[0];
                             paths[componentName] = paths[componentName] || {};
                             paths[componentName].configFile = link;
                             paths[componentName].path = componentFolder + nodeList[0];

@@ -310,7 +310,8 @@ module.exports.mergePath = function (paths, routePath, checkIndex) {
 };
 
 /**
- * Get raw config file
+ * Scan folder config and read all configuration file. If configuration file does not exists then copy default
+ * configuration file from Arrowjs module to folder config
  */
 
 module.exports.getRawConfig = function getRawConfig() {
@@ -488,8 +489,7 @@ module.exports.getRawConfig = function getRawConfig() {
     return conf
 };
 /**
- *
- * @returns {{}}
+ * Read file config/structure.js and return structure object
  */
 module.exports.getStructure = function getStructure() {
     let structure = {};
