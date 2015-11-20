@@ -195,6 +195,9 @@ class ArrowApplication {
 
         return Promise.resolve()
             .then(function () {
+                setupService(self)
+            })
+            .then(function () {
                 loadServices(self)
             })
             .then(function () {
@@ -754,55 +757,79 @@ function handleError(app) {
 }
 
 
+function setupService(app) {
+    let serviceConfig = app.getConfig('service_setting');
+    
+    if(serviceConfig  && serviceConfig.enable) {
+        let protocol = serviceConfig.protocol || 'tcp',
+            host = serviceConfig.host || '127.0.0.1',
+            port = serviceConfig.port || app.getConfig('port');
+        let connectString = `${protocol}://${host}:${port}`;
+        let connectionType = serviceConfig.connect_type || "bind";
+        if(serviceConfig.sync) {
+            connectionType += 'Sync';
+        }
+        if (serviceConfig.type) {
+            app.service = zmq.socket(serviceConfig.type);
+        }
+        app.service[connectionType](connectString, function (err) {
+            if(err)
+                logger.error(err);
+            else
+                logger.info('Service started: ' + connectString);
+        });
+        setInterval(function () {
+            app.service.send(["key","aa"]);
+        },1000)
+    }
+    return app
+}
+
 function loadServices(app) {
-    //let serviceConfig = app.getConfig('services');
-    //
-    //app.services = {};
-    //
-    //if(serviceConfig) {
-    //    Object.keys(serviceConfig).map(function (serviceName) {
-    //        app.services[serviceName] = {};
-    //        let service;
-    //
-    //        if (serviceConfig[serviceName].protocol && serviceConfig[serviceName].host && serviceConfig[serviceName].port && serviceConfig[serviceName].type) {
-    //            if(serviceConfig[serviceName].connect_type) {
-    //                service =  zmq.socket(serviceConfig[serviceName].type);
-    //                let connectString = serviceConfig[serviceName].protocol + "://" + serviceConfig[serviceName].host + ":" + serviceConfig[serviceName].port;
-    //                service[serviceConfig[serviceName].connect_type](connectString, function (err) {
-    //                    if(err)
-    //                        console.log(err);
-    //                    else
-    //                        console.log('Listening on ' + serviceConfig[serviceName].port)
-    //                })
-    //            }
-    //        }
-    //        if(serviceConfig[serviceName].type === "pub") {
-    //            setInterval(function(){
-    //                //if you pass an array, send() uses SENDMORE flag automatically
-    //                service.send(["A", "We do not want to see this"]);
-    //                //if you want, you can set it explicitly
-    //                service.send("B", zmq.ZMQ_SNDMORE);
-    //                service.send("We would like to see this");
-    //            }, 500);
-    //        }
-    //
-    //        if(serviceConfig[serviceName].type === "sub") {
-    //            service.subscribe("B");
-    //            service.on('message', function() {
-    //                var msg = [];
-    //                Array.prototype.slice.call(arguments).forEach(function(arg) {
-    //                    msg.push(arg.toString());
-    //                });
-    //
-    //                console.log(msg);
-    //            })
-    //        }
-    //        app.services[serviceName] = service;
-    //    })
-    //}
+    let serviceConfig = app.getConfig('services');
+    
+    app.services = {};
+
+    if(serviceConfig) {
+        Object.keys(serviceConfig).map(function (serviceName) {
+            let protocol = serviceConfig[serviceName].protocol || 'tcp',
+                host = serviceConfig[serviceName].host || '127.0.0.1',
+                port = serviceConfig[serviceName].port ;
+            let connectString = `${protocol}://${host}:${port}`;
+            let connectionType = serviceConfig[serviceName].connect_type || "connect";
+            if(serviceConfig[serviceName].sync) {
+                connectionType += 'Sync';
+            }
+            if (serviceConfig[serviceName].type && port) {
+                app.services[serviceName] = zmq.socket(serviceConfig[serviceName].type);
+            }
+            app.services[serviceName][connectionType](connectString);
+            handleService(app.services[serviceName],serviceConfig[serviceName],app);
+            //logger.info(`Connecting to ${serviceName}: ${connectString}`);
+            app.services[serviceName].on("message", function (msg) {
+                console.log(msg.toString())
+            })
+        })
+    }
 
     return app;
 }
 
+function handleService(service,config,application) {
+    if(config.subscribe && _.isString(config.subscribe)) {
+        service.subscribe(config.subscribe)
+    }
+    if(config.monitor && config.monitor.interval && config.monitor.numOfEvents) {
+        if (_.isObject(config.monitor_events)) {
+            service.monitor(config.monitor.interval,config.monitor.numOfEvents)
+            Object.keys(config.monitor_events).map(function (event) {
+                if (_.isFunction(config.monitor_events[event])) {
+                    service.on(event,monitor_events[event].bind(application))
+                }
+            })
+        }
+    }
+
+}
 
 module.exports = ArrowApplication;
