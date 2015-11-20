@@ -14,6 +14,7 @@ let fs = require('fs'),
     __ = require("./global_function"),
     EventEmitter = require('events').EventEmitter,
     Database = require('./database'),
+    r = require('nunjucks').runtime,
     DefaultManager = require("../manager/DefaultManager"),
     ConfigManager = require("../manager/ConfigManager"),
     buildStructure = require("./buildStructure"),
@@ -84,6 +85,7 @@ class ArrowApplication {
         this.useFlashMessage = require("../config/middleware/flashMessage");
         this.useSession = require("../config/middleware/useSession");
         this.serveStatic = require("../config/middleware/staticResource");
+        this.markSafe = r.markSafe;
 
         this._componentList = [];
 
