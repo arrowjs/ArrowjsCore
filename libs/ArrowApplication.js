@@ -184,6 +184,16 @@ class ArrowApplication {
         }
     }
 
+    addGlobal(obj) {
+        if (_.isObject(obj)) {
+            _.assign(Arrow, obj);
+        }
+    }
+
+    addPlugin(plugin) {
+        console.log(plugin);
+    }
+
     /**
      * Kick start express application and listen at default port
      * @param setting - passport: boolean, role: boolean
@@ -497,9 +507,9 @@ function makeRender(req, res, application, componentView, componentName, compone
 
         // default callback to respond
         done = done || function (err, str) {
-            if (err) return req.next(err);
-            res.send(str);
-        };
+                if (err) return req.next(err);
+                res.send(str);
+            };
 
         if (application._config.viewExtension && view.indexOf(application._config.viewExtension) === -1 && view.indexOf(".") === -1) {
             view += "." + application._config.viewExtension;
@@ -675,7 +685,7 @@ function handleError(app) {
 
         } else {
             error.error = err.stack;
-            error[req.url].time = Date.now();
+            error.time = Date.now();
             let arrayInfo = app.getConfig('fault_tolerant.logdata');
             if (_.isArray(arrayInfo)) {
                 arrayInfo.map(function (key) {
@@ -683,7 +693,7 @@ function handleError(app) {
                 })
             }
         }
-        if(app.getConfig('fault_tolerant.log')) {
+        if (app.getConfig('fault_tolerant.log')) {
             logger.error(error);
         }
 
@@ -699,7 +709,7 @@ function handleError(app) {
                 }
             });
             let link = arrayPart.join(path.sep);
-            app.render(link, { error :error }, function (err, html) {
+            app.render(link, {error: error}, function (err, html) {
                 if (err) {
                     res.send(err)
                 }
@@ -756,80 +766,146 @@ function handleError(app) {
     }
 }
 
-
 function setupService(app) {
     let serviceConfig = app.getConfig('service_setting');
-    
-    if(serviceConfig  && serviceConfig.enable) {
+
+    if (serviceConfig && serviceConfig.enable) {
         let protocol = serviceConfig.protocol || 'tcp',
             host = serviceConfig.host || '127.0.0.1',
             port = serviceConfig.port || app.getConfig('port');
         let connectString = `${protocol}://${host}:${port}`;
         let connectionType = serviceConfig.connect_type || "bind";
-        if(serviceConfig.sync) {
+        let socketType = serviceConfig.type || "router";
+        if (serviceConfig.sync && connectionType !== "connect") {
             connectionType += 'Sync';
         }
-        if (serviceConfig.type) {
-            app.service = zmq.socket(serviceConfig.type);
-        }
-        app.service[connectionType](connectString, function (err) {
-            if(err)
+        app.service = {};
+        app.service.socket = zmq.socket(socketType);
+
+        app.service.socket[connectionType](connectString, function (err) {
+            if (err)
                 logger.error(err);
-            else
+            else {
                 logger.info('Service started: ' + connectString);
+                app.service.socket.on('message', function (envelope, obj) {
+                    obj = JSON.parse(obj);
+                    let response = "null";
+                    let error = "null";
+                    if (obj.action && obj.data) {
+                        let action = getDataByDotNotation(app.actions,obj.action);
+                        if (action) {
+                            action(obj.data, function (err,result) {
+                                if (err) {
+                                    error = JSON.stringify({error: true, message: err.message, content : err});
+                                }
+                                console.log(result);
+                                result = JSON.stringify(result);
+                                app.service.socket.send([envelope,error, result]);
+                            })
+                        } else {
+                            error = JSON.stringify({error: true, message: `invalid action`});
+                            app.service.socket.send([envelope, error, response]);
+                        }
+
+                    } else {
+                        error = JSON.stringify({error: true, message: `invalid data`});
+                        app.service.socket.send([envelope,error, response]);
+                    }
+                })
+            }
         });
-        setInterval(function () {
-            app.service.send(["key","aa"]);
-        },1000)
     }
     return app
 }
 
 function loadServices(app) {
     let serviceConfig = app.getConfig('services');
-    
+
     app.services = {};
 
-    if(serviceConfig) {
+    if (serviceConfig) {
         Object.keys(serviceConfig).map(function (serviceName) {
+            app.services[serviceName] = {};
             let protocol = serviceConfig[serviceName].protocol || 'tcp',
                 host = serviceConfig[serviceName].host || '127.0.0.1',
-                port = serviceConfig[serviceName].port ;
+                port = serviceConfig[serviceName].port;
             let connectString = `${protocol}://${host}:${port}`;
             let connectionType = serviceConfig[serviceName].connect_type || "connect";
-            if(serviceConfig[serviceName].sync) {
+            if (serviceConfig[serviceName].sync && connectionType !== "connect") {
                 connectionType += 'Sync';
             }
-            if (serviceConfig[serviceName].type && port) {
-                app.services[serviceName] = zmq.socket(serviceConfig[serviceName].type);
+            let socketType = serviceConfig.type || "dealer";
+
+            if (port) {
+                app.services[serviceName].socket = zmq.socket(socketType);
             }
-            app.services[serviceName][connectionType](connectString);
-            handleService(app.services[serviceName],serviceConfig[serviceName],app);
+            app.services[serviceName].socket[connectionType](connectString);
+            handleService(app.services[serviceName].socket, serviceConfig[serviceName], app);
             //logger.info(`Connecting to ${serviceName}: ${connectString}`);
-            app.services[serviceName].on("message", function (msg) {
-                console.log(msg.toString())
-            })
+
+            app.services[serviceName].send = function (obj, callback) {
+                if (typeof(obj) == `object`) {
+                    if (obj.action && obj.data ) {
+                        var message = JSON.stringify(obj);
+                        app.services[serviceName].socket.send(message);
+                        app.services[serviceName].socket.once(`message`, function (err,data) {
+                            err = JSON.parse(err);
+                            if(String(err) !== "null") {
+                                callback(err);
+                            } else {
+                                var result = JSON.parse(data);
+                                callback(null,result);
+                            }
+                        });
+                    } else {
+                        let error = JSON.stringify({error: true, message: `no data or action`});
+                        callback(error)
+                    }
+                }
+            }
         })
     }
 
     return app;
 }
 
-function handleService(service,config,application) {
-    if(config.subscribe && _.isString(config.subscribe)) {
+function handleService(service, config, application) {
+    if (config.subscribe && _.isString(config.subscribe)) {
         service.subscribe(config.subscribe)
     }
-    if(config.monitor && config.monitor.interval && config.monitor.numOfEvents) {
+    if (config.monitor && config.monitor.interval && config.monitor.numOfEvents) {
         if (_.isObject(config.monitor_events)) {
-            service.monitor(config.monitor.interval,config.monitor.numOfEvents)
+            service.monitor(config.monitor.interval, config.monitor.numOfEvents)
             Object.keys(config.monitor_events).map(function (event) {
                 if (_.isFunction(config.monitor_events[event])) {
-                    service.on(event,monitor_events[event].bind(application))
+                    service.on(event, monitor_events[event].bind(application))
                 }
             })
         }
     }
+}
 
+function getDataByDotNotation(obj, key) {
+    if (_.isString(key)) {
+        if (key.indexOf(".") > 0) {
+            let arrayKey = key.split(".");
+            let self = obj;
+            let result;
+            arrayKey.map(function (name) {
+                if (self[name]) {
+                    result = self[name];
+                    self = result;
+                } else {
+                    result = null
+                }
+            });
+            return result
+        } else {
+            return obj[key];
+        }
+    } else {
+        return null
+    }
 }
 
 module.exports = ArrowApplication;
