@@ -327,6 +327,19 @@ module.exports.getRawConfig = function getRawConfig() {
         }
     }
 
+    //get services.js
+    try {
+        fs.accessSync(__base + 'config/services.js');
+        _.assign(conf, require(__base + 'config/services'));
+    } catch (err) {
+        if (err.code === 'ENOENT') {
+            fsEx.copySync(path.resolve(__dirname, '..', 'config/services.js'), __base + 'config/services.js');
+            _.assign(conf, require(__base + 'config/services'));
+        } else {
+            throw err
+        }
+    }
+
     //get websocket.js
     try {
         fs.accessSync(__base + 'config/websocket.js');
@@ -437,18 +450,6 @@ module.exports.getRawConfig = function getRawConfig() {
         }
     }
 
-    //get default config
-    try {
-        fs.accessSync(__base + 'config/env/default.js');
-        _.assign(conf, require(__base + 'config/env/default'));
-    } catch (err) {
-        if (err.code === 'ENOENT') {
-            fsEx.copySync(path.resolve(__dirname, '..', 'config/env/default.js'), __base + 'config/env/default.js');
-            _.assign(conf, require(__base + 'config/env/default'));
-        }else {
-            throw err
-        }
-    }
 
     //get ENV config
     let env = process.env.NODE_ENV || "development";
