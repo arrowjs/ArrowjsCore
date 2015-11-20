@@ -1,21 +1,29 @@
 "use strict";
 
-let pathAttribute = require('./path');
-let extendsAttribute = require('./extends');
-let modelAttribute = require('./model');
-let routeAttribute = require('./route');
-let viewAttribute = require('./view');
-let actionAttribute = require('./action');
-let controllerAttribute = require('./controller');
-let otherAttribute = require('./other');
+const pathAttribute = require('./path'),
+    extendsAttribute = require('./extends'),
+    modelAttribute = require('./model'),
+    routeAttribute = require('./route'),
+    viewAttribute = require('./view'),
+    actionAttribute = require('./action'),
+    controllerAttribute = require('./controller'),
+    otherAttribute = require('./other');
 
+/**
+ * Get config by attribute of feature
+ * @param attName
+ * @param component
+ * @param fatherPath
+ * @param application
+ * @returns {*}
+ */
 module.exports = function actionByAttribute(attName, component, fatherPath, application) {
     let setting = component._structure[attName];
     switch (attName) {
         case "path" :
             return pathAttribute();
-        case "extends":
-            return extendsAttribute(setting);
+        case "extend":
+            return extendsAttribute(setting, application);
         case "model":
             return modelAttribute(setting, fatherPath, component, application);
         case "route":

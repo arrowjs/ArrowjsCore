@@ -4,30 +4,31 @@ module.exports = {
             "folder": "/features",
             "file": "feature.js"
         },
-        //extends : {
-        //  system :true
-        //},
-        //model : {
-        //    path: {
-        //        folder : "models",
-        //        file: "*.js"
-        //    }
-        //},
-        controller: {
-            path: {
-                folder : "controllers",
-                file: "*.js"
+        "extends": {
+            system: true,
+            active: true
+        },
+        "model": {
+            "path": {
+                "folder": "models",
+                "file": "*.js"
             }
         },
-        view : {
-          path : {
-              folder: "views"
-          }
+        "view": {
+            "path": {
+                "folder": "view"
+            }
         },
-        route : {
-            path : {
-                file :'route.js'
+        "controller": {
+            "path": {
+                "folder": "controller",
+                "file": "*.js"
+            }
+        },
+        "route": {
+            "path": {
+                "file": "route.js"
             }
         }
     }
-};
+}

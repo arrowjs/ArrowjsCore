@@ -14,9 +14,9 @@
 </head>
 <body>
     <div class="container">
-    {% for message in messages %}
+    {% for key,value in messages %}
         <div class="alert">
-            <strong>{{ message.type }}</strong> {{ message.content }}
+            <strong>{{ key }}</strong> {{ value }}
         </div>
     {% endfor %}
     {% block content %}

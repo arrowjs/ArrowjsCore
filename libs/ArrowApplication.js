@@ -3,22 +3,35 @@
 /**
  * Module dependencies.
  */
-let fs = require('fs'),
+const fs = require('fs'),
     arrowStack = require('./ArrStack'),
     path = require('path'),
     express = require('express'),
     _ = require('lodash'),
     Promise = require('bluebird'),
-    chalk = require('chalk'),
     RedisCache = require("./RedisCache"),
     logger = require("./logger"),
-    utils = require("./utils"),
     __ = require("./global_function"),
     EventEmitter = require('events').EventEmitter,
+    Database = require('./database'),
+    r = require('nunjucks').runtime,
     DefaultManager = require("../manager/DefaultManager"),
     ConfigManager = require("../manager/ConfigManager"),
-    buildStructure = require("./buildStructure");
+    buildStructure = require("./buildStructure"),
+    socket_io = require('socket.io'),
+    http = require('http'),
+    cluster = require('cluster'),
+    socketRedisAdapter = require('socket.io-redis'),
+    ViewEngine = require("../libs/ViewEngine"),
+    request = require('request'),
+    zmq = require('zmq'),
+    loadingLanguage = require("./i18n").loadLanguage;
+/**
+ * Singleton object. It is heart of Arrowjs.io web app. it wraps Express and adds following functions:
+ * support Redis, multi-languages, passport, check permission and socket.io / websocket
+ */
 
+let arrowErrorLink = {};
 class ArrowApplication {
 
     /**
@@ -29,11 +42,12 @@ class ArrowApplication {
         //if NODE_ENV does not exist, use development by default
         process.env.NODE_ENV = process.env.NODE_ENV || 'development';
 
-        let eventEmitter = new EventEmitter();
-        this.beforeFunction = [];
-        this.beforeAuthenticate = [];
-        this.afterAuthenticate = [];
-        this._expressApplication = express();
+        this.beforeAuth = [];  //add middle-wares before user authenticates
+        this.afterAuth = [];   //add middle-ware after user authenticates
+        this._expressApplication = express();  //wrap express object
+
+        global.Arrow = {};
+        Arrow.request = request;
 
         //Move all functions of express to ArrowApplication
         //So we can call ArrowApplication.listen(port)
@@ -46,20 +60,35 @@ class ArrowApplication {
             }
         }
 
-        let requester = arrowStack(2);  //Why arrowStack(2)?
+        // 0 : location of this file
+        // 1 : location of index.js (module file)
+        // 2 : location of server.js file
+        let requester = arrowStack(2);
         this.arrFolder = path.dirname(requester) + '/';
 
-
+        //assign current Arrowjs application folder to global variable
         global.__base = this.arrFolder;
-        this._config = __.getRawConfig();  //Read config/config.js into this._config
+
+        //Read config/config.js into this._config
+        this._config = __.getRawConfig();
+
+        //Read and parse config/structure.js
         this.structure = buildStructure(__.getStructure());
 
+        //display longer stack trace in console
+        if (this._config.long_stack) {
+            require('longjohn')
+        }
 
         //Make redis cache
         let redisConfig = this._config.redis || {};
         let redisFunction = RedisCache(redisConfig);
         var redisClient, redisSubscriber;
 
+        /* In config/env/development.js , section Redis:
+         if real Redis server is not available, set type = 'fakeredis'
+         if real Redis server present, set type = 'redis', host and port correctly
+         */
         if (redisConfig.type === "fakeredis") {
             redisClient = redisFunction("client");
             redisSubscriber = redisFunction.bind(null, redisConfig);
@@ -71,121 +100,219 @@ class ArrowApplication {
         this.redisClient = redisClient;
         this.redisSubscriber = redisSubscriber;
 
-        //TODO: why we assign many properties of ArrowApplication to _expressApplication. It is redundant
-        this._expressApplication.arrFolder = this.arrFolder;
-        this._expressApplication.arrConfig = this._config;
-        this._expressApplication.redisCache = this.redisCache;
-        this._expressApplication._arrApplication = this;
-        this._expressApplication.usePassport = require("./loadPassport");
-        this._expressApplication.useFlashMessage = require("./flashMessage");
-        this._expressApplication.useSession = require("./useSession");
+        //Add passport and its authentication strategies
+        this.usePassport = require("../config/middleware/loadPassport");
 
-        this._componentList = [];
+        //Display flash message when user reloads view
+        this.useFlashMessage = require("../config/middleware/flashMessage");
 
-        let languagePath = __base + this._config.langPath + '/*.js';
-        this._lang = {};
-        __.getGlobbedFiles(languagePath).forEach(function (file) {
-            this._lang[path.basename(file, '.js')] = require(file);
-        }.bind(this));
+        //Use middleware express-session to store user session
+        this.useSession = require("../config/middleware/useSession");
 
+        //Serve static resources when not using Nginx.
+        //See config/view.js section resource
+        this.serveStatic = require("../config/middleware/staticResource");
+        this.markSafe = r.markSafe;
+
+        //Load available languages. See config/i18n.js and folder /lang
+        loadingLanguage(this._config);
+
+        //Bind all global functions to ArrowApplication object
         loadingGlobalFunction(this);
 
         this.configManager = new ConfigManager(this, "config");
+
+        //Share eventEmitter among all kinds of Managers. This helps Manager object notifies each other
+        //when configuration is changed
+        let eventEmitter = new EventEmitter();
+
+        //subscribes to get notification from shared eventEmitter object
         this.configManager.eventHook(eventEmitter);
-        this._config = this.configManager._config;
+
+        //Create shortcut call
         this.getConfig = this.configManager.getConfig.bind(this.configManager);
         this.setConfig = this.configManager.setConfig.bind(this.configManager);
+        this.updateConfig = this.configManager.updateConfig.bind(this.configManager);
 
+        let viewEngineSetting = _.assign(this._config.nunjuckSettings || {}, {express: this._expressApplication});
+        let applicationView = ViewEngine(this.arrFolder, viewEngineSetting, this);
+        this.applicationENV = applicationView;
 
-        this._arrRoutes = {};
+        this.render = this.applicationENV.render.bind(applicationView);
 
+        this.renderString = applicationView.renderString.bind(applicationView);
+
+        //_componentList contains name property of composite features, singleton features, widgets, plugins
+        this._componentList = [];
         Object.keys(this.structure).map(function (managerKey) {
             let key = managerKey;
             let managerName = managerKey + "Manager";
             this[managerName] = new DefaultManager(this, key);
             this[managerName].eventHook(eventEmitter);
+            //load sub components of
             this[managerName].loadComponents(key);
             this[key] = this[managerName]["_" + key];
             this._componentList.push(key);
         }.bind(this));
 
+        //Declare _arrRoutes to store all routes of features
+        this._arrRoutes = {};
+    }
+
+    /**
+     * When user requests an URL, execute this function before server checks in session if user has authenticates
+     * If web app does not require authentication, beforeAuthenticate and afterAuthenticate are same. <br>
+     * beforeAuthenticate > authenticate > afterAuthenticate
+     * @param func
+     */
+    beforeAuthenticate(func) {
+        let self = this;
+        if (typeof func == "function") {
+            self.beforeAuth.push(func.bind(self));
+        }
+    }
+
+    /**
+     * When user requests an URL, execute this function after server checks in session if user has authenticates
+     * This function always runs regardless user has authenticated or not
+     * @param func
+     */
+    afterAuthenticate(func) {
+        let self = this;
+        if (typeof func == "function") {
+            self.afterAuth.push(func.bind(self));
+        }
+    }
+
+    addGlobal(obj) {
+        if (_.isObject(obj)) {
+            _.assign(Arrow, obj);
+        }
+    }
+
+    addPlugin(plugin) {
+        console.log(plugin);
     }
 
     /**
      * Kick start express application and listen at default port
-     * @returns {Promise.<T>}
+     * @param setting - passport: boolean, role: boolean
      */
     start(setting) {
         let self = this;
-        let exApp = self._expressApplication;
-        /** Init the express application */
+
+        self.arrowSettings = setting;
+
         return Promise.resolve()
             .then(function () {
+                setupService(self)
+            })
+            .then(function () {
+                loadServices(self)
+            })
+            .then(function () {
                 addRoles(self);
+                if (self.getConfig("redis.type") !== "fakeredis") {
+                    //TODO : testing auto load config if use redis
+                    let resolve = self.configManager.getCache();
+                    self._componentList.map(function (key) {
+                        let managerName = key + "Manager";
+                        resolve = resolve.then(function () {
+                            return self[managerName].getCache()
+                        })
+                    });
+                    return resolve
+                } else {
+                    return Promise.resolve();
+                }
             })
             .then(function () {
-                expressApp(exApp, exApp.arrConfig, setting)
+                //init Express app
+                return configureExpressApp(self, self.getConfig(), setting)
             })
             .then(function () {
-                loadPreFunc(exApp, self.beforeFunction)
+                return circuit_breaker(self)
             })
             .then(function () {
-                setupManager(self);
+                return loadModel_Route_Render(self, setting);
             })
             .then(function () {
-                loadRouteAndRender(self, setting);
+                return handleError(self)
             })
             .then(function (app) {
-                exApp.listen(self._config.port, function () {
+                let server = http.createServer(self._expressApplication);
+
+                if (self.getConfig('websocket_enable') && self.getConfig('websocket_folder')) {
+                    let io = socket_io(server);
+                    if (self.getConfig('redis.type') !== 'fakeredis') {
+                        let redisConf = {host: self.getConfig('redis.host'), port: self.getConfig('redis.port')};
+                        io.adapter(socketRedisAdapter(redisConf));
+                    }
+                    self.io = io;
+
+                    __.getGlobbedFiles(path.normalize(self.arrFolder + self.getConfig('websocket_folder'))).map(function (link) {
+                        let socketFunction = require(link);
+                        if (_.isFunction(socketFunction)) {
+                            socketFunction(io);
+                        }
+                    })
+                }
+
+                server.listen(self.getConfig("port"), function () {
                     logger.info('Application loaded using the "' + process.env.NODE_ENV + '" environment configuration');
-                    logger.info('Application started on port ' + self._config.port, ', Process ID: ' + process.pid);
+                    logger.info('Application started on port ' + self.getConfig("port"), ', Process ID: ' + process.pid);
                 });
                 return app;
+            }).catch(function (err) {
+                throw err
             });
 
-    }
-
-    /**
-     * Add function that will execute before authentication task
-     * @param func
-     */
-
-    before(func) {
-        if (typeof func == "function") {
-            this.beforeFunction.push(func);
-        }
-    }
-
-    beforeAuthenticate(func) {
-        let self = this;
-        if (typeof func == "function") {
-            self.beforeAuthenticate.push(func.bind(self));
-        }
-    }
-
-    afterAuthenticate(func) {
-        let self = this;
-        if (typeof func == "function") {
-            self.afterAuthenticate.push(func.bind(self));
-        }
     }
 }
 
 /**
- *
  * Supporting functions
  */
 
-/**
- * Load routers
- * @param arrow
- */
 
-//TODO testing render ;
-function loadRouteAndRender(arrow, userSetting) {
+/**
+ *
+ * @param arrow
+ * @param userSetting
+ */
+function loadModel_Route_Render(arrow, userSetting) {
+
+    let defaultDatabase = {};
+
+    if (arrow.models && Object.keys(arrow.models).length > 0) {
+        if (_.isEmpty(defaultDatabase)) {
+            defaultDatabase = Database(arrow);
+        }
+        let defaultQueryResolve = function () {
+            return new Promise(function (fulfill, reject) {
+                fulfill("No models")
+            })
+        };
+        arrow.models.rawQuery = defaultDatabase.query ? defaultDatabase.query.bind(defaultDatabase) : defaultQueryResolve;
+
+        //New way to associate db:
+
+        let databaseFunction = require(arrow.arrFolder + "config/database");
+
+        if (databaseFunction.associate) {
+            databaseFunction.associate(arrow.models)
+        }
+    }
+
+    if (!_.isEmpty(defaultDatabase)) {
+        defaultDatabase.sync();
+    }
+
     arrow._componentList.map(function (key) {
         Object.keys(arrow[key]).map(function (componentKey) {
-            logger.info("Arrow loaded: '" + key + "' - '" + componentKey + "'");
+            if (cluster.isMaster) {
+                logger.info("Arrow loaded: '" + key + "' - '" + componentKey + "'");
+            }
             let routeConfig = arrow[key][componentKey]._structure.route;
             if (routeConfig) {
                 Object.keys(routeConfig.path).map(function (second_key) {
@@ -194,7 +321,6 @@ function loadRouteAndRender(arrow, userSetting) {
                         let componentRouteSetting = arrow[key][componentKey].routes[second_key];
                         handleComponentRouteSetting(arrow, componentRouteSetting, defaultRouteConfig, key, userSetting, componentKey);
                     } else {
-
                         let componentRouteSetting = arrow[key][componentKey].routes;
                         //Handle Route Path;
                         handleComponentRouteSetting(arrow, componentRouteSetting, defaultRouteConfig, key, userSetting, componentKey);
@@ -206,11 +332,12 @@ function loadRouteAndRender(arrow, userSetting) {
 }
 
 /**
- *
- * @param app
- * @returns {*}
+ * Run /config/express.js to configure Express object
+ * @param app - ArrowApplication object
+ * @param config - this.configManager.getConfig
+ * @param setting - parameters in application.start(setting);
  */
-function expressApp(app, config, setting) {
+function configureExpressApp(app, config, setting) {
     return new Promise(function (fulfill, reject) {
         let expressFunction;
         if (fs.existsSync(path.resolve(app.arrFolder + "config/express.js"))) {
@@ -222,34 +349,16 @@ function expressApp(app, config, setting) {
     });
 }
 
+
 /**
  *
- * @param app
- * @param beforeFunc
- * @returns {*}
+ * @param arrow
+ * @param componentRouteSetting
+ * @param defaultRouteConfig
+ * @param key
+ * @param setting
+ * @param componentKey
  */
-function loadPreFunc(app, beforeFunc) {
-    return new Promise(function (fulfill, reject) {
-        beforeFunc.map(function (func) {
-            func(app);
-        });
-
-        fulfill(app)
-    })
-}
-
-
-function setupManager(app) {
-    try {
-        fs.accessSync(path.resolve(app.arrFolder + "config/manager.js"));
-        let setupManager = require(app.arrFolder + "config/manager");
-        setupManager(app);
-    } catch (err) {
-
-    }
-    return null;
-}
-
 function handleComponentRouteSetting(arrow, componentRouteSetting, defaultRouteConfig, key, setting, componentKey) {
     let component = arrow[key][componentKey];
     let componentName = arrow[key][componentKey].name;
@@ -291,7 +400,7 @@ function handleComponentRouteSetting(arrow, componentRouteSetting, defaultRouteC
 
             //Add viewRender
             if (!_.isEmpty(viewInfo) && !_.isString(authenticate)) {
-                arrayHandler.splice(0, 0, overrideViewRender(arrow, viewInfo, componentName, component))
+                arrayHandler.splice(0, 0, overrideViewRender(arrow, viewInfo, componentName, component, key))
             }
 
 
@@ -305,9 +414,9 @@ function handleComponentRouteSetting(arrow, componentRouteSetting, defaultRouteC
             }
 
             //add middleware after authenticate;
-            if(!_.isEmpty(arrow.afterAuthenticate)) {
-                arrow.afterAuthenticate.map(function (func) {
-                    arrayHandler.splice(0, 0,func)
+            if (!_.isEmpty(arrow.afterAuth)) {
+                arrow.afterAuth.map(function (func) {
+                    arrayHandler.splice(0, 0, func)
                 })
             }
 
@@ -319,9 +428,9 @@ function handleComponentRouteSetting(arrow, componentRouteSetting, defaultRouteC
             }
 
             //add middleware before authenticate;
-            if(!_.isEmpty(arrow.beforeAuthenticate)) {
-                arrow.beforeAuthenticate.map(function (func) {
-                    arrayHandler.splice(0, 0,func)
+            if (!_.isEmpty(arrow.beforeAuth)) {
+                arrow.beforeAuth.map(function (func) {
+                    arrayHandler.splice(0, 0, func)
                 })
             }
 
@@ -341,10 +450,19 @@ function handleComponentRouteSetting(arrow, componentRouteSetting, defaultRouteC
         !_.isEmpty(arrayMethod) && arrow.use(prefix, route);
     });
 }
-
-function overrideViewRender(application, componentView, componentName, component) {
+/**
+ *
+ * @param application
+ * @param componentView
+ * @param componentName
+ * @param component
+ * @returns {Function}
+ */
+function overrideViewRender(application, componentView, componentName, component, key) {
     return function (req, res, next) {
         // Grab reference of render
+        req.arrowUrl = key + "." + componentName;
+
         let _render = res.render;
         let self = this;
         if (_.isArray(componentView)) {
@@ -359,17 +477,27 @@ function overrideViewRender(application, componentView, componentName, component
         next();
     }
 }
-
+/**
+ *
+ * @param req
+ * @param res
+ * @param application
+ * @param componentView
+ * @param componentName
+ * @param component
+ * @returns {Function}
+ */
 function makeRender(req, res, application, componentView, componentName, component) {
     return function (view, options, callback) {
-        if (req.session.messages) {
-            req.session.messages = []
-        }
+
         var done = callback;
         var opts = options || {};
 
         // merge res.locals
         _.assign(opts, res.locals);
+
+        //remove flash message
+        delete req.session.flash;
 
         // support callback function as second arg
         if (typeof options === 'function') {
@@ -383,7 +511,7 @@ function makeRender(req, res, application, componentView, componentName, compone
                 res.send(str);
             };
 
-        if (application._config.viewExtension && view.indexOf(application._config.viewExtension) === -1) {
+        if (application._config.viewExtension && view.indexOf(application._config.viewExtension) === -1 && view.indexOf(".") === -1) {
             view += "." + application._config.viewExtension;
         }
         component.viewEngine.loaders[0].pathsToNames = {};
@@ -396,7 +524,13 @@ function makeRender(req, res, application, componentView, componentName, compone
     };
 }
 
-
+/**
+ *
+ * @param obj
+ * @param application
+ * @param componentName
+ * @returns {*}
+ */
 function handleView(obj, application, componentName) {
     let miniPath = obj.func(application._config, componentName);
     let normalizePath;
@@ -427,7 +561,14 @@ function handleAuthenticate(application, name) {
         next()
     }
 }
-
+/**
+ *
+ * @param application
+ * @param permissions
+ * @param componentName
+ * @param key
+ * @returns {handleRoles}
+ */
 function handleRole(application, permissions, componentName, key) {
     let arrayPermissions = [];
     if (_.isArray(permissions)) {
@@ -442,8 +583,11 @@ function handleRole(application, permissions, componentName, key) {
                 if (arrayPermissions.indexOf(key.name) > -1) {
                     return key
                 }
+            }).map(function (data) {
+                return data.name
             });
             if (!_.isEmpty(checkedPermission)) {
+                req.permissions = checkedPermission;
                 req.hasPermission = true
             }
         } else {
@@ -452,32 +596,38 @@ function handleRole(application, permissions, componentName, key) {
         next();
     }
 }
-
+/**
+ * Load global functions then append to global.ArrowHelper
+ * bind global function to ArrowApplication object so dev can this keyword in that function to refer
+ * ArrowApplication object
+ * @param self: ArrowApplication object
+ */
 function loadingGlobalFunction(self) {
     global.ArrowHelper = {};
-    __.getGlobbedFiles(path.resolve(__dirname,"..","helpers/*.js")).map(function (link) {
-       let arrowObj = require(link);
+    __.getGlobbedFiles(path.resolve(__dirname, "..", "helpers/*.js")).map(function (link) {
+        let arrowObj = require(link);
         Object.keys(arrowObj).map(function (key) {
-            if(_.isFunction(arrowObj[key])) {
-                ArrowHelper[key] =  arrowObj[key].bind(self)
+            if (_.isFunction(arrowObj[key])) {
+                ArrowHelper[key] = arrowObj[key].bind(self)
             } else {
-                ArrowHelper[key] =  arrowObj[key]
+                ArrowHelper[key] = arrowObj[key]
             }
         })
     });
     __.getGlobbedFiles(path.normalize(__base + self._config.ArrowHelper + "*.js")).map(function (link) {
         let arrowObj = require(link);
         Object.keys(arrowObj).map(function (key) {
-            if(_.isFunction(arrowObj[key])) {
-                ArrowHelper[key] =  arrowObj[key].bind(self)
+            if (_.isFunction(arrowObj[key])) {
+                ArrowHelper[key] = arrowObj[key].bind(self)
             } else {
-                ArrowHelper[key] =  arrowObj[key]
+                ArrowHelper[key] = arrowObj[key]
             }
         })
     });
 
     //Add some support function
-    global.t = ArrowHelper.t
+    global.__ = ArrowHelper.__;
+
 }
 
 
@@ -488,4 +638,274 @@ function addRoles(self) {
         self.permissions[key] = self[managerName].getPermissions();
     });
 }
+
+/**
+ * Redirect url when meet same error.
+ * @param app
+ * @returns {*}
+ */
+function circuit_breaker(app) {
+    if (app.getConfig('fault_tolerant.enable')) {
+        app.use(function (req, res, next) {
+            if (arrowErrorLink[req.url]) {
+                let redirectLink = app.getConfig('fault_tolerant.redirect');
+                redirectLink = _.isString(redirectLink) ? redirectLink : "404";
+                res.redirect(path.normalize(path.sep + redirectLink));
+            } else {
+                next();
+            }
+        })
+    }
+    return app
+}
+
+/**
+ * Handle Error and redirect error
+ * @param app
+ */
+function handleError(app) {
+    /** Assume 'not found' in the error msg is a 404.
+     * This is somewhat silly, but valid, you can do whatever you like, set properties, use instanceof etc.
+     */
+    app.use(function (err, req, res, next) {
+        // If the error object doesn't exists
+        let error = {};
+        if (!err) return next();
+        if (app.getConfig('fault_tolerant.enable')) {
+            arrowErrorLink[req.url] = true;
+            error[req.url] = {};
+            error[req.url].error = err.stack;
+            error[req.url].time = Date.now();
+            let arrayInfo = app.getConfig('fault_tolerant.logdata');
+            if (_.isArray(arrayInfo)) {
+                arrayInfo.map(function (key) {
+                    error[req.url][key] = req[key];
+                })
+            }
+
+        } else {
+            error.error = err.stack;
+            error.time = Date.now();
+            let arrayInfo = app.getConfig('fault_tolerant.logdata');
+            if (_.isArray(arrayInfo)) {
+                arrayInfo.map(function (key) {
+                    error[key] = req[key];
+                })
+            }
+        }
+        if (app.getConfig('fault_tolerant.log')) {
+            logger.error(error);
+        }
+
+        let renderSetting = app.getConfig('fault_tolerant.render');
+        if (_.isString(renderSetting)) {
+            let arrayPart = renderSetting.split(path.sep);
+            arrayPart = arrayPart.map(function (key) {
+                if (key[0] === ":") {
+                    key = key.replace(":", "");
+                    return app.getConfig(key);
+                } else {
+                    return key
+                }
+            });
+            let link = arrayPart.join(path.sep);
+            app.render(link, {error: error}, function (err, html) {
+                if (err) {
+                    res.send(err)
+                }
+                res.send(html)
+            });
+        } else {
+            res.send(error)
+        }
+    });
+
+    if (app.getConfig("error")) {
+        Object.keys(app.getConfig("error")).map(function (link) {
+            let errorConfig = app.getConfig("error");
+            if (errorConfig[link].render) {
+                if (_.isString(errorConfig[link].render)) {
+                    let newLink = "";
+                    let arrayPart = [];
+                    if (_.isString(errorConfig[link].render)) {
+                        arrayPart = errorConfig[link].render.split(path.sep);
+                        arrayPart = arrayPart.map(function (key) {
+                            if (key[0] === ":") {
+                                key = key.replace(":", "");
+                                return app.getConfig(key);
+                            } else {
+                                return key
+                            }
+                        })
+                    }
+                    newLink = arrayPart.join(path.sep);
+                    app.get(path.normalize(path.sep + link + `(.${app.getConfig('viewExtension')})?`), function (req, res) {
+                        app.render(newLink, function (err, html) {
+                            if (err) {
+                                res.send(err)
+                            }
+                            res.send(html)
+                        });
+                    })
+                } else if (_.isObject(errorConfig[link].render)) {
+                    app.get(link, function (req, res) {
+                        res.send(errorConfig[link].render)
+                    })
+                } else if (_.isNumber(errorConfig[link].render)) {
+                    app.get(link, function (req, res) {
+                        res.sendStatus(errorConfig[link].render)
+                    })
+                } else {
+                    app.get(link, function (req, res) {
+                        res.send(link)
+                    })
+                }
+            }
+
+        })
+    }
+}
+
+function setupService(app) {
+    let serviceConfig = app.getConfig('service_setting');
+
+    if (serviceConfig && serviceConfig.enable) {
+        let protocol = serviceConfig.protocol || 'tcp',
+            host = serviceConfig.host || '127.0.0.1',
+            port = serviceConfig.port || app.getConfig('port');
+        let connectString = `${protocol}://${host}:${port}`;
+        let connectionType = serviceConfig.connect_type || "bind";
+        let socketType = serviceConfig.type || "router";
+        if (serviceConfig.sync && connectionType !== "connect") {
+            connectionType += 'Sync';
+        }
+        app.service = {};
+        app.service.socket = zmq.socket(socketType);
+
+        app.service.socket[connectionType](connectString, function (err) {
+            if (err)
+                logger.error(err);
+            else {
+                logger.info('Service started: ' + connectString);
+                app.service.socket.on('message', function (envelope, obj) {
+                    obj = JSON.parse(obj);
+                    let response = "null";
+                    let error = "null";
+                    if (obj.action && obj.data) {
+                        let action = getDataByDotNotation(app.actions,obj.action);
+                        if (action) {
+                            action(obj.data, function (err,result) {
+                                if (err) {
+                                    error = JSON.stringify({error: true, message: err.message, content : err});
+                                }
+                                console.log(result);
+                                result = JSON.stringify(result);
+                                app.service.socket.send([envelope,error, result]);
+                            })
+                        } else {
+                            error = JSON.stringify({error: true, message: `invalid action`});
+                            app.service.socket.send([envelope, error, response]);
+                        }
+
+                    } else {
+                        error = JSON.stringify({error: true, message: `invalid data`});
+                        app.service.socket.send([envelope,error, response]);
+                    }
+                })
+            }
+        });
+    }
+    return app
+}
+
+function loadServices(app) {
+    let serviceConfig = app.getConfig('services');
+
+    app.services = {};
+
+    if (serviceConfig) {
+        Object.keys(serviceConfig).map(function (serviceName) {
+            app.services[serviceName] = {};
+            let protocol = serviceConfig[serviceName].protocol || 'tcp',
+                host = serviceConfig[serviceName].host || '127.0.0.1',
+                port = serviceConfig[serviceName].port;
+            let connectString = `${protocol}://${host}:${port}`;
+            let connectionType = serviceConfig[serviceName].connect_type || "connect";
+            if (serviceConfig[serviceName].sync && connectionType !== "connect") {
+                connectionType += 'Sync';
+            }
+            let socketType = serviceConfig.type || "dealer";
+
+            if (port) {
+                app.services[serviceName].socket = zmq.socket(socketType);
+            }
+            app.services[serviceName].socket[connectionType](connectString);
+            handleService(app.services[serviceName].socket, serviceConfig[serviceName], app);
+            //logger.info(`Connecting to ${serviceName}: ${connectString}`);
+
+            app.services[serviceName].send = function (obj, callback) {
+                if (typeof(obj) == `object`) {
+                    if (obj.action && obj.data ) {
+                        var message = JSON.stringify(obj);
+                        app.services[serviceName].socket.send(message);
+                        app.services[serviceName].socket.once(`message`, function (err,data) {
+                            err = JSON.parse(err);
+                            if(String(err) !== "null") {
+                                callback(err);
+                            } else {
+                                var result = JSON.parse(data);
+                                callback(null,result);
+                            }
+                        });
+                    } else {
+                        let error = JSON.stringify({error: true, message: `no data or action`});
+                        callback(error)
+                    }
+                }
+            }
+        })
+    }
+
+    return app;
+}
+
+function handleService(service, config, application) {
+    if (config.subscribe && _.isString(config.subscribe)) {
+        service.subscribe(config.subscribe)
+    }
+    if (config.monitor && config.monitor.interval && config.monitor.numOfEvents) {
+        if (_.isObject(config.monitor_events)) {
+            service.monitor(config.monitor.interval, config.monitor.numOfEvents)
+            Object.keys(config.monitor_events).map(function (event) {
+                if (_.isFunction(config.monitor_events[event])) {
+                    service.on(event, monitor_events[event].bind(application))
+                }
+            })
+        }
+    }
+}
+
+function getDataByDotNotation(obj, key) {
+    if (_.isString(key)) {
+        if (key.indexOf(".") > 0) {
+            let arrayKey = key.split(".");
+            let self = obj;
+            let result;
+            arrayKey.map(function (name) {
+                if (self[name]) {
+                    result = self[name];
+                    self = result;
+                } else {
+                    result = null
+                }
+            });
+            return result
+        } else {
+            return obj[key];
+        }
+    } else {
+        return null
+    }
+}
+
 module.exports = ArrowApplication;

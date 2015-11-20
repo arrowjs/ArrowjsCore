@@ -1,20 +1,25 @@
 "use strict";
 
-let _ = require("lodash");
-let path = require('path');
+const _ = require("lodash"),
+    path = require('path'),
+    logger = require('./logger');
 let globalPattern = {};
 
 module.exports = function (struc) {
     let arrStruc = {};
     Object.keys(struc).map(function (key) {
-        arrStruc[key] = getDataFromArray(struc[key], key,1);
+        arrStruc[key] = parseConfig_Structure(struc[key], key,1);
     });
     return arrStruc
 };
-/*
-
-*/
-function getDataFromArray(obj, key,level) {
+/**
+ * Parse key-value in /config/structure.js
+ * @param obj
+ * @param key
+ * @param level
+ * @returns {{}}
+ */
+function parseConfig_Structure(obj, key,level) {
     let newObj = {};
     let wrapArray = [];
     if (_.isArray(obj)) {
@@ -24,13 +29,14 @@ function getDataFromArray(obj, key,level) {
     }
     let baseObject = wrapArray[0];
     newObj.path = {};
-    newObj.type = "single";
+    newObj.type = "single";  //When feature has one namespace
     wrapArray.map(function (data, index) {
         //handle path
         if (data.path) {
             data = _.assign(baseObject, data);
             let pathInfo = handlePath(data.path, key,level);
 
+            //When feature has more than one namespace
             if (!_.isEmpty(pathInfo[1])) {
                 newObj.type = "multi";
             }
@@ -38,15 +44,15 @@ function getDataFromArray(obj, key,level) {
             newObj.path[pathKey] = {};
             newObj.path[pathKey].path = pathInfo[0];
             Object.keys(data).map(function (key) {
-                if (key === "extends") {
-                    newObj.path[pathKey].extends = data.extends;
+                if (key === "extend") {
+                    newObj.path[pathKey].extend = data.extend;
                 }
 
                 if (typeof data.key === 'function') {
                     newObj.path[pathKey][key] = data[key];
                 }
 
-                if (['controller', "view", "helper", "model", "route"].indexOf(key) > -1) {
+                if (['controller', "view", "action", "model", "route"].indexOf(key) > -1) {
                     if (_.isArray(data[key])) {
                         data[key].map(function (data_key) {
                             if (!data_key.path.singleton) {
@@ -58,9 +64,9 @@ function getDataFromArray(obj, key,level) {
                             data[key].path.singleton = true;
                         }
                     }
-                    newObj.path[pathKey][key] = getDataFromArray(data[key], key ,2);
+                    newObj.path[pathKey][key] = parseConfig_Structure(data[key], key ,2);
                 } else {
-                    if (key !== "extends" && key !== "path" && typeof data.key === 'object') {
+                    if (key !== "extend" && key !== "path" && typeof data.key === 'object') {
                         newObj.path[pathKey][key] = data[key]
                     }
                 }
@@ -91,7 +97,7 @@ function handlePath(pathInfo, attribute,level) {
                 break;
             case "controller":
                 break;
-            case "helper":
+            case "action":
                 break;
             case "route":
                 break;
@@ -104,7 +110,7 @@ function handlePath(pathInfo, attribute,level) {
         switch (level) {
             case 1:
                 if(name) {
-                    console.log('Carefully : Cant set "name" attribute at level 1 in structure.js');
+                    logger.warn('Carefully : Cant set "name" attribute at level 1 in structure.js');
                 }
                 name = "";
                 break;

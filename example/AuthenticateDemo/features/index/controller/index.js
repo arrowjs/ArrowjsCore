@@ -4,10 +4,12 @@ module.exports = function (controller,component,application) {
 
     controller.loginView = function (req,res) {
         res.render('login');
-    }
+    };
+
     controller.createView = function (req,res) {
         res.render('create');
-    }
+    };
+
     controller.create = function (req,res) {
         var username = req.body.username;
         var password = req.body.password;
@@ -27,7 +29,8 @@ module.exports = function (controller,component,application) {
                 console.log(err);
             })
         })
-    }
+    };
+
     controller.index = function (req,res) {
         res.render('index');
     }
