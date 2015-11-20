@@ -589,7 +589,20 @@ function loadingGlobalFunction(self) {
     });
 
     //Add some support function
-    global.__ = ArrowHelper.__
+    global.__ = ArrowHelper.__;
+
+    //Export node_module from Core node_module  to App node_module
+    global.Arrow = {};
+    Arrow.Promise = Promise;
+    Arrow._ = _;
+    Arrow.glob = require('glob');
+    Arrow.cookieParse = require('cookie-parser');
+    Arrow.bodyParser = require('body-parser');
+    Arrow.methodOverride = require('method-override');
+    Arrow.fs =  require('fs-extra');
+    Arrow.sercurity =  require('helmet');
+    Arrow.log = logger;
+
 }
 
 

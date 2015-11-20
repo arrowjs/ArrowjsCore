@@ -439,26 +439,6 @@ module.exports.getRawConfig = function getRawConfig() {
         }
     }
 
-    try {
-        fs.accessSync(__base + 'config/strategies/google.js');
-    } catch (err) {
-        if (err.code === 'ENOENT') {
-            fsEx.copySync(path.resolve(__dirname, '..', 'config/strategies/google.js'), __base + 'config/strategies/google.js');
-        } else {
-            throw err
-        }
-    }
-
-    try {
-        fs.accessSync(__base + 'config/strategies/facebook.js');
-    } catch (err) {
-        if (err.code === 'ENOENT') {
-            fsEx.copySync(path.resolve(__dirname, '..', 'config/strategies/facebook.js'), __base + 'config/strategies/facebook.js');
-        } else {
-            throw err
-        }
-    }
-
     //get default config
     try {
         fs.accessSync(__base + 'config/env/default.js');
