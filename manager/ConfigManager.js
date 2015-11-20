@@ -3,8 +3,15 @@
 let SystemManager = require('./SystemManager');
 let __ = require('../libs/global_function');
 let _ = require('lodash');
-
+/**
+ * class ConfigManager extends SystemManager
+ */
 class ConfigManager extends SystemManager {
+    /**
+     * Create ConfigManager object
+     * @param app - ArrowApplication
+     * @param name - key will be used in Redis to synchronize configuration among multiple ArrowApplication processes.
+     */
     constructor(app,name){
         super(app,name);
     }
