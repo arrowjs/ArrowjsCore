@@ -3,7 +3,7 @@
 /**
  * Module dependencies.
  */
-let fs = require('fs'),
+const fs = require('fs'),
     arrowStack = require('./ArrStack'),
     path = require('path'),
     express = require('express'),
@@ -224,6 +224,8 @@ class ArrowApplication {
                     logger.info('Application started on port ' + self.getConfig("port"), ', Process ID: ' + process.pid);
                 });
                 return app;
+            }).catch(function (err) {
+                throw err
             });
 
     }

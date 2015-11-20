@@ -1,9 +1,10 @@
 "use strict";
 
-let getListFile = require('../helper/getListFile');
+const getListFile = require('../helper/getListFile'),
+    path = require('path'),
+    _ = require('lodash');
 let Database = require("../../libs/database");
-let path = require('path');
-let _ = require('lodash');
+
 
 /**
  * Add model to application and component

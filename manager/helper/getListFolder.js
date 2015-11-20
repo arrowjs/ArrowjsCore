@@ -1,5 +1,5 @@
 "use strict";
-let path = require('path');
+const path = require('path');
 
 /**
  * Get list folder from structure
