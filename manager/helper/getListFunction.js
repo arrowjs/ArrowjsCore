@@ -1,6 +1,12 @@
 "use strict";
-let path = require('path');
-
+const path = require('path');
+/**
+ * Get list function from structure
+ * @param componentSetting
+ * @param fatherPath
+ * @param application
+ * @returns {{}}
+ */
 module.exports = function getListFunction(componentSetting, fatherPath, application) {
     let functions = {};
     let componentPath = componentSetting.path;

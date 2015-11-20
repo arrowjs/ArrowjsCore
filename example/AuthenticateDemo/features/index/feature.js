@@ -5,6 +5,6 @@ module.exports = {
     author: 'Tran Quoc Cuong',
     version: '0.1.0',
     description: "Hello Arrowjs",
-    roles: []
+    permissions: []
 };
 

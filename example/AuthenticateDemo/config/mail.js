@@ -9,5 +9,5 @@ module.exports = {
         },
         mailer_from: "Techmaster <test@techmaster.vn>",
         mailer_to: "test@techmaster.vn"
-    }
+    },
 }

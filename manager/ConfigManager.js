@@ -1,56 +1,105 @@
 "use strict";
 
-let SystemManager = require('./SystemManager');
-let __ = require('../libs/global_function');
-let _ = require('lodash');
-
+const SystemManager = require('./SystemManager'),
+    __ = require('../libs/global_function'),
+    _ = require('lodash');
+/**
+ * class ConfigManager extends SystemManager
+ */
 class ConfigManager extends SystemManager {
-    constructor(app,name){
-        super(app,name);
+    /**
+     * Create ConfigManager object
+     * @param app - ArrowApplication
+     * @param name - key will be used in Redis to synchronize configuration among multiple ArrowApplication processes.
+     */
+    constructor(app, name) {
+        super(app, name);
     }
 
-    getConfig (key){
-        return this._config[key];
-    };
+    /**
+     * Get system config by key
+     * @param key
+     * @returns {*}
+     */
+    getConfig(key) {
+        if (_.isString(key)) {
+            if (key.indexOf(".") > 0) {
+                let arrayKey = key.split(".");
+                let self = this._app._config;
+                let result;
+                arrayKey.map(function (name) {
+                    if (self[name]) {
+                        result = self[name];
+                        self = result;
+                    } else {
+                        result = null
+                    }
+                });
+                return result
+            } else {
+                return this._app._config[key];
+            }
+        } else {
+            return this._app._config;
+        }
+    }
 
-    setConfig(key,setting){
-        this._config[key] = setting;
+;
+    /**
+     * Set config
+     * @param key
+     * @param setting
+     * @returns {*|Promise.<T>}
+     */
+    setConfig(key, setting) {
+        this._app._config[key] = setting;
         let self = this;
         return self.setCache().then(self.reload());
-    };
+    }
 
-    getCache(){
-        let self = this._config;
+;
+    /**
+     * Set multi config
+     * @param setting
+     * @returns {*}
+     */
+    updateConfig(setting) {
+        let self = this;
+        if (setting) {
+            _.assign(this._app._config, setting);
+            return self.setCache().then(self.reload());
+        }
+        return Promise.resolve();
+    }
+
+;
+
+    getCache() {
+        let self = this._app._config;
         return this.pub.getAsync(self.redis_prefix + self.redis_key.configs)
             .then(function (data) {
-                if(data) {
+                if (data) {
                     let conf = JSON.parse(data);
-                    //if(self.raw_config || self.raw_config.length > 0) {
-                    //    self.raw_config.map(function (key) {
-                    //        if(conf[key]) {
-                    //            delete conf[key];
-                    //        }
-                    //    })
-                    //}
-                    _.assign(this._config,conf);
+                    _.assign(this._app._config, conf);
                 }
-                return(this._config);
+                return (this._app._config);
             }.bind(this))
             .catch(function (err) {
-                log("Config Manager Class: ",err);
+                log("Config Manager Class: ", err);
                 return err
             }.bind(this));
     }
 
-    reload(){
+    reload() {
         let self = this;
         return self.getCache().then(function () {
-            return self.pub.publishAsync(self._config.redis_prefix + self._config.redis_event.update_config,"Update config")
+            return self.pub.publishAsync(self._app._config.redis_prefix + self._app._config.redis_event.update_config, "Update config")
         })
     }
+
     setCache() {
-        let self = this._config;
-        return this.pub.setAsync(self.redis_prefix + self.redis_key.configs,JSON.stringify(self))
+        let self = this._app._config;
+        return this.pub.setAsync(self.redis_prefix + self.redis_key.configs, JSON.stringify(self))
     }
 }
 

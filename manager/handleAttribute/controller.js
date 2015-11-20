@@ -1,7 +1,13 @@
 "use strict";
 
-let getListFile = require('../helper/getListFile');
-
+const getListFile = require('../helper/getListFile');
+/**
+ * Get controller from file
+ * @param setting
+ * @param fatherPath
+ * @param component
+ * @param application
+ */
 module.exports = function controllerAttribute(setting, fatherPath, component, application) {
     let files = getListFile(setting, fatherPath, application);
     if (files.type === "single") {

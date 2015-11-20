@@ -1,38 +1,41 @@
 "use strict";
-let __ = require('../libs/global_function');
-let events = require('events');
-let path = require('path');
-let _ = require('lodash');
-let Express = require('express');
-let Database = require("../libs/database");
-let actionByAttribute = require('./handleAttribute/handleFunction');
-let ViewEngine = require("../libs/ViewEngine");
+const __ = require('../libs/global_function'),
+    events = require('events'),
+    path = require('path'),
+    _ = require('lodash'),
+    Promise = require('bluebird'),
+    Database = require("../libs/database"),
+    actionByAttribute = require('./handleAttribute/handleFunction'),
+    ViewEngine = require("../libs/ViewEngine");
 
-
+/**
+ * Class is base class for FeatureManager, ThemeManager...
+ */
 class SystemManager extends events.EventEmitter {
     constructor(app, name) {
         super();
-        this._config = app._config;
-        this.arrFolder = app.arrFolder;
-        this.structure = app.structure;
         this.pub = app.redisClient;
         this.sub = app.redisSubscriber();
         this._app = app;
+        //this._config = app._config;
         this.name = name;
         this.viewEngine = null;
         let self = this;
-        let updateKey = self._config.redis_event['update_' + self.name] || ('update_' + self.name);
-        this.sub.subscribe(self._config.redis_prefix + updateKey);
+        let updateKey = app._config.redis_event['update_' + self.name] || ('update_' + self.name);
+        this.sub.subscribe(app._config.redis_prefix + updateKey);
 
         this.sub.on("message", function (demo) {
             self.getCache();
         });
-
     }
 
+    /**
+     * Get all feature config from cache (Redis)
+     * @returns {Promise.<T>}
+     */
     getCache() {
         let self = this;
-        return this.pub.getAsync(self._config.redis_prefix + self._config.redis_key[self.name] || self.name)
+        return this.pub.getAsync(self._app._config.redis_prefix + self._app._config.redis_key[self.name] || self.name)
             .then(function (data) {
                 if (data) {
                     let cache = JSON.parse(data);
@@ -46,34 +49,48 @@ class SystemManager extends events.EventEmitter {
             }.bind(this));
     }
 
+    /**
+     * Set all feature config to cache
+     */
     setCache() {
         let self = this;
 
         if (self["_" + self.name]) {
             let data = getInfo(self["_" + self.name]);
-            return this.pub.setAsync(self._config.redis_prefix + self._config.redis_key[self.name] || self.name, JSON.stringify(data));
+            return this.pub.setAsync(self._app._config.redis_prefix + self._app._config.redis_key[self.name] || self.name, JSON.stringify(data));
         } else {
-            return this.pub.setAsync(self._config.redis_prefix + self._config.redis_key[self.name] || self.name, null);
+            return this.pub.setAsync(self._app._config.redis_prefix + self._app._config.redis_key[self.name] || self.name, null);
         }
     }
 
+    /**
+     * Get data from cache and sync cluster
+     */
     reload() {
         let self = this;
         return self.getCache().then(function (a) {
             let name = self.name;
-            let updateKey = self._config.redis_event['update_' + self.name] || ('update_' + self.name);
-            return self.pub.publishAsync(self._config.redis_prefix + updateKey, "update " + name)
+            let updateKey = self._app._config.redis_event['update_' + self.name] || ('update_' + self.name);
+            return self.pub.publishAsync(self._app._config.redis_prefix + updateKey, "update " + name)
         })
     }
 
+    /**
+     * ArrowApplication use singleton events
+     * @param events
+     */
     eventHook(events) {
         this._events = events._events
     }
 
+    /**
+     * Load views, controllers and models of a feature
+     */
     loadComponents() {
         let self = this;
-        let struc = this.structure[self.name];
-        let _base = this.arrFolder;
+        //See /config/structure.js and /lib/buildStructure.js
+        let struc = self._app.structure[self.name];
+        let _base = self._app.arrFolder;
         let privateName = "_" + self.name;
         let components = {};
         let _app = this._app;
@@ -81,17 +98,22 @@ class SystemManager extends events.EventEmitter {
         if (struc.type === "single") {
             Object.keys(struc.path).map(function (id) {
                 struc.path[id].path.map(function (globMaker) {
-                    let componentGlobLink = path.normalize(_base + globMaker(self._config));
+                    let componentGlobLink = path.normalize(_base + globMaker(self._app._config));
                     let listComponents = __.getGlobbedFiles(componentGlobLink);
-                    let componentFolder = componentGlobLink.slice(0, componentGlobLink.indexOf('*'));
+                    let componentFolder;
+                    if (componentGlobLink.indexOf('*') > -1) {
+                        componentFolder = componentGlobLink.slice(0, componentGlobLink.indexOf('*'));
+                    } else {
+                        componentFolder = path.dirname(componentGlobLink)
+                    }
+
                     listComponents.forEach(function (link) {
                         let nodeList = path.relative(componentGlobLink, link).split(path.sep).filter(function (node) {
                             return (node !== "..")
                         });
                         let componentConfigFunction = require(link);
                         if (typeof componentConfigFunction === "object") {
-                            let componentConfig = componentConfigFunction;
-                            let componentName = componentConfig.name || nodeList[0];
+                            let componentName = componentConfigFunction.name || nodeList[0] || self.name;
                             paths[componentName] = paths[componentName] || {};
                             paths[componentName].configFile = link;
                             paths[componentName].path = componentFolder + nodeList[0];
@@ -102,7 +124,6 @@ class SystemManager extends events.EventEmitter {
                 });
             })
         }
-
         Object.keys(paths).map(function (name) {
             let id = paths[name].strucID;
             if (id) {
@@ -116,7 +137,7 @@ class SystemManager extends events.EventEmitter {
                 components[name].routes = {};
                 components[name].models = {};
                 components[name].views = [];
-                //components[name].helpers = {};
+                components[name].actions = {};
                 let componentConfig = require(paths[name].configFile);
                 _.assign(components[name], componentConfig);
 
@@ -126,8 +147,8 @@ class SystemManager extends events.EventEmitter {
                     _.assign(components[name], data);
                 }
 
-                if (components[name]._structure.extends) {
-                    let data = actionByAttribute("extends", components[name], paths[name].path, _app);
+                if (components[name]._structure.extend) {
+                    let data = actionByAttribute("extend", components[name], paths[name].path, _app);
                     _.assign(components[name], data);
                 }
 
@@ -136,8 +157,8 @@ class SystemManager extends events.EventEmitter {
                     _.assign(components[name], data);
                 }
 
-                if (components[name]._structure.helper) {
-                    let data = actionByAttribute("helper", components[name], paths[name].path, _app);
+                if (components[name]._structure.action) {
+                    let data = actionByAttribute("action", components[name], paths[name].path, _app);
                     _.assign(components[name], data);
                 }
 
@@ -164,7 +185,6 @@ class SystemManager extends events.EventEmitter {
                 });
             }
         });
-
         //handle Database
         let defaultDatabase = {};
         let defaultQueryResolve = function () {
@@ -182,28 +202,32 @@ class SystemManager extends events.EventEmitter {
         });
 
         let featureViewEngine = this.viewEngine;
-        let viewEngineSetting = _.assign(_app._config.nunjuckSettings || {},{ express: self._app._expressApplication});
+        let viewEngineSetting = _.assign(_app._config.nunjuckSettings || {}, {express: _app._expressApplication});
         Object.keys(components).map(function (key) {
             if (!_.isEmpty(components[key].views)) {
-                featureViewEngine = featureViewEngine || ViewEngine(_base,viewEngineSetting);
+                featureViewEngine = featureViewEngine || ViewEngine(_base, viewEngineSetting, _app);
             }
             if (_.isArray(components[key].views)) {
-                components[key].render = makeRender(featureViewEngine,components[key].views,key)
+                components[key].render = Promise.promisify(makeRender(featureViewEngine, components[key].views, key, _app));
                 components[key].viewEngine = featureViewEngine
             } else {
                 Object.keys(components[key].views).map(function (second_key) {
                     components[key][second_key] = components[key][second_key] || {};
-                    components[key][second_key].render = makeRender(featureViewEngine,components[key][second_key].views,key);
+                    components[key][second_key].render = Promise.promisify(makeRender(featureViewEngine, components[key][second_key].views, key, _app));
                     components[key][second_key].viewEngine = featureViewEngine
 
                 })
             }
         });
-
         this[privateName] = components;
 
     }
 
+    /**
+     * Get permission of one feature or all feature
+     * @param name
+     * @returns {{}}
+     */
 
     getPermissions(name) {
         let self = this;
@@ -221,8 +245,93 @@ class SystemManager extends events.EventEmitter {
         }
         return result
     }
-}
 
+    /**
+     * Get feature attribute
+     * @param attributeName
+     * @returns {{}}
+     */
+
+    getAttribute(attributeName) {
+        let self = this;
+        let privateName = "_" + self.name;
+        let result = {};
+        if (attributeName && _.isString(attributeName) && self[privateName]) {
+            Object.keys(self[privateName]).map(function (componentName) {
+                if (self[privateName][componentName] && self[privateName][componentName][attributeName]) {
+                    result[componentName] = self[privateName][componentName][attributeName];
+                }
+            });
+        } else {
+            Object.keys(self[privateName]).map(function (componentName) {
+                Object.keys(self[privateName][componentName]).map(function (attributeKey) {
+                    if (attributeKey[0] !== "_" && ["controllers", "views", "models", "action", "routes", "viewEngine"].indexOf(attributeKey) === -1 && !_.isFunction(self[privateName][componentName][attributeKey])) {
+                        result[componentName] = result[componentName] || {};
+                        result[componentName][attributeKey] = self[privateName][componentName][attributeKey]
+                    }
+                });
+            });
+        }
+        return result
+    }
+
+    /**
+     * @param componentName
+     * @param name : declare in structure.js
+     * @returns {Array}
+     */
+    getViewFiles(componentName, name) {
+        let self = this;
+        let privateName = "_" + self.name;
+        let extension = self._app._config.viewExtension || "html";
+        let pathFolder = [];
+        let result = [];
+        if (componentName && self[privateName][componentName]) {
+            if (name) {
+                if (self[privateName][componentName][name] && self[privateName][componentName][name].views) {
+                    self[privateName][componentName][name].views.map(function (obj) {
+                        let miniPath = handleView(obj, self, componentName);
+                        pathFolder.push(miniPath);
+                    })
+                }
+            } else {
+                if (self[privateName][componentName].views) {
+                    self[privateName][componentName].views.map(function (obj) {
+                        let miniPath = handleView(obj, self, componentName);
+                        pathFolder.push(miniPath);
+                    })
+                }
+            }
+        }
+
+        if (!_.isEmpty(pathFolder)) {
+            pathFolder.map(function (link) {
+                __.getGlobbedFiles(link + "*." + extension).map(function (result_link) {
+                    result.push(result_link)
+                })
+            })
+        }
+        return result
+    }
+
+    /**
+     *
+     * @param componentName
+     * @returns {*}
+     */
+    getComponent(componentName) {
+        let self = this;
+        let privateName = "_" + self.name;
+        return self[privateName][componentName];
+    }
+}
+/**
+ *
+ * @param obj
+ * @param application
+ * @param componentName
+ * @returns {*}
+ */
 function handleView(obj, application, componentName) {
     let miniPath = obj.func(application._config, componentName);
     let normalizePath;
@@ -242,8 +351,7 @@ function handleView(obj, application, componentName) {
  * @returns {Function}
  */
 
-function makeRender(viewEngine,componentView, componentName) {
-    let application = viewEngine.express._arrApplication;
+function makeRender(viewEngine, componentView, componentName, application) {
     return function (view, options, callback) {
 
         var done = callback;
@@ -255,7 +363,6 @@ function makeRender(viewEngine,componentView, componentName) {
             done = options;
             opts = {};
         }
-
         if (application._config.viewExtension && view.indexOf(application._config.viewExtension) === -1) {
             view += "." + application._config.viewExtension;
         }

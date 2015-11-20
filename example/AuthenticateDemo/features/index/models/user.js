@@ -12,8 +12,8 @@ module.exports = function (sequelize,Datatypes) {
             unique: true
         },
         password: {
-            type: Datatypes.STRING,
-        },
+            type: Datatypes.STRING
+        }
     }, {
         freezeTableName : true,
         hooks : {
@@ -30,7 +30,7 @@ module.exports = function (sequelize,Datatypes) {
                 }
             }
         }
-    })
+    });
 
     User.sync();
     return User

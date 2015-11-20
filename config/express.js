@@ -1,31 +1,25 @@
 "use strict";
 
-let bodyParser = require('body-parser'),
-    methodOverride = require('method-override'),
-    express = require('express'),
-    path = require('path'),
-    morgan = require('morgan'),
-    _ = require('lodash'),
-    fs = require('fs'),
-    helmet = require('helmet'),
-    cookieParser = require('cookie-parser'),
-    arrowStack = require('../libs/ArrStack').stack;
+let morgan = require('morgan');
+let bodyParser = require("../").bodyParser,
+    methodOverride = require("../").methodOverride,
+    sercurity = require("../").sercurity,
+    cookieParser = require("../").cookieParse;
 
-let flash = require('connect-flash');
+/**
+ * Setting for express
+ * @param app
+ * @param config : config file
+ * @param setting : user setting
+ * @returns {*}
+ */
 
+module.exports = function (app, config, setting) {
 
-module.exports = function (app,config,setting) {
     /**
      * Set folder static resource
      */
-    if (_.isArray(config.resource.path)) {
-        config.resource.path.map(function (link) {
-            app.use(express.static(path.resolve(app.arrFolder + link), config.resource.option));
-        })
-    } else {
-        app.use(express.static(path.resolve(app.arrFolder + config.resource.path), config.resource.option));
-
-    }
+    app.serveStatic();
 
     /**
      * Set local variable
@@ -59,35 +53,28 @@ module.exports = function (app,config,setting) {
     app.use(cookieParser());
 
     /** Express session storage */
-
     app.useSession();
 
     /** Use passport session */
-    app.usePassport(app,setting);
+    app.usePassport(setting);
 
     /** Flash messages */
-
-    app.use(flash());
-
     app.useFlashMessage();
 
     /** Use helmet to secure Express headers */
-    app.use(helmet.xframe());
-    app.use(helmet.xssFilter());
-    app.use(helmet.nosniff());
-    app.use(helmet.ienoopen());
+    app.use(sercurity.xframe());
+    app.use(sercurity.xssFilter());
+    app.use(sercurity.nosniff());
+    app.use(sercurity.ienoopen());
     app.disable('x-powered-by');
 
     /** Passing the variables to environment locals */
     app.use(function (req, res, next) {
-        res.locals.hasOwnProperty = Object.hasOwnProperty;
+        //res.locals.hasOwnProperty = Object.hasOwnProperty;
         res.locals.url = req.protocol + '://' + req.headers.host + req.url;
         res.locals.path = req.protocol + '://' + req.headers.host;
         res.locals.route = req.url;
 
-        if (req.user) {
-            res.locals.__user = req.user;
-        }
         next();
     });
 

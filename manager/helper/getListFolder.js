@@ -1,6 +1,13 @@
 "use strict";
-let path = require('path');
+const path = require('path');
 
+/**
+ * Get list folder from structure
+ * @param componentSetting
+ * @param fatherPath
+ * @param application
+ * @returns {{}}
+ */
 module.exports = function getListFolder(componentSetting, fatherPath, application) {
     let folders = {};
     let componentPath = componentSetting.path;
