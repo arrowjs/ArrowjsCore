@@ -9,10 +9,12 @@ module.exports = function (controller, component, application) {
                 password: 'Developer'
             }
         }, function (err,result) {
+            console.log(err);
             if (err) {
                 res.send(err);
+            } else {
+                res.send(result)
             }
-            res.send(result)
         })
     }
 };
