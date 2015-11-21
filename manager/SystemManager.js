@@ -133,11 +133,11 @@ class SystemManager extends events.EventEmitter {
                 components[name]._configFile = paths[name].configFile;
                 components[name]._strucID = id;
                 components[name]._structure = struc.path[id] || struc;
-                components[name].controllers = {};
-                components[name].routes = {};
-                components[name].models = {};
+                components[name].controllers = Object.create(null);
+                components[name].routes = Object.create(null);
+                components[name].models = Object.create(null);
                 components[name].views = [];
-                components[name].actions = {};
+                components[name].actions = Object.create(null);
                 let componentConfig = require(paths[name].configFile);
                 _.assign(components[name], componentConfig);
 
