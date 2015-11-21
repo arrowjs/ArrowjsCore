@@ -2,7 +2,7 @@
 
 module.exports = {
     fault_tolerant : {
-        enable : false,
+        //enable : false,
         logdata : ["body","query"],//
         render : '',
         redirect : '500'
