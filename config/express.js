@@ -27,7 +27,6 @@ module.exports = function (app, config, setting) {
     app.locals.title = config.app.title;
     app.locals.description = config.app.description;
     app.locals.keywords = config.app.keywords;
-    app.locals.facebookAppId = config.facebook.clientID || "";
 
     /** Showing stack errors */
     app.set('showStackError', true);
