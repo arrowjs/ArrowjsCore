@@ -327,18 +327,6 @@ module.exports.getRawConfig = function getRawConfig() {
         }
     }
 
-    //get services.js
-    try {
-        fs.accessSync(__base + 'config/services.js');
-        _.assign(conf, require(__base + 'config/services'));
-    } catch (err) {
-        if (err.code === 'ENOENT') {
-            fsEx.copySync(path.resolve(__dirname, '..', 'config/services.js'), __base + 'config/services.js');
-            _.assign(conf, require(__base + 'config/services'));
-        } else {
-            throw err
-        }
-    }
 
     //get websocket.js
     try {
