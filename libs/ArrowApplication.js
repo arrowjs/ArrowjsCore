@@ -24,7 +24,7 @@ const fs = require('fs'),
     socketRedisAdapter = require('socket.io-redis'),
     ViewEngine = require("../libs/ViewEngine"),
     request = require('request'),
-    zmq = require('zmq'),
+    fsExtra = require('fs-extra'),
     Sequelize = require('sequelize'),
     loadingLanguage = require("./i18n").loadLanguage;
 /**
@@ -159,7 +159,13 @@ class ArrowApplication {
         }.bind(this));
 
         //Declare _arrRoutes to store all routes of features
-        this._arrRoutes = {};
+        this._arrRoutes = Object.create(null);
+
+        this.utils = Object.create(null);
+        this.utils.dotChain = getDataByDotNotation;
+        this.utils.fs = fsExtra;
+
+        this.arrowSettings = Object.create(null);
     }
 
     /**
@@ -195,13 +201,10 @@ class ArrowApplication {
 
     addPlugin(plugin) {
         let self = this;
-        console.log(self.plugins);
         if (_.isFunction(plugin)) {
             self.plugins.push(plugin.bind(self));
         }
-
     }
-
     /**
      * Kick start express application and listen at default port
      * @param setting - passport: boolean, role: boolean
@@ -775,4 +778,26 @@ function handleError(app) {
     }
 }
 
+function getDataByDotNotation(obj, key) {
+    if (_.isString(key)) {
+        if (key.indexOf(".") > 0) {
+            let arrayKey = key.split(".");
+            let self = obj;
+            let result;
+            arrayKey.map(function (name) {
+                if (self[name]) {
+                    result = self[name];
+                    self = result;
+                } else {
+                    result = null
+                }
+            });
+            return result
+        } else {
+            return obj[key];
+        }
+    } else {
+        return null
+    }
+}
 module.exports = ArrowApplication;
