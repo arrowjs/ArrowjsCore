@@ -133,6 +133,7 @@ class ArrowApplication {
         this.configManager.eventHook(eventEmitter);
 
         //Create shortcut call
+        this.addConfig = addConfig.bind(this);
         this.getConfig = this.configManager.getConfig.bind(this.configManager);
         this.setConfig = this.configManager.setConfig.bind(this.configManager);
         this.updateConfig = this.configManager.updateConfig.bind(this.configManager);
@@ -164,6 +165,7 @@ class ArrowApplication {
         this.utils = Object.create(null);
         this.utils.dotChain = getDataByDotNotation;
         this.utils.fs = fsExtra;
+        this.utils.loadAndCreate = loadSetting.bind(this);
 
         this.arrowSettings = Object.create(null);
     }
@@ -800,4 +802,32 @@ function getDataByDotNotation(obj, key) {
         return null
     }
 }
+
+function loadSetting(des, source) {
+    let baseFolder = this.arrFolder;
+    let setting = {};
+    let filePath = path.normalize(baseFolder + des);
+    try {
+        fs.accessSync(filePath);
+        _.assign(setting, require(filePath));
+    } catch (err) {
+        if (err.code === 'ENOENT') {
+            fsExtra.copySync(path.resolve(source), filePath);
+            _.assign(setting, require(filePath));
+        } else {
+            throw err
+        }
+
+    }
+    return setting;
+}
+
+function addConfig(obj) {
+    let config = this._config;
+    if(_.isObject(obj)) {
+        _.assign(config,obj);
+    }
+}
+
 module.exports = ArrowApplication;
+
