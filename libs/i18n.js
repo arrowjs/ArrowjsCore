@@ -6,6 +6,14 @@ const __ =  require('./global_function'),
 let lang = {};
 
 module.exports = lang;
+module.exports.languageKey = function () {
+    let languageKey = Object.keys(lang).filter(function (key) {
+        if(key !== 'loadLanguage' && key !== 'languageKey') {
+            return key
+        }
+    });
+    return languageKey
+}
 
 /**
  * Loading language file.

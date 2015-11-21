@@ -10,6 +10,7 @@ module.exports.Promise = require('bluebird');
 module.exports._ = require('lodash');
 module.exports.glob = require('glob');
 module.exports.cookieParse = require('cookie-parser');
+module.exports.language = require('./libs/i18n');
 module.exports.bodyParser = require('body-parser');
 module.exports.methodOverride = require('method-override');
 module.exports.fs = require('fs-extra');
