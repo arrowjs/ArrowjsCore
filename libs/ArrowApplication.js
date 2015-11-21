@@ -25,6 +25,7 @@ const fs = require('fs'),
     ViewEngine = require("../libs/ViewEngine"),
     request = require('request'),
     zmq = require('zmq'),
+    Sequelize = require('sequelize'),
     loadingLanguage = require("./i18n").loadLanguage;
 /**
  * Singleton object. It is heart of Arrowjs.io web app. it wraps Express and adds following functions:
@@ -292,12 +293,9 @@ class ArrowApplication {
  */
 function loadModel_Route_Render(arrow, userSetting) {
 
-    let defaultDatabase = {};
+    let defaultDatabase = require('./database').db();
 
     if (arrow.models && Object.keys(arrow.models).length > 0) {
-        if (_.isEmpty(defaultDatabase)) {
-            defaultDatabase = Database(arrow);
-        }
         let defaultQueryResolve = function () {
             return new Promise(function (fulfill, reject) {
                 fulfill("No models")
@@ -310,12 +308,13 @@ function loadModel_Route_Render(arrow, userSetting) {
         let databaseFunction = require(arrow.arrFolder + "config/database");
 
         if (databaseFunction.associate) {
-            databaseFunction.associate(arrow.models)
+            let resolve = Promise.resolve();
+            resolve.then(function () {
+                return databaseFunction.associate(arrow.models)
+            }).then(function () {
+                defaultDatabase.sync();
+            })
         }
-    }
-
-    if (!_.isEmpty(defaultDatabase)) {
-        defaultDatabase.sync();
     }
 
     arrow._componentList.map(function (key) {
