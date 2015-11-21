@@ -9,6 +9,8 @@ module.exports = {
         logo: '',
         icon: ''
     },
+    long_stack : true,
+    port: process.env.PORT || 8000,
     admin_prefix: 'admin',
     bodyParser : {
         extended: true,
