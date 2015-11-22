@@ -1,0 +1,332 @@
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>Custom filter - ARROW CMS PROJECT</title>
+  
+
+  
+  <link href='https://fonts.googleapis.com/css?family=Lato:400,700|Roboto+Slab:400,700|Inconsolata:400,700' rel='stylesheet' type='text/css'>
+
+  <link rel="stylesheet" href="../../css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../../css/theme_extra.css" type="text/css" />
+  <link rel="stylesheet" href="../../css/highlight.css">
+
+  <script src="//cdnjs.cloudflare.com/ajax/libs/jquery/2.1.1/jquery.min.js"></script>
+  <script src="//cdnjs.cloudflare.com/ajax/libs/modernizr/2.8.3/modernizr.min.js"></script>
+  <script type="text/javascript" src="../../js/highlight.pack.js"></script>
+  <script src="../../js/theme.js"></script>
+
+  <style>
+    body {font-size: 90%;}
+    pre, code {font-size: 100%;}
+    h3, h4, h5, h6 {color: #2980b9; font-weight: 300}
+  </style> 
+</head>
+
+<body class="wy-body-for-nav" role="document">
+
+  <div class="wy-grid-for-nav">
+
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side stickynav">
+      <div class="wy-side-nav-search">
+        <a href="../.." class="icon icon-home"> ARROW CMS PROJECT</a>
+        
+      </div>
+
+      <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+      <ul class="current">
+    
+        
+        <span>Get started</span>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../..">Get started</a>
+                    
+                </li>
+            
+        
+
+    
+        
+        <span>Make a feature</span>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../../makeFeature">Make a feature</a>
+                    
+                </li>
+            
+        
+
+    
+        
+            <li class="toctree-l1 ">
+                <a class="" href="../../session">Session</a>
+            </li>
+        
+
+    
+        
+            <li class="toctree-l1 ">
+                <a class="" href="../../guidelines">Guideline</a>
+            </li>
+        
+
+    
+        
+        <span>Template Engine</span>
+            
+                <li class="toctree-l1 current">
+                    <a class="current" href=".">Custom filter</a>
+                    
+                        <ul>
+                        
+                            <li class="toctree-l2"><a href="#folder-setting">Folder setting</a></li>
+                            
+                        
+                            <li class="toctree-l2"><a href="#custom-filter-sample">Custom filter sample</a></li>
+                            
+                        
+                            <li class="toctree-l2"><a href="#function-sample">Function sample</a></li>
+                            
+                        
+                            <li class="toctree-l2"><a href="#variable-sample">Variable sample</a></li>
+                            
+                        
+                            <li class="toctree-l2"><a href="#core-support-filter">Core support Filter</a></li>
+                            
+                        
+                            <li class="toctree-l2"><a href="#core-support-function">Core support function</a></li>
+                            
+                        
+                        </ul>
+                    
+                </li>
+            
+        
+
+    
+        
+        <span>Structure</span>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../../structure">Basic</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../../structure/controller">Controller</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../../structure/models">Model</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../../structure/route">Route</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../../structure/Extends">Extends</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../../structure/template_engine">View</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../../structure/feature_config">Config</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../../structure/folder">Core structure</a>
+                    
+                </li>
+            
+        
+
+    
+        
+        <span>Utilities</span>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../../utilities">Basic</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../../utilities/logger">Logger</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../../utilities/flash_message">Flash messages</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../../utilities/global_function">Global functions and Variable</a>
+                    
+                </li>
+            
+        
+
+    
+</ul>
+
+      </div>
+      &nbsp;
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" role="navigation" aria-label="top navigation">
+        <i data-toggle="wy-nav-top" class="icon icon-reorder"></i>
+        <a href="../.."></a>
+      </nav>
+
+      
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="breadcrumbs navigation">
+  <ul class="wy-breadcrumbs">
+    <li><a href="../..">Docs</a> &raquo;</li>
+    <li>Custom filter</li>
+      <li class="wy-breadcrumbs-aside">
+        
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main">
+            <div class="section">
+              <h2 id="folder-setting">Folder setting</h2>
+<p>config/view.js</p>
+<pre><code>    functionFolder : '/extendsView/function',
+    filterFolder : '/extendsView/filter',
+    variableFile : '/extendsView/variable.js'
+</code></pre>
+
+<h2 id="custom-filter-sample">Custom filter sample</h2>
+<p>Declare : </p>
+<pre><code>   module.exports = {
+       name: &quot;test&quot;, //default file_name
+       async :true, // default false 
+       handler : function (param,cb) { //if async we must push cb(err,data)
+           fs.readFile(&quot;file&quot;, function (err,data) {
+               cb(null,err)
+           })
+       }
+   }; 
+</code></pre>
+
+<p>Use : </p>
+<pre><code>    {{ &quot;&quot; | test }} //param = &quot;&quot;,second param need add to test(b,c)..
+</code></pre>
+
+<h2 id="function-sample">Function sample</h2>
+<p>Declare :</p>
+<pre><code> module.exports = {
+       name: &quot;test&quot;, //default file_name
+       async :true, // default false&gt;
+       handler : function (param) { 
+           .....
+       }
+   }; 
+</code></pre>
+
+<p>function async can run when you use async filter </p>
+<pre><code>    {{ test() | async }}
+</code></pre>
+
+<p>Use : </p>
+<pre><code>    {{ test() }} 
+</code></pre>
+
+<h2 id="variable-sample">Variable sample</h2>
+<p>Declare :</p>
+<pre><code> module.exports = {
+       &quot;hello&quot; : &quot;Hello World&quot;
+ }; 
+</code></pre>
+
+<p>Use: </p>
+<pre><code>    {{ test }}
+</code></pre>
+
+<h2 id="core-support-filter">Core support Filter</h2>
+<ul>
+<li>async : 
+It receive a function async and make function run async in view</li>
+</ul>
+<pre><code>    {{ &lt;async function&gt; | async }}
+</code></pre>
+
+<h2 id="core-support-function">Core support function</h2>
+<ul>
+<li>link_to(name,option) : route function</li>
+</ul>
+<pre><code>    {{ link_to('about',{id : 1}) }}
+    // get route name about and replace id = 1; result: /about/1;
+</code></pre>
+
+<ul>
+<li>t(key) : translate function</li>
+</ul>
+<pre><code>    t('module_name')
+    //check folder lang and get result of key 'module_name'
+</code></pre>
+
+
+            </div>
+          </div>
+          <footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+        <a href="../../structure" class="btn btn-neutral float-right" title="Basic"/>Next <span class="icon icon-circle-arrow-right"></span></a>
+      
+      
+        <a href="../../guidelines" class="btn btn-neutral" title="Guideline"><span class="icon icon-circle-arrow-left"></span> Previous</a>
+      
+    </div>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+    <!-- Copyright etc -->
+    </p>
+  </div>
+
+  Built with <a href="http://www.mkdocs.org">MkDocs</a> using a <a href="https://github.com/snide/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>.
+</footer>
+	  
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+
+<div class="rst-versions" role="note" style="cursor: pointer">
+    <span class="rst-current-version" data-toggle="rst-current-version">
+        
+      <span><a href="../../guidelines" style="color: #fcfcfc;">&laquo; Previous</a></span>
+      <span style="margin-left: 15px"><a href="../../structure" style="color: #fcfcfc">Next &raquo;</a></span>
+    </span>
+</div>
+</body>
+</html>

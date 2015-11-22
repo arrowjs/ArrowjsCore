@@ -1,0 +1,258 @@
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>Session - ARROW CMS PROJECT</title>
+  
+
+  
+  <link href='https://fonts.googleapis.com/css?family=Lato:400,700|Roboto+Slab:400,700|Inconsolata:400,700' rel='stylesheet' type='text/css'>
+
+  <link rel="stylesheet" href="../css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../css/theme_extra.css" type="text/css" />
+  <link rel="stylesheet" href="../css/highlight.css">
+
+  <script src="//cdnjs.cloudflare.com/ajax/libs/jquery/2.1.1/jquery.min.js"></script>
+  <script src="//cdnjs.cloudflare.com/ajax/libs/modernizr/2.8.3/modernizr.min.js"></script>
+  <script type="text/javascript" src="../js/highlight.pack.js"></script>
+  <script src="../js/theme.js"></script>
+
+  <style>
+    body {font-size: 90%;}
+    pre, code {font-size: 100%;}
+    h3, h4, h5, h6 {color: #2980b9; font-weight: 300}
+  </style> 
+</head>
+
+<body class="wy-body-for-nav" role="document">
+
+  <div class="wy-grid-for-nav">
+
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side stickynav">
+      <div class="wy-side-nav-search">
+        <a href=".." class="icon icon-home"> ARROW CMS PROJECT</a>
+        
+      </div>
+
+      <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+      <ul class="current">
+    
+        
+        <span>Get started</span>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="..">Get started</a>
+                    
+                </li>
+            
+        
+
+    
+        
+        <span>Make a feature</span>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../makeFeature">Make a feature</a>
+                    
+                </li>
+            
+        
+
+    
+        
+            <li class="toctree-l1 current">
+                <a class="current" href=".">Session</a>
+            </li>
+        
+
+    
+        
+            <li class="toctree-l1 ">
+                <a class="" href="../guidelines">Guideline</a>
+            </li>
+        
+
+    
+        
+        <span>Template Engine</span>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../template/custom_filter">Custom filter</a>
+                    
+                </li>
+            
+        
+
+    
+        
+        <span>Structure</span>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../structure">Basic</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../structure/controller">Controller</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../structure/models">Model</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../structure/route">Route</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../structure/Extends">Extends</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../structure/template_engine">View</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../structure/feature_config">Config</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../structure/folder">Core structure</a>
+                    
+                </li>
+            
+        
+
+    
+        
+        <span>Utilities</span>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../utilities">Basic</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../utilities/logger">Logger</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../utilities/flash_message">Flash messages</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../utilities/global_function">Global functions and Variable</a>
+                    
+                </li>
+            
+        
+
+    
+</ul>
+
+      </div>
+      &nbsp;
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" role="navigation" aria-label="top navigation">
+        <i data-toggle="wy-nav-top" class="icon icon-reorder"></i>
+        <a href=".."></a>
+      </nav>
+
+      
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="breadcrumbs navigation">
+  <ul class="wy-breadcrumbs">
+    <li><a href="..">Docs</a> &raquo;</li>
+    <li>Session</li>
+      <li class="wy-breadcrumbs-aside">
+        
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main">
+            <div class="section">
+              <h1 id="session">Session</h1>
+<p>Session is mechanism that stores information of user between requests in period time. For example, in shopping web site, user may order several different items. He puts each item into shopping cart then check out. How can shopping web site remember order list of different customers when they have not yet logined. Session will be used to store order list temporarily.</p>
+<p>Another alternative is using cookie to store user information in browser while session store data in server side.</p>
+<p>In Express web application, developer use a middle-ware <a href="https://www.npmjs.com/package/express-session">Express-Session</a> to store and retrieve data to / from session.</p>
+<p>Basic configuration as below diagram:
+<img alt="image" src=".././img/express-session.jpg" /></p>
+<p>A high traffic web site must be scaled out to several Node.js processes. Nginx acts as a load balancer in fronts Node.js processes. If each Node.js process stores session locally then we have synchronize data among all sessions. It is complex task.</p>
+<p>The better solution is use a Redis server to store session. Module <a href="https://www.npmjs.com/package/connect-redis">connect-redis</a> bridges Express-Session to Redis server.</p>
+<p><img alt="image" src=".././img/nginx_redis.jpg" /></p>
+<p>Arrowjs supports both storing session in Express-Session or external storage such as <a href="https://www.npmjs.com/package/connect-redis">Redis</a>, <a href="https://www.npmjs.com/package/connect-mongo">MongoDB</a>. See more at section <a href="https://github.com/expressjs/session">Compatible Session Stores</a>.</p>
+<h4 id="default-settings">Default Settings</h4>
+<p>In <em>config</em> folder, a file name <em>session.js</em> defines how we store session.</p>
+<p>Arrowjs uses express-session by default. When Arrowjs is configured to connect Redis server correctly, it will use redis-session automatically.</p>
+<pre><code>module.exports = {
+   secret: &quot;helloArrow&quot;, // Key to encrypt sessionID
+   key: 'sid', // sessionID name to save in cookie 
+   resave: true, 
+   saveUninitialized: true, // basic config of express-session to advoid deprecate error
+   cookie : {
+       httpOnly: true // must be used in browser
+   },
+   redis_prefix : &quot;sess : &quot; //key used in Redis server to differentiate with other data
+};
+</code></pre>
+
+
+            </div>
+          </div>
+          <footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+        <a href="../guidelines" class="btn btn-neutral float-right" title="Guideline"/>Next <span class="icon icon-circle-arrow-right"></span></a>
+      
+      
+        <a href="../makeFeature" class="btn btn-neutral" title="Make a feature"><span class="icon icon-circle-arrow-left"></span> Previous</a>
+      
+    </div>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+    <!-- Copyright etc -->
+    </p>
+  </div>
+
+  Built with <a href="http://www.mkdocs.org">MkDocs</a> using a <a href="https://github.com/snide/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>.
+</footer>
+	  
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+
+<div class="rst-versions" role="note" style="cursor: pointer">
+    <span class="rst-current-version" data-toggle="rst-current-version">
+        
+      <span><a href="../makeFeature" style="color: #fcfcfc;">&laquo; Previous</a></span>
+      <span style="margin-left: 15px"><a href="../guidelines" style="color: #fcfcfc">Next &raquo;</a></span>
+    </span>
+</div>
+</body>
+</html>

@@ -1,0 +1,710 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="ChangeListManager">
+    <list default="true" id="53b7aef6-fa2e-41a7-bdd0-1f54d76c3e98" name="Default" comment="" />
+    <ignored path="crazyarrow.iws" />
+    <ignored path=".idea/workspace.xml" />
+    <ignored path=".idea/dataSources.local.xml" />
+    <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
+    <option name="TRACKING_ENABLED" value="true" />
+    <option name="SHOW_DIALOG" value="false" />
+    <option name="HIGHLIGHT_CONFLICTS" value="true" />
+    <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
+    <option name="LAST_RESOLUTION" value="IGNORE" />
+  </component>
+  <component name="ChangesViewManager" flattened_view="true" show_ignored="false" />
+  <component name="CreatePatchCommitExecutor">
+    <option name="PATCH_PATH" value="" />
+  </component>
+  <component name="DaemonCodeAnalyzer">
+    <disable_hints />
+  </component>
+  <component name="DatabaseView">
+    <option name="FLATTEN" value="false" />
+    <option name="GROUP_BY_TYPE" value="true" />
+    <option name="SORT_CHILDREN" value="false" />
+    <option name="SHOW_TABLE_CONSTRAINTS" value="true" />
+  </component>
+  <component name="ExecutionTargetManager" SELECTED_TARGET="default_target" />
+  <component name="FavoritesManager">
+    <favorites_list name="crazyarrow" />
+  </component>
+  <component name="FileEditorManager">
+    <leaf />
+  </component>
+  <component name="Git.Settings">
+    <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
+  </component>
+  <component name="IdeDocumentHistory">
+    <option name="CHANGED_PATHS">
+      <list>
+        <option value="$PROJECT_DIR$/documents/mkdocs.yml" />
+        <option value="$PROJECT_DIR$/documents/docs/models.md" />
+        <option value="$PROJECT_DIR$/middleware/flash-plugin.js" />
+        <option value="$PROJECT_DIR$/libs/flashMessage.js" />
+        <option value="$PROJECT_DIR$/libs/ArrStack.js" />
+        <option value="$PROJECT_DIR$/config/env/development.js" />
+        <option value="$PROJECT_DIR$/templateExtends/function/useSocket.js" />
+        <option value="$PROJECT_DIR$/config/middleware/loadPassport.js" />
+        <option value="$PROJECT_DIR$/config/middleware/flashMessage.js" />
+        <option value="$PROJECT_DIR$/config/middleware/staticResource.js" />
+        <option value="$PROJECT_DIR$/config/middleware/useSession.js" />
+        <option value="$PROJECT_DIR$/config/mail.js" />
+        <option value="$PROJECT_DIR$/config/passport.js" />
+        <option value="$PROJECT_DIR$/config/redis.js" />
+        <option value="$PROJECT_DIR$/config/session.js" />
+        <option value="$PROJECT_DIR$/config/structure.js" />
+        <option value="$PROJECT_DIR$/config/view.js" />
+        <option value="$PROJECT_DIR$/config/websocket.js" />
+        <option value="$PROJECT_DIR$/helpers/tranlate.js" />
+        <option value="$PROJECT_DIR$/templateExtends/filter/async.js" />
+        <option value="$PROJECT_DIR$/templateExtends/function/getConfig.js" />
+        <option value="$PROJECT_DIR$/templateExtends/function/translate.js" />
+        <option value="$PROJECT_DIR$/templateExtends/function/link_to.js" />
+        <option value="$PROJECT_DIR$/libs/buildStructure.js" />
+        <option value="$PROJECT_DIR$/libs/database.js" />
+        <option value="$PROJECT_DIR$/libs/i18n.js" />
+        <option value="$PROJECT_DIR$/libs/RedisCache.js" />
+        <option value="$PROJECT_DIR$/manager/handleAttribute/controller.js" />
+        <option value="$PROJECT_DIR$/manager/handleAttribute/model.js" />
+        <option value="$PROJECT_DIR$/manager/handleAttribute/route.js" />
+        <option value="$PROJECT_DIR$/manager/handleAttribute/view.js" />
+        <option value="$PROJECT_DIR$/manager/helper/getListFile.js" />
+        <option value="$PROJECT_DIR$/manager/helper/getListFolder.js" />
+        <option value="$PROJECT_DIR$/manager/helper/getListFunction.js" />
+        <option value="$PROJECT_DIR$/manager/DefaultManager.js" />
+        <option value="$PROJECT_DIR$/package.json" />
+        <option value="$PROJECT_DIR$/config/config.js" />
+        <option value="$PROJECT_DIR$/libs/ViewEngine.js" />
+        <option value="$PROJECT_DIR$/index.js" />
+        <option value="$PROJECT_DIR$/config/express.js" />
+        <option value="$PROJECT_DIR$/manager/ConfigManager.js" />
+        <option value="$PROJECT_DIR$/libs/logger.js" />
+        <option value="$PROJECT_DIR$/ReadMe.md" />
+        <option value="$PROJECT_DIR$/config/zeromq.js" />
+        <option value="$PROJECT_DIR$/libs/global_function.js" />
+        <option value="$PROJECT_DIR$/manager/handleAttribute/handleFunction.js" />
+        <option value="$PROJECT_DIR$/manager/handleAttribute/action.js" />
+        <option value="$PROJECT_DIR$/manager/SystemManager.js" />
+        <option value="$PROJECT_DIR$/config/services.js" />
+        <option value="$PROJECT_DIR$/libs/ArrowApplication.js" />
+        <option value="$PROJECT_DIR$/config/error.js" />
+      </list>
+    </option>
+  </component>
+  <component name="JsGruntFileManager">
+    <initial>false</initial>
+  </component>
+  <component name="JsGulpfileManager">
+    <detection-done>true</detection-done>
+  </component>
+  <component name="PhpWorkspaceProjectConfiguration" backward_compatibility_performed="true" />
+  <component name="ProjectFrameBounds">
+    <option name="y" value="23" />
+    <option name="width" value="1920" />
+    <option name="height" value="966" />
+  </component>
+  <component name="ProjectLevelVcsManager" settingsEditedManually="false">
+    <OptionsSetting value="true" id="Add" />
+    <OptionsSetting value="true" id="Remove" />
+    <OptionsSetting value="true" id="Checkout" />
+    <OptionsSetting value="true" id="Update" />
+    <OptionsSetting value="true" id="Status" />
+    <OptionsSetting value="true" id="Edit" />
+    <ConfirmationsSetting value="0" id="Add" />
+    <ConfirmationsSetting value="0" id="Remove" />
+  </component>
+  <component name="ProjectView">
+    <navigator currentView="ProjectPane" proportions="" version="1">
+      <flattenPackages />
+      <showMembers />
+      <showModules />
+      <showLibraryContents />
+      <hideEmptyPackages />
+      <abbreviatePackageNames />
+      <autoscrollToSource />
+      <autoscrollFromSource />
+      <sortByType />
+    </navigator>
+    <panes>
+      <pane id="ProjectPane">
+        <subPane>
+          <PATH>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="crazyarrow" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewProjectNode" />
+            </PATH_ELEMENT>
+          </PATH>
+          <PATH>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="crazyarrow" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewProjectNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="crazyarrow" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+          </PATH>
+        </subPane>
+      </pane>
+      <pane id="Scope" />
+    </panes>
+  </component>
+  <component name="PropertiesComponent">
+    <property name="WebServerToolWindowFactoryState" value="true" />
+    <property name="FullScreen" value="false" />
+    <property name="JavaScriptLanguageLevel" value="ES6" />
+    <property name="JavaScriptPreferStrict" value="true" />
+    <property name="JavaScriptWeakerCompletionTypeGuess" value="true" />
+    <property name="options.lastSelected" value="preferences.keymap" />
+    <property name="options.splitter.main.proportions" value="0.3" />
+    <property name="options.splitter.details.proportions" value="0.2" />
+    <property name="recentsLimit" value="5" />
+    <property name="HbShouldOpenHtmlAsHb" value="" />
+    <property name="WebServerToolWindowPanel.toolwindow.show.size" value="false" />
+    <property name="WebServerToolWindowPanel.toolwindow.show.date" value="false" />
+    <property name="WebServerToolWindowPanel.toolwindow.show.permissions" value="false" />
+    <property name="WebServerToolWindowPanel.toolwindow.highlight.symlinks" value="true" />
+    <property name="WebServerToolWindowPanel.toolwindow.highlight.mappings" value="true" />
+    <property name="last_opened_file_path" value="$USER_HOME$/PhpstormProjects/ArrowCMS" />
+  </component>
+  <component name="RecentsManager">
+    <key name="CopyFile.RECENT_KEYS">
+      <recent name="$PROJECT_DIR$/documents" />
+      <recent name="$PROJECT_DIR$/example/AuthenticateDemo" />
+      <recent name="$PROJECT_DIR$" />
+      <recent name="$PROJECT_DIR$/example" />
+      <recent name="$PROJECT_DIR$/example/HelloWorld" />
+    </key>
+    <key name="MoveFile.RECENT_KEYS">
+      <recent name="$PROJECT_DIR$/testing" />
+      <recent name="$PROJECT_DIR$/documents/docs/utilities" />
+      <recent name="$PROJECT_DIR$/documents" />
+      <recent name="$PROJECT_DIR$/docs/template" />
+      <recent name="$PROJECT_DIR$" />
+    </key>
+  </component>
+  <component name="RunManager">
+    <configuration default="true" type="GoApplicationRunConfiguration" factoryName="Go Application">
+      <option name="name" value="Go application" />
+      <option name="saveOutputToFile" value="false" />
+      <option name="showConsoleOnStdErr" value="false" />
+      <option name="showConsoleOnStdOut" value="false" />
+      <option name="scriptName" value="" />
+      <option name="scriptArguments" value="" />
+      <option name="builderArguments" value="" />
+      <option name="goBuildBeforeRun" value="false" />
+      <option name="goOutputDir" value="" />
+      <option name="workingDir" value="" />
+      <option name="envVars" value="" />
+      <option name="goVetEnabled" value="false" />
+      <module name="" />
+      <method />
+    </configuration>
+    <configuration default="true" type="JavaScriptTraceType" factoryName="Spy-js" node="" config="" has-config="false" system-proxy="true" proxy-port="3546">
+      <method />
+    </configuration>
+    <configuration default="true" type="PhpLocalRunConfigurationType" factoryName="PHP Console">
+      <method />
+    </configuration>
+    <configuration default="true" type="JavascriptDebugType" factoryName="JavaScript Debug">
+      <method />
+    </configuration>
+    <configuration default="true" type="PhpBehatConfigurationType" factoryName="Behat">
+      <BehatRunner />
+      <method />
+    </configuration>
+    <configuration default="true" type="NodeJSConfigurationType" factoryName="Node.js" working-dir="">
+      <method />
+    </configuration>
+    <configuration default="true" type="XSLT" factoryName="XSLT">
+      <option name="myOutputFile" />
+      <option name="myOpenOutputFile" value="false" />
+      <option name="myOpenInBrowser" value="false" />
+      <option name="mySmartErrorHandling" value="true" />
+      <option name="myRunnerPort" value="34873" />
+      <option name="myVmArguments" />
+      <option name="myWorkingDirectory" />
+      <option name="myModule" />
+      <option name="myJdk" />
+      <parameters />
+      <OutputType value="CONSOLE" save-to-file="false" />
+      <FileType name="XML" />
+      <JdkChoice value="FROM_MODULE" />
+      <method />
+    </configuration>
+    <configuration default="true" type="js.build_tools.gulp" factoryName="Gulp.js">
+      <node-options />
+      <gulpfile />
+      <tasks />
+      <pass-parent-envs>true</pass-parent-envs>
+      <envs />
+      <method />
+    </configuration>
+    <configuration default="true" type="PhpUnitRemoteRunConfigurationType" factoryName="PHPUnit on Server">
+      <method />
+    </configuration>
+    <configuration default="true" type="PHPUnitRunConfigurationType" factoryName="PHPUnit">
+      <TestRunner />
+      <method />
+    </configuration>
+    <configuration default="true" type="NodeWebKit" factoryName="Node-webkit">
+      <option name="name" value="" />
+      <method />
+    </configuration>
+    <configuration default="true" type="GoTestConfiguration" factoryName="Go Test">
+      <option name="name" value="Go Test" />
+      <option name="saveOutputToFile" value="false" />
+      <option name="showConsoleOnStdErr" value="false" />
+      <option name="showConsoleOnStdOut" value="false" />
+      <option name="envVars" value="" />
+      <option name="testRunnerArgs" value="" />
+      <option name="testTargetType" value="Package" />
+      <option name="packageName" value="" />
+      <option name="packageDir" value="" />
+      <option name="testFile" value="" />
+      <option name="testArgs" value="" />
+      <option name="workingDir" value="" />
+      <option name="executeWhat" value="Test" />
+      <option name="filter" value="" />
+      <option name="useShortRun" value="false" />
+      <option name="testBeforeBenchmark" value="false" />
+      <option name="goVetEnabled" value="false" />
+      <module name="" />
+      <method />
+    </configuration>
+    <configuration default="true" type="JavaScriptNodeJsTraceType" factoryName="Spy-js for Node.js" config="" node="" node-params="" app="" app-params="" working-dir="$PROJECT_DIR$" proxy-port="3547" pass-parent-env="true">
+      <envs />
+      <method />
+    </configuration>
+    <list size="0" />
+  </component>
+  <component name="ShelveChangesManager" show_recycled="false" />
+  <component name="SvnConfiguration">
+    <configuration />
+  </component>
+  <component name="TaskManager">
+    <task active="true" id="Default" summary="Default task">
+      <changelist id="53b7aef6-fa2e-41a7-bdd0-1f54d76c3e98" name="Default" comment="" />
+      <created>1435286008573</created>
+      <option name="number" value="Default" />
+      <updated>1435286008573</updated>
+    </task>
+    <task id="LOCAL-00001" summary="remove acl router">
+      <created>1436329977915</created>
+      <option name="number" value="00001" />
+      <option name="project" value="LOCAL" />
+      <updated>1436329977915</updated>
+    </task>
+    <task id="LOCAL-00002" summary="fix cache module">
+      <created>1436418094480</created>
+      <option name="number" value="00002" />
+      <option name="project" value="LOCAL" />
+      <updated>1436418094480</updated>
+    </task>
+    <task id="LOCAL-00003" summary="fix cache module">
+      <created>1436517148521</created>
+      <option name="number" value="00003" />
+      <option name="project" value="LOCAL" />
+      <updated>1436517148521</updated>
+    </task>
+    <task id="LOCAL-00004" summary="fix app config">
+      <created>1436589207804</created>
+      <option name="number" value="00004" />
+      <option name="project" value="LOCAL" />
+      <updated>1436589207804</updated>
+    </task>
+    <task id="LOCAL-00005" summary="fix 404&#10;Repair  createfilter">
+      <created>1436945928062</created>
+      <option name="number" value="00005" />
+      <option name="project" value="LOCAL" />
+      <updated>1436945928062</updated>
+    </task>
+    <task id="LOCAL-00006" summary="Add logic $component , logic auto add '/' prefix">
+      <created>1447218435222</created>
+      <option name="number" value="00006" />
+      <option name="project" value="LOCAL" />
+      <updated>1447218435222</updated>
+    </task>
+    <task id="LOCAL-00007" summary="rename module to feature">
+      <created>1447218905016</created>
+      <option name="number" value="00007" />
+      <option name="project" value="LOCAL" />
+      <updated>1447218905016</updated>
+    </task>
+    <task id="LOCAL-00008" summary="repair pathWithConfig">
+      <created>1447222019097</created>
+      <option name="number" value="00008" />
+      <option name="project" value="LOCAL" />
+      <updated>1447222019097</updated>
+    </task>
+    <task id="LOCAL-00009" summary="Update  example">
+      <created>1447297191063</created>
+      <option name="number" value="00009" />
+      <option name="project" value="LOCAL" />
+      <updated>1447297191063</updated>
+    </task>
+    <task id="LOCAL-00010" summary="Update logic check Role,  &#10;Add  2 setting start function &quot;role&quot; and &quot;passport&quot;,&#10;Add new Example use role and flash message&#10;">
+      <created>1447321567122</created>
+      <option name="number" value="00010" />
+      <option name="project" value="LOCAL" />
+      <updated>1447321567122</updated>
+    </task>
+    <task id="LOCAL-00011" summary="fix error in structure.js&#10;Fix logic add param route">
+      <created>1447384918806</created>
+      <option name="number" value="00011" />
+      <option name="project" value="LOCAL" />
+      <updated>1447384918806</updated>
+    </task>
+    <task id="LOCAL-00012" summary="Support set filter, function, variable to viewEngine">
+      <created>1447388732236</created>
+      <option name="number" value="00012" />
+      <option name="project" value="LOCAL" />
+      <updated>1447388732236</updated>
+    </task>
+    <task id="LOCAL-00013" summary="Fix name">
+      <created>1447389316330</created>
+      <option name="number" value="00013" />
+      <option name="project" value="LOCAL" />
+      <updated>1447389316330</updated>
+    </task>
+    <task id="LOCAL-00014" summary="And logic for setting Arrow Function and filter">
+      <created>1447391187753</created>
+      <option name="number" value="00014" />
+      <option name="project" value="LOCAL" />
+      <updated>1447391187753</updated>
+    </task>
+    <task id="LOCAL-00015" summary="Update logic function need variable in view">
+      <created>1447470446344</created>
+      <option name="number" value="00015" />
+      <option name="project" value="LOCAL" />
+      <updated>1447470446344</updated>
+    </task>
+    <task id="LOCAL-00016" summary="Each manager have a private templateRender">
+      <created>1447497594868</created>
+      <option name="number" value="00016" />
+      <option name="project" value="LOCAL" />
+      <updated>1447497594868</updated>
+    </task>
+    <task id="LOCAL-00017" summary="Each manager have a private templateRender">
+      <created>1447498017838</created>
+      <option name="number" value="00017" />
+      <option name="project" value="LOCAL" />
+      <updated>1447498017838</updated>
+    </task>
+    <task id="LOCAL-00018" summary="Each manager have a private templateRender">
+      <created>1447498184803</created>
+      <option name="number" value="00018" />
+      <option name="project" value="LOCAL" />
+      <updated>1447498184803</updated>
+    </task>
+    <task id="LOCAL-00019" summary="add new function getComponent(name)">
+      <created>1447649639239</created>
+      <option name="number" value="00019" />
+      <option name="project" value="LOCAL" />
+      <updated>1447649639239</updated>
+    </task>
+    <task id="LOCAL-00020" summary="add new function getComponent(name)">
+      <created>1447658683931</created>
+      <option name="number" value="00020" />
+      <option name="project" value="LOCAL" />
+      <updated>1447658683931</updated>
+    </task>
+    <task id="LOCAL-00021" summary="add new function getComponent(name)">
+      <created>1447663443575</created>
+      <option name="number" value="00021" />
+      <option name="project" value="LOCAL" />
+      <updated>1447663443575</updated>
+    </task>
+    <task id="LOCAL-00022" summary="Add documents ,">
+      <created>1447670684039</created>
+      <option name="number" value="00022" />
+      <option name="project" value="LOCAL" />
+      <updated>1447670684039</updated>
+    </task>
+    <task id="LOCAL-00023" summary="update database rawQuery">
+      <created>1447672237203</created>
+      <option name="number" value="00023" />
+      <option name="project" value="LOCAL" />
+      <updated>1447672237203</updated>
+    </task>
+    <task id="LOCAL-00024" summary="fix bug casesensitive in linux">
+      <created>1447672941096</created>
+      <option name="number" value="00024" />
+      <option name="project" value="LOCAL" />
+      <updated>1447672941096</updated>
+    </task>
+    <task id="LOCAL-00025" summary="Add 2 function support getViewFiles and getAttribute">
+      <created>1447729118610</created>
+      <option name="number" value="00025" />
+      <option name="project" value="LOCAL" />
+      <updated>1447729118610</updated>
+    </task>
+    <task id="LOCAL-00026" summary="fix logic flash message">
+      <created>1447730458757</created>
+      <option name="number" value="00026" />
+      <option name="project" value="LOCAL" />
+      <updated>1447730458757</updated>
+    </task>
+    <task id="LOCAL-00027" summary="fix logic flash message">
+      <created>1447731419969</created>
+      <option name="number" value="00027" />
+      <option name="project" value="LOCAL" />
+      <updated>1447731419969</updated>
+    </task>
+    <task id="LOCAL-00028" summary="replace t() to __()">
+      <created>1447732432001</created>
+      <option name="number" value="00028" />
+      <option name="project" value="LOCAL" />
+      <updated>1447732432001</updated>
+    </task>
+    <task id="LOCAL-00029" summary="replace t() to __()">
+      <created>1447733222667</created>
+      <option name="number" value="00029" />
+      <option name="project" value="LOCAL" />
+      <updated>1447733222667</updated>
+    </task>
+    <task id="LOCAL-00030" summary="replace t() to __()">
+      <created>1447748979023</created>
+      <option name="number" value="00030" />
+      <option name="project" value="LOCAL" />
+      <updated>1447748979023</updated>
+    </task>
+    <task id="LOCAL-00031" summary="rename extends to extend">
+      <created>1447755816402</created>
+      <option name="number" value="00031" />
+      <option name="project" value="LOCAL" />
+      <updated>1447755816402</updated>
+    </task>
+    <task id="LOCAL-00032" summary="updateConfig for assign config">
+      <created>1447758284711</created>
+      <option name="number" value="00032" />
+      <option name="project" value="LOCAL" />
+      <updated>1447758284711</updated>
+    </task>
+    <task id="LOCAL-00033" summary="fix associate">
+      <created>1447759730578</created>
+      <option name="number" value="00033" />
+      <option name="project" value="LOCAL" />
+      <updated>1447759730578</updated>
+    </task>
+    <task id="LOCAL-00034" summary="Auto load system settting from redis">
+      <created>1447815100628</created>
+      <option name="number" value="00034" />
+      <option name="project" value="LOCAL" />
+      <updated>1447815100628</updated>
+    </task>
+    <task id="LOCAL-00035" summary="fix name beforeAuth">
+      <created>1447833327613</created>
+      <option name="number" value="00035" />
+      <option name="project" value="LOCAL" />
+      <updated>1447833327613</updated>
+    </task>
+    <task id="LOCAL-00036" summary="sequelize become singleton">
+      <created>1447835861566</created>
+      <option name="number" value="00036" />
+      <option name="project" value="LOCAL" />
+      <updated>1447835861566</updated>
+    </task>
+    <task id="LOCAL-00037" summary="add application.permissions">
+      <created>1447842763363</created>
+      <option name="number" value="00037" />
+      <option name="project" value="LOCAL" />
+      <updated>1447842763363</updated>
+    </task>
+    <task id="LOCAL-00038" summary="Support long_stack , new way to translate">
+      <created>1447902457459</created>
+      <option name="number" value="00038" />
+      <option name="project" value="LOCAL" />
+      <updated>1447902457459</updated>
+    </task>
+    <task id="LOCAL-00039" summary="support socket_io">
+      <created>1447914163018</created>
+      <option name="number" value="00039" />
+      <option name="project" value="LOCAL" />
+      <updated>1447914163018</updated>
+    </task>
+    <task id="LOCAL-00040" summary="Update jsdoc">
+      <created>1447918064819</created>
+      <option name="number" value="00040" />
+      <option name="project" value="LOCAL" />
+      <updated>1447918064819</updated>
+    </task>
+    <task id="LOCAL-00041" summary="Merge branch 'master' of https://github.com/arrowjs/ArrowjsCore&#10;&#10;Conflicts:&#10;&#9;templateExtends/filter/async.js&#10;&#9;templateExtends/function/getConfig.js&#10;&#9;templateExtends/function/link_to.js&#10;">
+      <created>1447918324266</created>
+      <option name="number" value="00041" />
+      <option name="project" value="LOCAL" />
+      <updated>1447918324266</updated>
+    </task>
+    <task id="LOCAL-00042" summary="fix config makerender">
+      <created>1447920009136</created>
+      <option name="number" value="00042" />
+      <option name="project" value="LOCAL" />
+      <updated>1447920009136</updated>
+    </task>
+    <task id="LOCAL-00043" summary="component.render support promisify">
+      <created>1447921070282</created>
+      <option name="number" value="00043" />
+      <option name="project" value="LOCAL" />
+      <updated>1447921070282</updated>
+    </task>
+    <task id="LOCAL-00044" summary="Update markSafe for renderView">
+      <created>1447984092572</created>
+      <option name="number" value="00044" />
+      <option name="project" value="LOCAL" />
+      <updated>1447984092572</updated>
+    </task>
+    <task id="LOCAL-00045" summary="Merge branch 'master' of https://github.com/arrowjs/ArrowjsCore&#10;&#10;Conflicts:&#10;&#9;libs/ArrowApplication.js&#10;">
+      <created>1447984231002</created>
+      <option name="number" value="00045" />
+      <option name="project" value="LOCAL" />
+      <updated>1447984231002</updated>
+    </task>
+    <task id="LOCAL-00046" summary="replace let to const">
+      <created>1447987082768</created>
+      <option name="number" value="00046" />
+      <option name="project" value="LOCAL" />
+      <updated>1447987082768</updated>
+    </task>
+    <task id="LOCAL-00047" summary="Support node_module">
+      <created>1447992974064</created>
+      <option name="number" value="00047" />
+      <option name="project" value="LOCAL" />
+      <updated>1447992974064</updated>
+    </task>
+    <task id="LOCAL-00048" summary="arrowSettings, exports nodemodule, circuit breaker , handler error">
+      <created>1448007931118</created>
+      <option name="number" value="00048" />
+      <option name="project" value="LOCAL" />
+      <updated>1448007931118</updated>
+    </task>
+    <task id="LOCAL-00049" summary="remove default config, fix logic getConfig, update action attribute, support zeromq">
+      <created>1448019406347</created>
+      <option name="number" value="00049" />
+      <option name="project" value="LOCAL" />
+      <updated>1448019406347</updated>
+    </task>
+    <option name="localTasksCounter" value="50" />
+    <servers />
+  </component>
+  <component name="TodoView" selected-index="0">
+    <todo-panel id="selected-file">
+      <are-packages-shown value="false" />
+      <are-modules-shown value="false" />
+      <flatten-packages value="false" />
+      <is-autoscroll-to-source value="false" />
+    </todo-panel>
+    <todo-panel id="all">
+      <are-packages-shown value="false" />
+      <are-modules-shown value="false" />
+      <flatten-packages value="false" />
+      <is-autoscroll-to-source value="false" />
+    </todo-panel>
+    <todo-panel id="default-changelist">
+      <are-packages-shown value="false" />
+      <are-modules-shown value="false" />
+      <flatten-packages value="false" />
+      <is-autoscroll-to-source value="false" />
+    </todo-panel>
+  </component>
+  <component name="ToolWindowManager">
+    <frame x="0" y="23" width="1920" height="966" extended-state="0" />
+    <editor active="true" />
+    <layout>
+      <window_info id="Changes" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.3272311" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
+      <window_info id="Terminal" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" weight="0.21967964" sideWeight="0.5" order="12" side_tool="false" content_ui="tabs" />
+      <window_info id="TODO" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.3272311" sideWeight="0.5" order="6" side_tool="false" content_ui="tabs" />
+      <window_info id="Database" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.21885914" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
+      <window_info id="Structure" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.24906832" sideWeight="0.49916527" order="1" side_tool="false" content_ui="tabs" />
+      <window_info id="Application Servers" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="11" side_tool="false" content_ui="tabs" />
+      <window_info id="Remote Host" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.060702875" sideWeight="0.5" order="4" side_tool="false" content_ui="tabs" />
+      <window_info id="Project" active="true" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" weight="0.21831736" sideWeight="0.8638444" order="0" side_tool="false" content_ui="combo" />
+      <window_info id="Favorites" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.2140575" sideWeight="0.1361556" order="2" side_tool="true" content_ui="tabs" />
+      <window_info id="Event Log" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.39757413" sideWeight="0.5" order="8" side_tool="true" content_ui="tabs" />
+      <window_info id="Version Control" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.22488038" sideWeight="0.5" order="9" side_tool="false" content_ui="tabs" />
+      <window_info id="Cvs" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.25" sideWeight="0.5" order="4" side_tool="false" content_ui="tabs" />
+      <window_info id="Message" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="0" side_tool="false" content_ui="tabs" />
+      <window_info id="Ant Build" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.25" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
+      <window_info id="Find" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.22260274" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
+      <window_info id="Debug" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.4" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
+      <window_info id="Grunt" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.3298122" sideWeight="0.5" order="10" side_tool="false" content_ui="tabs" />
+      <window_info id="Messages" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="13" side_tool="false" content_ui="tabs" />
+      <window_info id="Commander" active="false" anchor="right" auto_hide="false" internal_type="SLIDING" type="SLIDING" visible="false" weight="0.4" sideWeight="0.5" order="0" side_tool="false" content_ui="tabs" />
+      <window_info id="Hierarchy" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.25" sideWeight="0.5" order="2" side_tool="false" content_ui="combo" />
+      <window_info id="Inspection" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.4" sideWeight="0.5" order="5" side_tool="false" content_ui="tabs" />
+      <window_info id="Run" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="2" side_tool="false" content_ui="tabs" />
+    </layout>
+    <layout-to-restore>
+      <window_info id="Cvs" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.25" sideWeight="0.5" order="4" side_tool="false" content_ui="tabs" />
+      <window_info id="Changes" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.3272311" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
+      <window_info id="Message" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="0" side_tool="false" content_ui="tabs" />
+      <window_info id="Terminal" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" weight="0.25743708" sideWeight="0.5" order="12" side_tool="false" content_ui="tabs" />
+      <window_info id="Ant Build" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.25" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
+      <window_info id="Database" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.21885914" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
+      <window_info id="Find" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.22260274" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
+      <window_info id="Remote Host" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.060702875" sideWeight="0.5" order="4" side_tool="false" content_ui="tabs" />
+      <window_info id="Debug" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.4" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
+      <window_info id="Event Log" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.39757413" sideWeight="0.5" order="8" side_tool="true" content_ui="tabs" />
+      <window_info id="Favorites" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" weight="0.2140575" sideWeight="0.13713405" order="2" side_tool="true" content_ui="tabs" />
+      <window_info id="Version Control" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.22488038" sideWeight="0.5" order="9" side_tool="false" content_ui="tabs" />
+      <window_info id="Grunt" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.3298122" sideWeight="0.5" order="10" side_tool="false" content_ui="tabs" />
+      <window_info id="Messages" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="13" side_tool="false" content_ui="tabs" />
+      <window_info id="TODO" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.3272311" sideWeight="0.5" order="6" side_tool="false" content_ui="tabs" />
+      <window_info id="Structure" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.24906832" sideWeight="0.49916527" order="1" side_tool="false" content_ui="tabs" />
+      <window_info id="Commander" active="false" anchor="right" auto_hide="false" internal_type="SLIDING" type="SLIDING" visible="false" weight="0.4" sideWeight="0.5" order="0" side_tool="false" content_ui="tabs" />
+      <window_info id="Application Servers" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="11" side_tool="false" content_ui="tabs" />
+      <window_info id="Project" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" weight="0.2140575" sideWeight="0.8628659" order="0" side_tool="false" content_ui="combo" />
+      <window_info id="Inspection" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.4" sideWeight="0.5" order="5" side_tool="false" content_ui="tabs" />
+      <window_info id="Hierarchy" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.25" sideWeight="0.5" order="2" side_tool="false" content_ui="combo" />
+      <window_info id="Run" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="2" side_tool="false" content_ui="tabs" />
+    </layout-to-restore>
+  </component>
+  <component name="Vcs.Log.UiProperties">
+    <option name="RECENTLY_FILTERED_USER_GROUPS">
+      <collection />
+    </option>
+    <option name="RECENTLY_FILTERED_BRANCH_GROUPS">
+      <collection />
+    </option>
+  </component>
+  <component name="VcsContentAnnotationSettings">
+    <option name="myLimit" value="2678400000" />
+  </component>
+  <component name="VcsManagerConfiguration">
+    <option name="myTodoPanelSettings">
+      <TodoPanelSettings />
+    </option>
+    <MESSAGE value="update database rawQuery" />
+    <MESSAGE value="fix bug casesensitive in linux" />
+    <MESSAGE value="add new function getComponent(name)" />
+    <MESSAGE value="Add 2 function support getViewFiles and getAttribute" />
+    <MESSAGE value="fix logic flash message" />
+    <MESSAGE value="replace t() to __()" />
+    <MESSAGE value="rename extends to extend" />
+    <MESSAGE value="updateConfig for assign config" />
+    <MESSAGE value="fix associate" />
+    <MESSAGE value="Auto load system settting from redis" />
+    <MESSAGE value="fix name beforeAuth" />
+    <MESSAGE value="sequelize become singleton" />
+    <MESSAGE value="add application.permissions" />
+    <MESSAGE value="Support long_stack , new way to translate" />
+    <MESSAGE value="support socket_io" />
+    <MESSAGE value="Update jsdoc" />
+    <MESSAGE value="Merge branch 'master' of https://github.com/arrowjs/ArrowjsCore&#10;&#10;Conflicts:&#10;&#9;templateExtends/filter/async.js&#10;&#9;templateExtends/function/getConfig.js&#10;&#9;templateExtends/function/link_to.js&#10;" />
+    <MESSAGE value="fix config makerender" />
+    <MESSAGE value="component.render support promisify" />
+    <MESSAGE value="Update markSafe for renderView" />
+    <MESSAGE value="Merge branch 'master' of https://github.com/arrowjs/ArrowjsCore&#10;&#10;Conflicts:&#10;&#9;libs/ArrowApplication.js&#10;" />
+    <MESSAGE value="replace let to const" />
+    <MESSAGE value="Support node_module" />
+    <MESSAGE value="arrowSettings, exports nodemodule, circuit breaker , handler error" />
+    <MESSAGE value="remove default config, fix logic getConfig, update action attribute, support zeromq" />
+    <option name="LAST_COMMIT_MESSAGE" value="remove default config, fix logic getConfig, update action attribute, support zeromq" />
+  </component>
+  <component name="XDebuggerManager">
+    <breakpoint-manager>
+      <option name="time" value="9" />
+    </breakpoint-manager>
+    <watches-manager />
+  </component>
+</project>

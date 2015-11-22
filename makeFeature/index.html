@@ -1,0 +1,460 @@
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>Make a feature - ARROW CMS PROJECT</title>
+  
+
+  
+  <link href='https://fonts.googleapis.com/css?family=Lato:400,700|Roboto+Slab:400,700|Inconsolata:400,700' rel='stylesheet' type='text/css'>
+
+  <link rel="stylesheet" href="../css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../css/theme_extra.css" type="text/css" />
+  <link rel="stylesheet" href="../css/highlight.css">
+
+  <script src="//cdnjs.cloudflare.com/ajax/libs/jquery/2.1.1/jquery.min.js"></script>
+  <script src="//cdnjs.cloudflare.com/ajax/libs/modernizr/2.8.3/modernizr.min.js"></script>
+  <script type="text/javascript" src="../js/highlight.pack.js"></script>
+  <script src="../js/theme.js"></script>
+
+  <style>
+    body {font-size: 90%;}
+    pre, code {font-size: 100%;}
+    h3, h4, h5, h6 {color: #2980b9; font-weight: 300}
+  </style> 
+</head>
+
+<body class="wy-body-for-nav" role="document">
+
+  <div class="wy-grid-for-nav">
+
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side stickynav">
+      <div class="wy-side-nav-search">
+        <a href=".." class="icon icon-home"> ARROW CMS PROJECT</a>
+        
+      </div>
+
+      <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+      <ul class="current">
+    
+        
+        <span>Get started</span>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="..">Get started</a>
+                    
+                </li>
+            
+        
+
+    
+        
+        <span>Make a feature</span>
+            
+                <li class="toctree-l1 current">
+                    <a class="current" href=".">Make a feature</a>
+                    
+                        <ul>
+                        
+                            <li class="toctree-l2"><a href="#feature">Feature</a></li>
+                            
+                                <li><a class="toctree-l3" href="#folder-structure-of-feature">Folder structure of feature</a></li>
+                            
+                                <li><a class="toctree-l3" href="#create-a-feature-manually">Create a feature manually</a></li>
+                            
+                                <li><a class="toctree-l3" href="#create-a-controller-inside-a-feature">Create a controller inside a feature</a></li>
+                            
+                                <li><a class="toctree-l3" href="#create-a-route-inside-a-feature">Create a route inside a feature</a></li>
+                            
+                                <li><a class="toctree-l3" href="#create-view-template-inside-a-feature">Create view template inside a feature</a></li>
+                            
+                                <li><a class="toctree-l3" href="#render-html-and-response-to-browser-in-handler-function">Render HTML and response to browser in handler function</a></li>
+                            
+                                <li><a class="toctree-l3" href="#create-a-model">Create a model</a></li>
+                            
+                                <li><a class="toctree-l3" href="#get-data-from-model">Get data from model</a></li>
+                            
+                        
+                        </ul>
+                    
+                </li>
+            
+        
+
+    
+        
+            <li class="toctree-l1 ">
+                <a class="" href="../session">Session</a>
+            </li>
+        
+
+    
+        
+            <li class="toctree-l1 ">
+                <a class="" href="../guidelines">Guideline</a>
+            </li>
+        
+
+    
+        
+        <span>Template Engine</span>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../template/custom_filter">Custom filter</a>
+                    
+                </li>
+            
+        
+
+    
+        
+        <span>Structure</span>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../structure">Basic</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../structure/controller">Controller</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../structure/models">Model</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../structure/route">Route</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../structure/Extends">Extends</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../structure/template_engine">View</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../structure/feature_config">Config</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../structure/folder">Core structure</a>
+                    
+                </li>
+            
+        
+
+    
+        
+        <span>Utilities</span>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../utilities">Basic</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../utilities/logger">Logger</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../utilities/flash_message">Flash messages</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../utilities/global_function">Global functions and Variable</a>
+                    
+                </li>
+            
+        
+
+    
+</ul>
+
+      </div>
+      &nbsp;
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" role="navigation" aria-label="top navigation">
+        <i data-toggle="wy-nav-top" class="icon icon-reorder"></i>
+        <a href=".."></a>
+      </nav>
+
+      
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="breadcrumbs navigation">
+  <ul class="wy-breadcrumbs">
+    <li><a href="..">Docs</a> &raquo;</li>
+    <li>Make a feature</li>
+      <li class="wy-breadcrumbs-aside">
+        
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main">
+            <div class="section">
+              <h1 id="feature">Feature</h1>
+<p>Feature represents one unit of feature in web application. A feature consists of Model, View, Controller, Route.</p>
+<ul>
+<li>Model: data structure and data object that is fetched from back end database. In early version, we support Postgresql. Later on we will support MongoDB, MySQL,...</li>
+<li>View: View template = HTML + Nunjucks syntax, CSS, JavaScript</li>
+<li>Controller: Javascript file contains handler functions for different HTTP requests</li>
+<li>Router: Direct HTTP request to appropriate handler functions in controller</li>
+</ul>
+<p><img alt="image" src=".././img/arrow_application.jpg" /></p>
+<h2 id="folder-structure-of-feature">Folder structure of feature</h2>
+<p><img alt="folder structure of blog feature" src=".././img/folder_feature.jpg" /></p>
+<p>Folder structure of a feature is governed by <a href="../structure">structure.js</a>. In common web application, a feature may have more than one subfolders: </p>
+<ul>
+<li><em>frontend</em> sub folder: It is customer facing part for end user.</li>
+<li><em>backend</em> sub folder: It is back office operational part for administrator, operator.</li>
+</ul>
+<p>A feature may have only <em>frontend</em> sub folder or <em>backend</em> subfolder or more than that. Below is extract of controller section in structure.js. There are sub folders <em>backend</em> and <em>frontend</em>. When you implement new feature, you may skip one of them but creating new sub folder different with <em>backend</em> and <em>frontend</em> will not be recognized when Arrowjs app parses.</p>
+<p>Example of feature that have backend and frontend sub folders.</p>
+<pre><code>controller: [
+    {
+        path: {
+            name: &quot;backend&quot;,
+            folder: &quot;backend/controllers&quot;,
+            file: &quot;*.js&quot;
+        }
+    },
+    {
+        path: {
+            name: &quot;frontend&quot;,
+            folder: &quot;frontend/controllers&quot;,
+            file: &quot;*.js&quot;
+        }
+    }
+]
+</code></pre>
+
+<p>Example of feature that has a single, direct sub folder named <em>controllers</em></p>
+<pre><code>controller: [
+    {
+        path: {     
+            folder: &quot;controllers&quot;,
+            file: &quot;*.js&quot;
+        }
+    }    
+]
+</code></pre>
+
+<h2 id="create-a-feature-manually">Create a feature manually</h2>
+<p>In booting process, Arrowjs web application will parse and load all features in folder <em>features</em>. Developer can create feature manually or use Yeoman generator to generate scaffold of feature.</p>
+<p>To create a feature manually.</p>
+<pre><code>    mkdir &lt;name&gt;
+    cd &lt;name&gt;
+    touch feature.js
+</code></pre>
+
+<p><name> is real name of feature such as: blog, order, event_calender. Please don't use space in feature name.</p>
+<p>feature.js is required configuration file for feature.</p>
+<pre><code>'use strict';
+
+module.exports = {
+    name: &quot;index&quot; // if not exist, Arrowjs will use feature folder name instead
+    title: &quot;Index Module&quot;, //display in feature management in back end
+    author: 'Tran Quoc Cuong', 
+    version: '0.1.0',
+    description: &quot;Hello Arrowjs&quot;,
+    permissions: [
+        {
+            name: 'index',  //key of permission
+            title: t('m_users_backend_rule_index')  //description of permission in localized language
+        },
+        {
+            name: 'create',
+            title: t('m_users_backend_rule_create')
+        },] 
+    };
+
+</code></pre>
+
+<h2 id="create-a-controller-inside-a-feature">Create a controller inside a feature</h2>
+<p>In this example, we are going to create a controller sub folder inside a feature then create index.js. index.js contains functions that handles HTTP requests we need map in route.js</p>
+<pre><code>    cd &lt;feature name&gt;
+    mkdir controllers
+    cd controllers
+    touch index.js
+</code></pre>
+
+<p>Below is example index.js that has one handler function responses back to browser "Hello Arrowjs"</p>
+<pre><code>module.exports = function (controller,component,application) {
+    controller.index = function (req,res) {
+       res.send(&quot;Hello Arrowjs&quot;);
+    };
+}
+</code></pre>
+
+<p>Developer can access properties 5 parameters passed in:</p>
+<ul>
+<li>controller &gt; controller object itself</li>
+<li>component &gt; feature object that contains controller</li>
+<li>application &gt; Arrowjs application object</li>
+<li>req &gt; <a href="http://expressjs.com/api.html#req">request object</a></li>
+<li>response &gt; <a href="http://expressjs.com/api.html#res">response object</a></li>
+</ul>
+<h2 id="create-a-route-inside-a-feature">Create a route inside a feature</h2>
+<p>If a feature contains several sub folder controllers such as <em>frontend</em> and <em>backend</em> then we need seperate route.js for each sub folder controller</p>
+<p>At one URL path, we can map several HTTP verbs such as: post, get, delete, put. Example of route.js. </p>
+<pre><code>'use strict';
+module.exports = function (component,application) {
+    return {
+        &quot;/&quot;: {
+            get : {
+                handler: component.controllers.index
+            }
+        },
+        &quot;/neworder&quot;: {
+            post : {
+                handler: component.controllers.newOrder
+            }
+        }
+    }
+};
+</code></pre>
+
+<h2 id="create-view-template-inside-a-feature">Create view template inside a feature</h2>
+<p>In fact, a view template is HTML file that include <a href="http://mozilla.github.io/nunjucks/">Nunjucks</a> syntax. Each page layout needs one view template. Nunjucks allows to <a href="http://mozilla.github.io/nunjucks/templating.html#include">include</a>, <a href="http://mozilla.github.io/nunjucks/templating.html#import">import</a> and <a href="http://mozilla.github.io/nunjucks/templating.html#extends">extend</a> a view template.</p>
+<p>If you use PHPStorm or WebStorm, you should use .twig file extension for view template then install <a href="https://plugins.jetbrains.com/plugin/7303?pr=">twig plugin</a> to highlight Nunjucks syntax.</p>
+<h2 id="render-html-and-response-to-browser-in-handler-function">Render HTML and response to browser in handler function</h2>
+<p>A common flow in MVC web application is :</p>
+<ul>
+<li>Browser sends a HTTP request to web application</li>
+<li>Using routes loaded in boot time, Web app maps this request to appropriate handler function</li>
+<li>Handler function may fetch or update data from or to model then render view</li>
+</ul>
+<p>To render view you need to use either <a href="http://expressjs.com/api.html#res.render">res.render</a> or component.render.</p>
+<p>For simplicity, just use res.render</p>
+<pre><code>module.exports = function (controller,component,application) {
+     controller.index = function (req,res) {
+        res.render(&quot;index.twig&quot;);
+      };
+    }
+</code></pre>
+
+<p>Use component.render when you want to use promise function</p>
+<pre><code>component.render(&quot;index&quot;). then(functiont(html){
+ res.send(html)
+})
+</code></pre>
+
+<p>To push data from controller to view:</p>
+<pre><code>    res.render(&quot;index.twig&quot;, {title : &quot;Hello ArrowJS&quot;});
+</code></pre>
+
+<h2 id="create-a-model">Create a model</h2>
+<p>Arrowjs uses <a href="http://docs.sequelizejs.com/en/latest/">Sequelize</a> as Object Relation Mapping between SQL database to models. We, original developers of Arrojws, have been using <a href="http://www.postgresql.org/">Postgresql</a> 9.4 intensively in several Arrowjs application. However you may use other SQL databases such as MySQL, MariaDB, SQLite and MSSQL.
+Please refer to <a href="http://docs.sequelizejs.com/en/latest/docs/models-definition/">Model definition</a> in Sequelize to know how to define a model.</p>
+<p>Example of User model with three fields: id, username and password:</p>
+<pre><code>var bcrypt = require('bcrypt');
+
+module.exports = function (sequelize,Datatypes) {
+    var User = sequelize.define('user', {
+        id : {
+            type: Datatypes.INTEGER,
+            primaryKey : true,
+            autoIncrement : true
+        },
+        username: {
+            type: Datatypes.STRING,
+            unique: true
+        },
+        password: {
+            type: Datatypes.STRING,
+        },
+    }, {
+        freezeTableName : true,
+        hooks : {
+            beforeCreate: function (user, op, fn) {
+                if(user.password) {
+                    bcrypt.hash(user.password,10, function (err, hash) {
+                        if(err) throw  err;
+                        user.password = hash;
+                        fn(null, user);
+                    })
+                } else {
+                    user.password = '';
+                    fn(null, user);
+                }
+            }
+        }
+    })
+
+    User.sync();
+    return User
+}
+</code></pre>
+
+<h2 id="get-data-from-model">Get data from model</h2>
+<p>Please refer to section <a href="http://docs.sequelizejs.com/en/latest/docs/querying/">Querying of Sequelizejs</a> for detail. Below are just some simple examples:</p>
+<p>Find a record by ID</p>
+<pre><code>    component.models.[model_name].findById(id)
+</code></pre>
+
+<p>Get all records in model</p>
+<pre><code>    application.models.[model_name].findAll(condition)
+</code></pre>
+
+
+            </div>
+          </div>
+          <footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+        <a href="../session" class="btn btn-neutral float-right" title="Session"/>Next <span class="icon icon-circle-arrow-right"></span></a>
+      
+      
+        <a href=".." class="btn btn-neutral" title="Get started"><span class="icon icon-circle-arrow-left"></span> Previous</a>
+      
+    </div>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+    <!-- Copyright etc -->
+    </p>
+  </div>
+
+  Built with <a href="http://www.mkdocs.org">MkDocs</a> using a <a href="https://github.com/snide/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>.
+</footer>
+	  
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+
+<div class="rst-versions" role="note" style="cursor: pointer">
+    <span class="rst-current-version" data-toggle="rst-current-version">
+        
+      <span><a href=".." style="color: #fcfcfc;">&laquo; Previous</a></span>
+      <span style="margin-left: 15px"><a href="../session" style="color: #fcfcfc">Next &raquo;</a></span>
+    </span>
+</div>
+</body>
+</html>
