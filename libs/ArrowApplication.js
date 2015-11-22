@@ -23,7 +23,6 @@ const fs = require('fs'),
     cluster = require('cluster'),
     socketRedisAdapter = require('socket.io-redis'),
     ViewEngine = require("../libs/ViewEngine"),
-    request = require('request'),
     fsExtra = require('fs-extra'),
     Sequelize = require('sequelize'),
     loadingLanguage = require("./i18n").loadLanguage;
@@ -50,7 +49,6 @@ class ArrowApplication {
         this._expressApplication = express();  //wrap express object
 
         global.Arrow = {};
-        Arrow.request = request;
         this.logger = logger;
 
         //Move all functions of express to ArrowApplication
@@ -282,7 +280,7 @@ class ArrowApplication {
                 });
                 return app;
             }).catch(function (err) {
-                throw err
+                logger.error(err)
             });
 
     }
@@ -345,6 +343,7 @@ function loadModel_Route_Render(arrow, userSetting) {
             }
         })
     })
+    return arrow
 }
 
 /**
@@ -465,6 +464,7 @@ function handleComponentRouteSetting(arrow, componentRouteSetting, defaultRouteC
         });
         !_.isEmpty(arrayMethod) && arrow.use(prefix, route);
     });
+    return arrow
 }
 /**
  *
@@ -643,7 +643,7 @@ function loadingGlobalFunction(self) {
 
     //Add some support function
     global.__ = ArrowHelper.__;
-
+    return self
 }
 
 
@@ -653,6 +653,7 @@ function addRoles(self) {
         let managerName = key + "Manager";
         self.permissions[key] = self[managerName].getPermissions();
     });
+    return self
 }
 
 /**
@@ -780,6 +781,7 @@ function handleError(app) {
 
         })
     }
+    return app
 }
 
 function getDataByDotNotation(obj, key) {
