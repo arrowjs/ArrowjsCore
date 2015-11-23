@@ -416,9 +416,11 @@ module.exports.getRawConfig = function getRawConfig() {
     //get database.js
     try {
         fs.accessSync(__base + 'config/database.js');
+        _.assign(conf, require(__base + 'config/database'));
     } catch (err) {
         if (err.code === 'ENOENT') {
             fsEx.copySync(path.resolve(__dirname, '..', 'config/database.js'), __base + 'config/database.js');
+            _.assign(conf, require(__base + 'config/database'));
         } else {
             throw err
         }
