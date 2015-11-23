@@ -327,7 +327,6 @@ module.exports.getRawConfig = function getRawConfig() {
         }
     }
 
-
     //get websocket.js
     try {
         fs.accessSync(__base + 'config/websocket.js');
@@ -449,7 +448,7 @@ module.exports.getRawConfig = function getRawConfig() {
             fsEx.copySync(path.resolve(__dirname, '..', 'config/env/development.js'), __base + 'config/env/' + env + '.js');
             _.assign(conf, require(__base + 'config/env/' + env));
         } else {
-            th
+            throw err
         }
     }
     return conf
