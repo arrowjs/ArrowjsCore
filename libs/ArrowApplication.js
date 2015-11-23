@@ -23,10 +23,10 @@ const fs = require('fs'),
     cluster = require('cluster'),
     socketRedisAdapter = require('socket.io-redis'),
     ViewEngine = require("../libs/ViewEngine"),
-    request = require('request'),
     fsExtra = require('fs-extra'),
     Sequelize = require('sequelize'),
     loadingLanguage = require("./i18n").loadLanguage;
+
 /**
  * Singleton object. It is heart of Arrowjs.io web app. it wraps Express and adds following functions:
  * support Redis, multi-languages, passport, check permission and socket.io / websocket
@@ -49,7 +49,6 @@ class ArrowApplication {
         this._expressApplication = express();  //wrap express object
 
         global.Arrow = {};
-        Arrow.request = request;
         this.logger = logger;
 
         //Move all functions of express to ArrowApplication
@@ -134,6 +133,7 @@ class ArrowApplication {
 
         //Create shortcut call
         this.addConfig = addConfig.bind(this);
+        this.addConfigFile = addConfigFile.bind(this);
         this.getConfig = this.configManager.getConfig.bind(this.configManager);
         this.setConfig = this.configManager.setConfig.bind(this.configManager);
         this.updateConfig = this.configManager.updateConfig.bind(this.configManager);
@@ -216,8 +216,8 @@ class ArrowApplication {
 
         self.arrowSettings = setting;
 
-        return Promise.resolve().
-            then(function () {
+        return Promise.resolve()
+            .then(function () {
                 let resolve = Promise.resolve();
                 self.plugins.map(function (plug) {
                     resolve = resolve.then(function () {
@@ -280,7 +280,7 @@ class ArrowApplication {
                 });
                 return app;
             }).catch(function (err) {
-                throw err
+                logger.error(err)
             });
 
     }
@@ -343,6 +343,7 @@ function loadModel_Route_Render(arrow, userSetting) {
             }
         })
     })
+    return arrow
 }
 
 /**
@@ -463,6 +464,7 @@ function handleComponentRouteSetting(arrow, componentRouteSetting, defaultRouteC
         });
         !_.isEmpty(arrayMethod) && arrow.use(prefix, route);
     });
+    return arrow
 }
 /**
  *
@@ -641,7 +643,7 @@ function loadingGlobalFunction(self) {
 
     //Add some support function
     global.__ = ArrowHelper.__;
-
+    return self
 }
 
 
@@ -651,6 +653,7 @@ function addRoles(self) {
         let managerName = key + "Manager";
         self.permissions[key] = self[managerName].getPermissions();
     });
+    return self
 }
 
 /**
@@ -778,6 +781,7 @@ function handleError(app) {
 
         })
     }
+    return app
 }
 
 function getDataByDotNotation(obj, key) {
@@ -828,6 +832,27 @@ function addConfig(obj) {
         _.assign(config,obj);
     }
 }
+
+function addConfigFile(filename) {
+    let app = this;
+    let configFile = path.normalize(app.arrFolder + "/" + filename);
+    fs.readFile(configFile, 'utf8', function (err, data) {
+        if (err) throw err;
+        let obj = JSON.parse(data);
+
+        app.updateConfig(obj);
+    });
+    fs.watch(configFile, function (event,filename) {
+        if(event === "change") {
+            fs.readFile(configFile, 'utf8', function (err, data) {
+                if (err) throw err;
+                let obj = JSON.parse(data);
+
+                app.updateConfig(obj);
+            });
+        }
+    })
+};
 
 module.exports = ArrowApplication;
 
