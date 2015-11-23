@@ -1,49 +1,35 @@
 "use strict";
 const winston = require('winston'),
+    path = require('path'),
+    _ = require('lodash'),
     fs = require('fs');
-
-let logDir = 'log', // Or read from a configuration
-    env = process.env.NODE_ENV || 'development';
-
-if (!fs.existsSync(logDir)) {
-    // Create the directory if it does not exist
-    fs.mkdirSync(logDir);
-}
 /**
  * Setting logger
  */
-const logger = new ( winston.Logger )({
-    transports: [
-        new winston.transports.Console({
-            prettyPrint: true,
-            colorize: true,
-            silent: false,
-            timestamp: false
-        }),
-        new winston.transports.File({
-            level: env === 'development' ? 'debug' : 'info',
-            filename: logDir + '/logs.log',
-            maxsize: 1024 * 1024 * 10, // 10MB
-            name : "default-log"
-        }),
-        new winston.transports.File({
-            level : "error",
-            filename: logDir + '/error.log',
-            maxsize: 1024 * 1024 * 10, // 10MB
-            name : "error-log"
-        })
-    ],
-    exceptionHandlers: [
-        new winston.transports.File({
-            filename: 'log/exceptions.log'
-        }),
-        new winston.transports.Console({
-            prettyPrint: true,
-            colorize: true,
-            silent: false,
-            timestamp: false
-        })
-    ]
-});
+let logger = {};
 
 module.exports = logger;
+
+module.exports.init = function (app) {
+    let config = app._config;
+    let logDir = config.logFolder || 'log/';
+
+     // Or read from a configuration
+    if (!fs.existsSync(path.normalize(app.arrFolder + logDir))) {
+        // Create the directory if it does not exist
+        fs.mkdirSync(path.normalize(app.arrFolder + logDir));
+    }
+
+    Object.keys(config.winstonLog).map(function (key) {
+        if(_.isArray(config.winstonLog[key])) {
+            config.winstonLog[key].map(function (k) {
+                k.dirname = logDir
+            })
+        }
+    });
+    let log =  new ( winston.Logger )(config.winstonLog);
+    _.assign(logger,log);
+
+    return null;
+};
+

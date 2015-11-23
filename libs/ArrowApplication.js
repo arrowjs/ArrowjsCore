@@ -10,10 +10,10 @@ const fs = require('fs'),
     _ = require('lodash'),
     Promise = require('bluebird'),
     RedisCache = require("./RedisCache"),
-    logger = require("./logger"),
+    installLog = require("./logger").init,
+    logger = require('./logger'),
     __ = require("./global_function"),
     EventEmitter = require('events').EventEmitter,
-    Database = require('./database'),
     r = require('nunjucks').runtime,
     DefaultManager = require("../manager/DefaultManager"),
     ConfigManager = require("../manager/ConfigManager"),
@@ -24,7 +24,6 @@ const fs = require('fs'),
     socketRedisAdapter = require('socket.io-redis'),
     ViewEngine = require("../libs/ViewEngine"),
     fsExtra = require('fs-extra'),
-    Sequelize = require('sequelize'),
     loadingLanguage = require("./i18n").loadLanguage;
 
 /**
@@ -34,7 +33,6 @@ const fs = require('fs'),
 
 let arrowErrorLink = {};
 class ArrowApplication {
-
     /**
      * Constructor
      * @param setting
@@ -46,21 +44,16 @@ class ArrowApplication {
         this.beforeAuth = [];  //add middle-wares before user authenticates
         this.afterAuth = [];   //add middle-ware after user authenticates
         this.plugins = [];   //add middle-ware after user authenticates
-        this._expressApplication = express();  //wrap express object
+        let app = express();
 
         global.Arrow = {};
-        this.logger = logger;
 
         //Move all functions of express to ArrowApplication
         //So we can call ArrowApplication.listen(port)
-        let self = this._expressApplication;
-        for (let func in self) {
-            if (typeof self[func] == 'function') {
-                this[func] = self[func].bind(self);
-            } else {
-                this[func] = self[func]
-            }
-        }
+        _.assign(this,app);
+        this.expressApp =  function(req, res, next) {
+            this.handle(req, res, next);
+        }.bind(this);
 
         // 0 : location of this file
         // 1 : location of index.js (module file)
@@ -82,6 +75,7 @@ class ArrowApplication {
             require('longjohn')
         }
 
+        installLog(this);
         //Make redis cache
         let redisConfig = this._config.redis || {};
         let redisFunction = RedisCache(redisConfig);
@@ -102,19 +96,26 @@ class ArrowApplication {
         this.redisClient = redisClient;
         this.redisSubscriber = redisSubscriber;
 
+        this.middleware = Object.create(null);
         //Add passport and its authentication strategies
-        this.usePassport = require("../config/middleware/loadPassport");
+        this.middleware.passport = require("../config/middleware/loadPassport").bind(this);
 
         //Display flash message when user reloads view
-        this.useFlashMessage = require("../config/middleware/flashMessage");
+        this.middleware.flashMessage = require("../config/middleware/flashMessage").bind(this);
 
         //Use middleware express-session to store user session
-        this.useSession = require("../config/middleware/useSession");
+        this.middleware.session = require("../config/middleware/useSession").bind(this);
 
         //Serve static resources when not using Nginx.
         //See config/view.js section resource
-        this.serveStatic = require("../config/middleware/staticResource");
-        this.markSafe = r.markSafe;
+        this.middleware.serveStatic = require("../config/middleware/staticResource").bind(this);
+
+        this.middleware.helmet = require("helmet");
+        this.middleware.bodyParser = require("body-parser");
+        this.middleware.cookieParser = require("cookie-parser");
+        this.middleware.morgan = require("morgan");
+        this.middleware.methodOverride = require('method-override');
+
 
         //Load available languages. See config/i18n.js and folder /lang
         loadingLanguage(this._config);
@@ -166,6 +167,7 @@ class ArrowApplication {
         this.utils.dotChain = getDataByDotNotation;
         this.utils.fs = fsExtra;
         this.utils.loadAndCreate = loadSetting.bind(this);
+        this.utils.markSafe = r.markSafe;
 
         this.arrowSettings = Object.create(null);
     }
@@ -229,7 +231,6 @@ class ArrowApplication {
             .then(function () {
                 addRoles(self);
                 if (self.getConfig("redis.type") !== "fakeredis") {
-                    //TODO : testing auto load config if use redis
                     let resolve = self.configManager.getCache();
                     self._componentList.map(function (key) {
                         let managerName = key + "Manager";
@@ -255,9 +256,10 @@ class ArrowApplication {
             .then(function () {
                 return handleError(self)
             })
-            .then(function (app) {
-                let server = http.createServer(self._expressApplication);
-
+            .then(function () {
+                return http.createServer(self.expressApp);
+            })
+            .then(function (server) {
                 if (self.getConfig('websocket_enable') && self.getConfig('websocket_folder')) {
                     let io = socket_io(server);
                     if (self.getConfig('redis.type') !== 'fakeredis') {
@@ -278,8 +280,8 @@ class ArrowApplication {
                     logger.info('Application loaded using the "' + process.env.NODE_ENV + '" environment configuration');
                     logger.info('Application started on port ' + self.getConfig("port"), ', Process ID: ' + process.pid);
                 });
-                return app;
-            }).catch(function (err) {
+            })
+            .catch(function (err) {
                 logger.error(err)
             });
 
@@ -852,7 +854,7 @@ function addConfigFile(filename) {
             });
         }
     })
-};
+}
 
 module.exports = ArrowApplication;
 

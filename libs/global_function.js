@@ -391,14 +391,12 @@ module.exports.getRawConfig = function getRawConfig() {
         }
     }
 
-    //get i18n.js
+    //get express.js
     try {
-        fs.accessSync(__base + 'config/i18n.js');
-        _.assign(conf, require(__base + 'config/i18n'));
+        fs.accessSync(__base + 'config/express.js');
     } catch (err) {
         if (err.code === 'ENOENT') {
-            fsEx.copySync(path.resolve(__dirname, '..', 'config/i18n.js'), __base + 'config/i18n.js');
-            _.assign(conf, require(__base + 'config/i18n'));
+            fsEx.copySync(path.resolve(__dirname, '..', 'config/express.js'), __base + 'config/express.js');
         } else {
             throw err
         }
