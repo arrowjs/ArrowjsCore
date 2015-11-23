@@ -1,11 +1,5 @@
 "use strict";
 
-let morgan = require('morgan');
-let bodyParser = require("../").bodyParser,
-    methodOverride = require("../").methodOverride,
-    sercurity = require("../").sercurity,
-    cookieParser = require("../").cookieParse;
-
 /**
  * Setting for express
  * @param app
@@ -19,7 +13,7 @@ module.exports = function (app, config, setting) {
     /**
      * Set folder static resource
      */
-    app.serveStatic();
+    app.middleware.serveStatic();
 
     /**
      * Set local variable
@@ -37,34 +31,36 @@ module.exports = function (app, config, setting) {
     /** Environment dependent middleware */
     if (process.env.NODE_ENV === 'development') {
         /** Uncomment to enable logger (morgan) */
-        app.use(morgan('dev'));
+        app.use(app.middleware.morgan('dev'));
         /** Disable views cache */
         app.set('view cache', false);
     } else if (process.env.NODE_ENV === 'production') {
         app.locals.cache = 'memory';
     }
 
-    app.use(bodyParser.urlencoded(config.bodyParser));
-    app.use(bodyParser.json({limit: config.bodyParser.limit}));
-    app.use(methodOverride());
+    app.use(app.middleware.bodyParser.urlencoded({ extended: false }));
+    app.use(app.middleware.bodyParser.json());
+    app.use(app.middleware.methodOverride());
 
     /** CookieParser should be above session */
-    app.use(cookieParser());
+    app.use(app.middleware.cookieParser());
 
     /** Express session storage */
-    app.useSession();
+    app.middleware.session();
 
     /** Use passport session */
-    app.usePassport(setting);
+    app.middleware.passport(setting);
 
     /** Flash messages */
-    app.useFlashMessage();
+    app.middleware.flashMessage();
 
     /** Use helmet to secure Express headers */
-    app.use(sercurity.xframe());
-    app.use(sercurity.xssFilter());
-    app.use(sercurity.nosniff());
-    app.use(sercurity.ienoopen());
+    let helmet = app.middleware.helmet;
+
+    app.use(helmet.xframe());
+    app.use(helmet.xssFilter());
+    app.use(helmet.nosniff());
+    app.use(helmet.ienoopen());
     app.disable('x-powered-by');
 
     /** Passing the variables to environment locals */

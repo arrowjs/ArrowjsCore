@@ -1,7 +1,6 @@
 'use strict';
 
 module.exports = {
-    key: 'site_setting',
     app: {
         title: 'ArrowJS',
         description: '',
@@ -9,12 +8,9 @@ module.exports = {
         logo: '',
         icon: ''
     },
+    langPath : "/lang",
+    language: 'en_US',
     long_stack : true,
     port: process.env.PORT || 8000,
-    admin_prefix: 'admin',
-    bodyParser : {
-        extended: true,
-        limit: '5mb'
-    },
     ArrowHelper : "/helpers/"
 };
