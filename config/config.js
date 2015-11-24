@@ -10,7 +10,7 @@ module.exports = {
     },
     langPath : "/lang",
     language: 'en_US',
-    long_stack : true,
+    long_stack : false, //only use for development. Carefully: this will slow system.
     port: process.env.PORT || 8000,
     ArrowHelper : "/helpers/"
 };
