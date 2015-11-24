@@ -76,6 +76,7 @@ class ArrowApplication {
         }
 
         installLog(this);
+        this.logger = logger;
         //Make redis cache
         let redisConfig = this._config.redis || {};
         let redisFunction = RedisCache(redisConfig);
