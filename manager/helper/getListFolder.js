@@ -18,10 +18,10 @@ module.exports = function getListFolder(componentSetting, fatherPath, applicatio
             componentPath[id].path.map(function (globByConfig) {
                 let miniPath = globByConfig(application._config);
                 let normalizePath;
-                if (miniPath[0] === "/") {
-                    normalizePath = path.normalize(application.arrFolder + "/" + miniPath);
+                if (miniPath[0] === path.sep) {
+                    normalizePath = path.normalize(application.arrFolder + path.sep + miniPath);
                 } else {
-                    normalizePath = path.normalize(fatherPath + "/" + miniPath)
+                    normalizePath = path.normalize(fatherPath + path.sep + miniPath)
                 }
                 folders[id].push(normalizePath);
             })
