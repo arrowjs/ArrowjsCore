@@ -50,8 +50,8 @@ class ArrowApplication {
 
         //Move all functions of express to ArrowApplication
         //So we can call ArrowApplication.listen(port)
-        _.assign(this,app);
-        this.expressApp =  function(req, res, next) {
+        _.assign(this, app);
+        this.expressApp = function (req, res, next) {
             this.handle(req, res, next);
         }.bind(this);
 
@@ -218,7 +218,7 @@ class ArrowApplication {
         let self = this;
 
         self.arrowSettings = setting;
-
+        let stackBegin ;
         return Promise.resolve()
             .then(function () {
                 let resolve = Promise.resolve();
@@ -252,9 +252,39 @@ class ArrowApplication {
                 return circuit_breaker(self)
             })
             .then(function () {
+                if(setting.order) {
+                    stackBegin = self._router.stack.length;
+                }
                 return loadModel_Route_Render(self, setting);
             })
             .then(function () {
+                if(setting.order){
+                    let coreRoute = self._router.stack.slice(0,stackBegin);
+                    let newRoute = self._router.stack.slice(stackBegin);
+                    newRoute = newRoute.sort(function (a,b) {
+                        if(a.handle.order) {
+                            if (b.handle.order) {
+                                if (a.handle.order > b.handle.order) {
+                                    return 1
+                                } else if (a.handle.order < b.handle.order) {
+                                    return -1
+                                } else {
+                                    return 0
+                                }
+                            } else {
+                                return 0
+                            }
+                        } else {
+                            if (b.handle.order) {
+                                return 1
+                            } else {
+                                return 0
+                            }
+                        }
+                    });
+                    coreRoute = coreRoute.concat(newRoute);
+                    self._router.stack = coreRoute
+                }
                 return handleError(self)
             })
             .then(function () {
@@ -300,7 +330,6 @@ class ArrowApplication {
  * @param userSetting
  */
 function loadModel_Route_Render(arrow, userSetting) {
-
     let defaultDatabase = require('./database').db();
 
     if (arrow.models && Object.keys(arrow.models).length > 0) {
@@ -383,8 +412,9 @@ function handleComponentRouteSetting(arrow, componentRouteSetting, defaultRouteC
     let viewInfo = arrow[key][componentKey].views;
     //Handle Route Path;
     let route = express.Router();
-    Object.keys(componentRouteSetting).map(function (path_name) {
+    route.componentName = componentName;
 
+    Object.keys(componentRouteSetting).map(function (path_name) {
         //Check path_name
         let routePath = path_name[0] === '/' ? path_name : "/" + componentName + "/" + path_name;
 
@@ -461,6 +491,14 @@ function handleComponentRouteSetting(arrow, componentRouteSetting, defaultRouteC
                 return route.route(routePath)
                     [method](arrayHandler);
             } else if (route[method] && ['route', 'use'].indexOf(method) === -1) {
+                if(componentRouteSetting[path_name][method].order) {
+                    let newRoute = express.Router();
+                    newRoute.componentName = componentName;
+                    newRoute.order = componentRouteSetting[path_name][method].order;
+                    newRoute.route(routePath)
+                        [method](arrayHandler);
+                    arrow.use(prefix,newRoute)
+                }
                 return route.route(routePath)
                     [method](arrayHandler)
             }
@@ -526,9 +564,9 @@ function makeRender(req, res, application, componentView, componentName, compone
 
         // default callback to respond
         done = done || function (err, str) {
-                if (err) return req.next(err);
-                res.send(str);
-            };
+            if (err) return req.next(err);
+            res.send(str);
+        };
 
         if (application._config.viewExtension && view.indexOf(application._config.viewExtension) === -1 && view.indexOf(".") === -1) {
             view += "." + application._config.viewExtension;
@@ -831,8 +869,8 @@ function loadSetting(des, source) {
 
 function addConfig(obj) {
     let config = this._config;
-    if(_.isObject(obj)) {
-        _.assign(config,obj);
+    if (_.isObject(obj)) {
+        _.assign(config, obj);
     }
 }
 
@@ -845,8 +883,8 @@ function addConfigFile(filename) {
 
         app.updateConfig(obj);
     });
-    fs.watch(configFile, function (event,filename) {
-        if(event === "change") {
+    fs.watch(configFile, function (event, filename) {
+        if (event === "change") {
             fs.readFile(configFile, 'utf8', function (err, data) {
                 if (err) throw err;
                 let obj = JSON.parse(data);
