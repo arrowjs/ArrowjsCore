@@ -252,13 +252,13 @@ class ArrowApplication {
                 return circuit_breaker(self)
             })
             .then(function () {
-                if(setting.order) {
+                if(setting && setting.order) {
                     stackBegin = self._router.stack.length;
                 }
                 return loadModel_Route_Render(self, setting);
             })
             .then(function () {
-                if(setting.order){
+                if(setting && setting.order){
                     let coreRoute = self._router.stack.slice(0,stackBegin);
                     let newRoute = self._router.stack.slice(stackBegin);
                     newRoute = newRoute.sort(function (a,b) {
