@@ -223,7 +223,7 @@ function pathWithConfig(front, back) {
                 }
             });
 
-            stringPath =  path.normalize(frontArray.join('/') + back)
+            stringPath =  path.normalize(frontArray.join(path.sep) + back)
         }
         return stringPath.replace(/\$component/g,name);
 
