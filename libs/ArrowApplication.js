@@ -50,8 +50,8 @@ class ArrowApplication {
 
         //Move all functions of express to ArrowApplication
         //So we can call ArrowApplication.listen(port)
-        _.assign(this, app);
-        this.expressApp = function (req, res, next) {
+        _.assign(this,app);
+        this.expressApp =  function(req, res, next) {
             this.handle(req, res, next);
         }.bind(this);
 
@@ -144,7 +144,24 @@ class ArrowApplication {
         let applicationView = ViewEngine(this.arrFolder, viewEngineSetting, this);
         this.applicationENV = applicationView;
 
-        this.render = this.applicationENV.render.bind(applicationView);
+        this.render =  function (view, options, callback) {
+            let application = this
+            var done = callback;
+
+            var opts = options || {};
+
+            if (typeof options === "function") {
+                done = options;
+                opts = {};
+            }
+            if (application._config.viewExtension && view.indexOf(application._config.viewExtension) === -1 && view.indexOf(".") === -1) {
+                view += "." + application._config.viewExtension;
+            }
+            application.applicationENV.loaders[0].pathsToNames = {};
+            application.applicationENV.loaders[0].cache = {};
+            application.applicationENV.loaders[0].searchPaths = [path.dirname(view) + path.sep];
+            return application.applicationENV.render(view, opts, done);
+        }.bind(this);
 
         this.renderString = applicationView.renderString.bind(applicationView);
 
@@ -777,7 +794,6 @@ function handleError(app) {
             res.send(error)
         }
     });
-
     if (app.getConfig("error")) {
         Object.keys(app.getConfig("error")).map(function (link) {
             let errorConfig = app.getConfig("error");
@@ -822,6 +838,10 @@ function handleError(app) {
 
         })
     }
+    app.use("*",function (req, res) {
+        res.redirect('/404')
+    });
+
     return app
 }
 
