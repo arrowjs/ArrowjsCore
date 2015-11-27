@@ -50,8 +50,8 @@ class ArrowApplication {
 
         //Move all functions of express to ArrowApplication
         //So we can call ArrowApplication.listen(port)
-        _.assign(this,app);
-        this.expressApp =  function(req, res, next) {
+        _.assign(this, app);
+        this.expressApp = function (req, res, next) {
             this.handle(req, res, next);
         }.bind(this);
 
@@ -144,8 +144,8 @@ class ArrowApplication {
         let applicationView = ViewEngine(this.arrFolder, viewEngineSetting, this);
         this.applicationENV = applicationView;
 
-        this.render =  function (view, options, callback) {
-            let application = this
+        this.render = function (view, options, callback) {
+            let application = this;
             var done = callback;
 
             var opts = options || {};
@@ -154,13 +154,29 @@ class ArrowApplication {
                 done = options;
                 opts = {};
             }
+
             if (application._config.viewExtension && view.indexOf(application._config.viewExtension) === -1 && view.indexOf(".") === -1) {
                 view += "." + application._config.viewExtension;
             }
+
+            let arrayPart = view.split(path.sep);
+            arrayPart = arrayPart.map(function (key) {
+                if (key[0] === ":") {
+                    key = key.replace(":", "");
+                    return application.getConfig(key);
+                } else {
+                    return key
+                }
+            });
+
+            let newLink = arrayPart.join(path.sep);
+
+            newLink = path.normalize(application.arrFolder + newLink);
+
             application.applicationENV.loaders[0].pathsToNames = {};
             application.applicationENV.loaders[0].cache = {};
-            application.applicationENV.loaders[0].searchPaths = [path.dirname(view) + path.sep];
-            return application.applicationENV.render(view, opts, done);
+            application.applicationENV.loaders[0].searchPaths = [path.dirname(newLink) + path.sep];
+            return application.applicationENV.render(newLink, opts, done);
         }.bind(this);
 
         this.renderString = applicationView.renderString.bind(applicationView);
@@ -227,6 +243,7 @@ class ArrowApplication {
             self.plugins.push(plugin.bind(self));
         }
     }
+
     /**
      * Kick start express application and listen at default port
      * @param setting - passport: boolean, role: boolean
@@ -235,7 +252,7 @@ class ArrowApplication {
         let self = this;
 
         self.arrowSettings = setting;
-        let stackBegin ;
+        let stackBegin;
         return Promise.resolve()
             .then(function () {
                 let resolve = Promise.resolve();
@@ -269,17 +286,17 @@ class ArrowApplication {
                 return circuit_breaker(self)
             })
             .then(function () {
-                if(setting && setting.order) {
+                if (setting && setting.order) {
                     stackBegin = self._router.stack.length;
                 }
                 return loadModel_Route_Render(self, setting);
             })
             .then(function () {
-                if(setting && setting.order){
-                    let coreRoute = self._router.stack.slice(0,stackBegin);
+                if (setting && setting.order) {
+                    let coreRoute = self._router.stack.slice(0, stackBegin);
                     let newRoute = self._router.stack.slice(stackBegin);
-                    newRoute = newRoute.sort(function (a,b) {
-                        if(a.handle.order) {
+                    newRoute = newRoute.sort(function (a, b) {
+                        if (a.handle.order) {
                             if (b.handle.order) {
                                 if (a.handle.order > b.handle.order) {
                                     return 1
@@ -508,13 +525,13 @@ function handleComponentRouteSetting(arrow, componentRouteSetting, defaultRouteC
                 return route.route(routePath)
                     [method](arrayHandler);
             } else if (route[method] && ['route', 'use'].indexOf(method) === -1) {
-                if(componentRouteSetting[path_name][method].order) {
+                if (componentRouteSetting[path_name][method].order) {
                     let newRoute = express.Router();
                     newRoute.componentName = componentName;
                     newRoute.order = componentRouteSetting[path_name][method].order;
                     newRoute.route(routePath)
                         [method](arrayHandler);
-                    arrow.use(prefix,newRoute)
+                    arrow.use(prefix, newRoute)
                 }
                 return route.route(routePath)
                     [method](arrayHandler)
@@ -800,22 +817,8 @@ function handleError(app) {
             let errorConfig = app.getConfig("error");
             if (errorConfig[link].render) {
                 if (_.isString(errorConfig[link].render)) {
-                    let newLink = "";
-                    let arrayPart = [];
-                    if (_.isString(errorConfig[link].render)) {
-                        arrayPart = errorConfig[link].render.split(path.sep);
-                        arrayPart = arrayPart.map(function (key) {
-                            if (key[0] === ":") {
-                                key = key.replace(":", "");
-                                return app.getConfig(key);
-                            } else {
-                                return key
-                            }
-                        })
-                    }
-                    newLink = arrayPart.join(path.sep);
                     app.get(path.normalize(path.sep + link + `(.html)?`), function (req, res) {
-                        app.render(path.normalize(app.arrFolder + newLink), function (err, html) {
+                        app.render(errorConfig[link].render, function (err, html) {
                             if (err) {
                                 res.send(err.toString())
                             } else {
@@ -844,15 +847,15 @@ function handleError(app) {
     if (app.getConfig("error")) {
         Object.keys(app.getConfig("error")).map(function (link) {
             let errorConfig = app.getConfig("error");
-            if(errorConfig[link] && errorConfig[link].prefix) {
-                app.use(errorConfig[link].prefix, function (req,res) {
+            if (errorConfig[link] && errorConfig[link].prefix) {
+                app.use(errorConfig[link].prefix, function (req, res) {
                     res.redirect(path.normalize(path.sep + link))
                 })
             }
         })
     }
 
-    app.use("*",function (req, res) {
+    app.use("*", function (req, res) {
         res.redirect('/404')
     });
 
