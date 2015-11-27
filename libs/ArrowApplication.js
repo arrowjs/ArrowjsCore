@@ -787,8 +787,9 @@ function handleError(app) {
             app.render(link, {error: error}, function (err, html) {
                 if (err) {
                     res.send(err)
+                } else {
+                    res.send(html)
                 }
-                res.send(html)
             });
         } else {
             res.send(error)
@@ -813,7 +814,7 @@ function handleError(app) {
                         })
                     }
                     newLink = arrayPart.join(path.sep);
-                    app.get(path.normalize(path.sep + link + `(.${app.getConfig('viewExtension')})?`), function (req, res) {
+                    app.get(path.normalize(path.sep + link + `(.html)?`), function (req, res) {
                         app.render(newLink, function (err, html) {
                             if (err) {
                                 res.send(err)
