@@ -840,6 +840,18 @@ function handleError(app) {
 
         })
     }
+
+    if (app.getConfig("error")) {
+        Object.keys(app.getConfig("error")).map(function (link) {
+            let errorConfig = app.getConfig("error");
+            if(errorConfig[link] && errorConfig[link].prefix) {
+                app.use(errorConfig[link].prefix, function (req,res) {
+                    res.redirect(path.normalize(path.sep + link))
+                })
+            }
+        })
+    }
+
     app.use("*",function (req, res) {
         res.redirect('/404')
     });
