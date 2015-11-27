@@ -817,8 +817,9 @@ function handleError(app) {
                         app.render(newLink, function (err, html) {
                             if (err) {
                                 res.send(err)
+                            } else {
+                                res.send(html)
                             }
-                            res.send(html)
                         });
                     })
                 } else if (_.isObject(errorConfig[link].render)) {
