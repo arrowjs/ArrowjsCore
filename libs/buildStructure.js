@@ -1,16 +1,23 @@
 "use strict";
 
 const _ = require("lodash"),
-    path = require('path'),
-    logger = require('./logger');
+    path = require('path');
 let globalPattern = {};
 
 module.exports = function (struc) {
-    let arrStruc = {};
-    Object.keys(struc).map(function (key) {
-        arrStruc[key] = parseConfig_Structure(struc[key], key,1);
-    });
-    return arrStruc
+    if (_.isObject(struc)){
+        let arrStruc = {};
+        Object.keys(struc).map(function (key) {
+            let data = parseConfig_Structure(struc[key], key,1);
+            if(data) {
+                arrStruc[key] = data;
+            }
+        });
+        return arrStruc
+    } else {
+        throw new Error("config/structure.js is not an object")
+    }
+
 };
 /**
  * Parse key-value in /config/structure.js
@@ -83,7 +90,11 @@ function parseConfig_Structure(obj, key,level) {
             return null;
         }
     });
-    return newObj
+    if (_.isEmpty(newObj.path)) {
+        return null
+    } else {
+        return newObj
+    }
 }
 function handlePath(pathInfo, attribute,level) {
     if (pathInfo) {
@@ -110,7 +121,7 @@ function handlePath(pathInfo, attribute,level) {
         switch (level) {
             case 1:
                 if(name) {
-                    logger.warn('Carefully : Cant set "name" attribute at level 1 in structure.js');
+                    throw new Error('Carefully : Cant set "name" attribute at level 1 in structure.js');
                 }
                 name = "";
                 break;
