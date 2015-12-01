@@ -26,16 +26,22 @@ const fs = require('fs'),
     fsExtra = require('fs-extra'),
     loadingLanguage = require("./i18n").loadLanguage;
 
+let arrowErrorLink = {};
+
 /**
- * Singleton object. It is heart of Arrowjs.io web app. it wraps Express and adds following functions:
+ * ArrowApplication is a singleton object. It is heart of Arrowjs.io web app. it wraps Express and adds following functions:
  * support Redis, multi-languages, passport, check permission and socket.io / websocket
  */
 
-let arrowErrorLink = {};
 class ArrowApplication {
     /**
-     * Constructor
-     * @param setting
+     *
+     * @param {object} setting - {passport: bool ,role : bool, order :bool}
+     * <ul>
+     *     <li>passport: true, turn on authentication using Passport module</li>
+     *     <li>role: true, turn on permission checking, RBAC</li>
+     *     <li>order: true, order router priority rule.</li>
+     * </ul>
      */
     constructor(setting) {
         //if NODE_ENV does not exist, use development by default
@@ -210,7 +216,7 @@ class ArrowApplication {
      * When user requests an URL, execute this function before server checks in session if user has authenticates
      * If web app does not require authentication, beforeAuthenticate and afterAuthenticate are same. <br>
      * beforeAuthenticate > authenticate > afterAuthenticate
-     * @param func
+     * @param {function} func - function that executes before authentication
      */
     beforeAuthenticate(func) {
         let self = this;
@@ -222,7 +228,7 @@ class ArrowApplication {
     /**
      * When user requests an URL, execute this function after server checks in session if user has authenticates
      * This function always runs regardless user has authenticated or not
-     * @param func
+     * @param {function} func - function that executes after authentication
      */
     afterAuthenticate(func) {
         let self = this;
@@ -231,12 +237,22 @@ class ArrowApplication {
         }
     }
 
+    /**
+     * Turn object to become property of ArrowApplication
+     * @param {object} obj - object parameter
+     */
+
     addGlobal(obj) {
         if (_.isObject(obj)) {
             _.assign(Arrow, obj);
         }
     }
 
+    /**
+     * Add plugin function to ArrowApplication.plugins, bind this plugin function to ArrowApplication object
+     * @param {function} plugin - plugin function
+     * <p><a target="_blank" href="http://www.smashingmagazine.com/2014/01/understanding-javascript-function-prototype-bind/">See more about bind</a></p>
+     */
     addPlugin(plugin) {
         let self = this;
         if (_.isFunction(plugin)) {
@@ -246,7 +262,7 @@ class ArrowApplication {
 
     /**
      * Kick start express application and listen at default port
-     * @param setting - passport: boolean, role: boolean
+     * @param {object} setting - {passport: boolean, role: boolean}
      */
     start(setting) {
         let self = this;
@@ -283,13 +299,16 @@ class ArrowApplication {
                 return configureExpressApp(self, self.getConfig(), setting)
             })
             .then(function () {
+                return associateModels(self);
+            })
+            .then(function () {
                 return circuit_breaker(self)
             })
             .then(function () {
                 if (setting && setting.order) {
                     stackBegin = self._router.stack.length;
                 }
-                return loadModel_Route_Render(self, setting);
+                return loadRoute_Render(self, setting);
             })
             .then(function () {
                 if (setting && setting.order) {
@@ -354,16 +373,12 @@ class ArrowApplication {
 }
 
 /**
- * Supporting functions
+ * Associate all models that are loaded into ArrowApplication.models. Associate logic defined in /config/database.js
+ * @param {ArrowApplication} arrow
+ * @return {ArrowApplication} arrow
  */
 
-
-/**
- *
- * @param arrow
- * @param userSetting
- */
-function loadModel_Route_Render(arrow, userSetting) {
+function associateModels(arrow) {
     let defaultDatabase = require('./database').db();
 
     if (arrow.models && Object.keys(arrow.models).length > 0) {
@@ -372,24 +387,38 @@ function loadModel_Route_Render(arrow, userSetting) {
                 fulfill("No models")
             })
         };
+
+        //Assign raw query function of Sequelize to arrow.models object
+        //See Sequelize raw query http://docs.sequelizejs.com/en/latest/docs/raw-queries/
         arrow.models.rawQuery = defaultDatabase.query ? defaultDatabase.query.bind(defaultDatabase) : defaultQueryResolve;
 
-        //New way to associate db:
-
+        //Load model associate rules defined in /config/database.js
         let databaseFunction = require(arrow.arrFolder + "config/database");
 
         if (databaseFunction.associate) {
             let resolve = Promise.resolve();
             resolve.then(function () {
+                //Execute models associate logic in /config/database.js
                 return databaseFunction.associate(arrow.models)
             }).then(function () {
-                defaultDatabase.sync();
+                defaultDatabase.sync();  //Sequelize.sync: sync all defined models to the DB.
             })
         }
     }
+    return arrow
+}
+
+
+/**
+ * load feature's routes and render
+ * @param {ArrowApplication } arrow
+ * @param {object} userSetting
+ */
+function loadRoute_Render(arrow, userSetting) {
 
     arrow._componentList.map(function (key) {
         Object.keys(arrow[key]).map(function (componentKey) {
+            /** display loaded feature in console log when booting Arrowjs application */
             if (cluster.isMaster) {
                 logger.info("Arrow loaded: '" + key + "' - '" + componentKey + "'");
             }
@@ -408,8 +437,8 @@ function loadModel_Route_Render(arrow, userSetting) {
                 });
             }
         })
-    })
-    return arrow
+    });
+    return arrow;
 }
 
 /**
