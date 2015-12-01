@@ -1,4 +1,5 @@
 ArrowJS for Node.js
+[![Build Status](https://travis-ci.org/arrowjs/ArrowjsCore.svg)](https://travis-ci.org/arrowjs/ArrowjsCore)
 ==================
 
 ArrowJS is framework based on Express.js. It helps you build your web application easier.
