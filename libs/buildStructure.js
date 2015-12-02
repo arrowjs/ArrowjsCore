@@ -60,18 +60,20 @@ function parseConfig_Structure(obj, key,level) {
                 }
 
                 if (['controller', "view", "action", "model", "route"].indexOf(key) > -1) {
-                    if (_.isArray(data[key])) {
-                        data[key].map(function (data_key) {
-                            if (!data_key.path.singleton) {
-                                data_key.path.singleton = true;
+                    if (!_.isEmpty(data[key].path)) {
+                        if (_.isArray(data[key])) {
+                            data[key].map(function (data_key) {
+                                if (!data_key.path.singleton) {
+                                    data_key.path.singleton = true;
+                                }
+                            });
+                        } else {
+                            if (!data[key].path.singleton) {
+                                data[key].path.singleton = true;
                             }
-                        });
-                    } else {
-                        if (!data[key].path.singleton) {
-                            data[key].path.singleton = true;
                         }
+                        newObj.path[pathKey][key] = parseConfig_Structure(data[key], key ,2);
                     }
-                    newObj.path[pathKey][key] = parseConfig_Structure(data[key], key ,2);
                 } else {
                     if (key !== "extend" && key !== "path" && typeof data.key === 'object') {
                         newObj.path[pathKey][key] = data[key]
@@ -121,9 +123,8 @@ function handlePath(pathInfo, attribute,level) {
         switch (level) {
             case 1:
                 if(name) {
-                    throw new Error('Carefully : Cant set "name" attribute at level 1 in structure.js');
+                    name = "";
                 }
-                name = "";
                 break;
             case 2:
                 break;
@@ -236,7 +237,9 @@ function pathWithConfig(front, back) {
 
             stringPath =  path.normalize(frontArray.join(path.sep) + back)
         }
-        return stringPath.replace(/\$component/g,name);
+        return path.normalize(stringPath.replace(/\$component/g,name || ""));
 
     }
 }
+
+module.exports.pathWithConfig = pathWithConfig;
