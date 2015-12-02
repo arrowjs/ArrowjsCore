@@ -426,7 +426,7 @@ module.exports.getRawConfig = function getRawConfig() {
     }
 
     //setup strategy
-    this.createDirectory('config/strategies');
+    createDirectory('config/strategies');
     try {
         fs.accessSync(__base + 'config/strategies/local.js');
     } catch (err) {
@@ -478,8 +478,11 @@ module.exports.getStructure = function getStructure() {
  * @param {string} path
  * return {void}
  */
-exports.createDirectory = function (path) {
+
+function createDirectory(path) {
     fs.mkdir(__base + path, function (err) {
-        if (err == null) console.log('Create directory ' + path);
+        //if (err == null) console.log('Create directory ' + path);
     });
 };
+
+exports.createDirectory = createDirectory

@@ -15,7 +15,6 @@ module.exports = function (application) {
     db.authenticate().catch(function (err) {
         logger.error("Database connect error : Check your database config in file config/env/" + process.env.NODE_ENV + ".js");
         logger.error("Database connect error : " + err.message);
-        process.exit();
     });
     return db;
 };

@@ -4,7 +4,7 @@
   "description": "ArrowJS framework for Node.js",
   "main": "index.js",
   "scripts": {
-    "test": "./node_modules/.bin/mocha -u bdd -R spec -t 500 --recursive",
+    "test": "./node_modules/.bin/istanbul cover ./node_modules/.bin/_mocha ",
     "watch": "./node_modules/.bin/mocha -u bdd -R spec -t 500 -w"
   },
   "repository": {
@@ -45,11 +45,13 @@
     "winston": "^2.1.0"
   },
   "devDependencies": {
-    "mockery": "^1.4.0",
     "chai": "^3.4.0",
     "grunt": "^0.4.5",
+    "istanbul": "^0.4.1",
     "mocha": "^2.3.3",
+    "mockery": "^1.4.0",
     "sinon": "^1.17.2",
-    "sinon-chai": "^2.8.0"
+    "sinon-chai": "^2.8.0",
+    "supertest": "^1.1.0"
   }
 }
