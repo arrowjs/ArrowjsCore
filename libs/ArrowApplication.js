@@ -344,6 +344,7 @@ class ArrowApplication {
                 return http.createServer(self.expressApp);
             })
             .then(function (server) {
+                self.httpServer = server;
                 if (self.getConfig('websocket_enable') && self.getConfig('websocket_folder')) {
                     let io = socket_io(server);
                     if (self.getConfig('redis.type') !== 'fakeredis') {
@@ -369,6 +370,12 @@ class ArrowApplication {
                 logger.error(err)
             });
 
+    }
+    close(cb) {
+        var self = this;
+        if(self.httpServer) {
+            self.httpServer.close(cb)
+        }
     }
 }
 

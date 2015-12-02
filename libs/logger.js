@@ -23,7 +23,7 @@ module.exports.init = function (app) {
     Object.keys(config.winstonLog).map(function (key) {
         if(_.isArray(config.winstonLog[key])) {
             config.winstonLog[key].map(function (k) {
-                k.dirname = logDir
+                k.dirname = path.normalize(app.arrFolder + logDir)
             })
         }
     });
