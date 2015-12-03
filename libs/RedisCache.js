@@ -21,6 +21,8 @@ module.exports = function (config) {
         return fakeRedis.createClient;
     }
     let client = redis.createClient(config);
+
+    /* istanbul ignore next */
     client.on('error', function (err) {
         logger.error(err.message);
     });

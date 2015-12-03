@@ -13,7 +13,7 @@ module.exports = function useSession() {
             host: app.getConfig("redis.host"),
             port: app.getConfig("redis.port"),
             client: app.redisClient,
-            prefix: sessionConfig.redis_prefix || 'sess:'
+            prefix: sessionConfig.redis_prefix
         })
     }
 

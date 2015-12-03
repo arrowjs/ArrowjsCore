@@ -19,7 +19,7 @@ module.exports = function viewAttribute(setting, fatherPath, component, applicat
                 })
             }
         })
-    } else if (functions.type === "multi") {
+    } else {
         component.views = {};
         Object.keys(functions).map(function (key) {
             if (key !== "type") {

@@ -31,7 +31,7 @@ module.exports = function actionAttribute(setting, fatherPath, component, applic
             }
         })
         _.assign(application.actions[component.name],component.actions);
-    } else if (files.type === "multi") {
+    } else  {
         Object.keys(files).map(function (key) {
             if (key !== "type") {
                 component.actions[key] = {};

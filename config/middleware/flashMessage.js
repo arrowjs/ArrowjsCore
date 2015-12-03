@@ -14,9 +14,7 @@ module.exports = function () {
 
     app.use(function (req, res, next) {
 
-        if (!req.session.flash) {
-            req.session.flash = {};
-        }
+        req.session.flash = req.session.flash || {};
 
         res.locals.messages = req.session.flash ;
 

@@ -375,6 +375,8 @@ class ArrowApplication {
         var self = this;
         if(self.httpServer) {
             self.httpServer.close(cb)
+        } else {
+            cb()
         }
     }
 }
