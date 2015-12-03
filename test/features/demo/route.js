@@ -5,12 +5,24 @@ module.exports = function (component,application) {
         "/": {
             get : {
                 handler: component.controllers.index,
-                name : "hello"
+                name : "hello",
+                order : 1
+            }
+        },
+        "/enableWebsocketCluster": {
+            get : {
+                handler: component.controllers.enableWebsocketCluster
+            }
+        },
+        "/linkto": {
+            get : {
+                handler: component.controllers.linkto
             }
         },
         "/applicationRender": {
             get : {
-                handler: component.controllers.applicationRender
+                handler: component.controllers.applicationRender,
+                order : 2
             }
         },
         "/logout": {

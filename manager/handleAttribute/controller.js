@@ -27,7 +27,7 @@ module.exports = function controllerAttribute(setting, fatherPath, component, ap
                 })
             }
         })
-    } else if (files.type === "multi") {
+    } else {
         Object.keys(files).map(function (key) {
             if (key !== "type") {
                 component.controllers[key] = {};

@@ -30,7 +30,7 @@ module.exports = function routeAttribute(setting, fatherPath, component, applica
                 })
             }
         })
-    } else if (files.type === "multi") {
+    } else  {
         Object.keys(files).map(function (key) {
             component.routes[key] = {};
             if (key !== "type") {

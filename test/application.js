@@ -19,7 +19,6 @@ describe("Arrow Application", function () {
             warnOnUnregistered: false
         });
         process.env.NODE_ENV = "test";
-        mockery.registerMock('arrowjs', require("../index.js"));
         mockery.registerMock(__dirname + '/config/error', {
             logFolder: 'log',
             winstonLog: {
@@ -51,6 +50,7 @@ describe("Arrow Application", function () {
                 }
             }
         });
+        mockery.registerMock('arrowjs', require("../index.js"));
     });
 
     after(function () {
@@ -169,36 +169,55 @@ describe("Arrow Application", function () {
             })
         });
     });
+
     describe("Test render function", function () {
         var application;
         before(function (done) {
             application = new ArrowJS;
             application.start().then(function () {
-                return done()
+                done()
             });
         });
 
         after(function (done) {
-            application.close(done);
             fsExtra.removeSync(__dirname + "/log/");
             fsExtra.removeSync(__dirname + "/config/");
+            application.close(done);
         });
 
         it('Can render view with Req.render, arrow custom_filter, req.flash', function (done) {
             request.get("/")
                 .expect(200)
-                .end(function (err,res) {
+                .end(function (err, res) {
                     if (err) return done(err);
                     done();
                 })
 
         });
 
+        it('Can ', function (done) {
+            request.get("/linkto")
+                .expect(200)
+                .end(function (err, res) {
+                    if (err) return done(err);
+                    done();
+                })
+
+        });
+
+        it('Can enable websocket cluster setting', function (done) {
+            request.get("/enableWebsocketCluster")
+                .expect(200)
+                .end(function (err, res) {
+                    if (err) return done(err);
+                    done();
+                })
+        });
+
         it("Can render view with application render", function (done) {
             request.get("/applicationRender")
                 .expect(200)
-                .end(function (err,res) {
-                    if (err) return done(err);
+                .end(function (err, res) {
                     done();
                 })
         })
@@ -253,7 +272,7 @@ describe("Arrow Application", function () {
         var application;
         before(function (done) {
             application = new ArrowJS;
-            application.start({role: true}).then(function () {
+            application.start({order: true}).then(function () {
                 return done()
             });
         });
@@ -268,7 +287,6 @@ describe("Arrow Application", function () {
             });
         });
     });
-
 
     describe("enable socket server", function () {
         var application;
@@ -293,22 +311,22 @@ describe("Arrow Application", function () {
         });
     });
 
-
-    describe("connect database", function () {
+    describe("Can not connect database with wrong setting", function () {
         var application;
         before(function (done) {
-            application = new ArrowJS;
-            application.setConfig("db", {
+            mockery.registerMock(__dirname + '/config/structure', {
                 db: {
                     host: 'localhost',
                     port: '5432',
-                    database: 'arrowjs',
-                    username: 'postgres',
-                    password: '',
+                    database: 'arrowjs', //db_name
+                    username: 'postgres', //db_username
+                    password: '1', //db_password
                     dialect: 'postgres',
                     logging: false
                 }
             });
+            application = new ArrowJS;
+
             application.start().then(function () {
                 return done()
             });
@@ -318,11 +336,134 @@ describe("Arrow Application", function () {
             fsExtra.removeSync(__dirname + "/log/");
             fsExtra.removeSync(__dirname + "/config/");
         });
-        it("Connect to database", function () {
-
+        it("Can connect to database", function (done) {
+            done()
         });
     });
+
     describe("test with another structure", function () {
+        var application;
+        before(function (done) {
+            mockery.registerMock(__dirname + '/config/structure', {
+                features: {
+                    "path": {
+                        "folder": "/features",
+                        "file": "feature.js"
+                    },
+                    "extend": {
+                        system: true,
+                        active: function () {
+                            
+                        }
+                    },
+                    "model": [
+                        {
+                            "path": {
+                                "folder": "model/backend",
+                                "file": "*.js",
+                                "name": "backend"
+                            }
+                        },
+                        {
+                            "path": {
+                                "folder": "model/frontend",
+                                "file": "*.js",
+                                "name": "frontend"
+                            }
+                        }
+                    ],
+                    "view": [
+                        {
+                            "path": {
+                                "folder": "view/backend",
+                                "name": "backend"
+                            }
+                        },
+                        {
+                            "path": {
+                                "folder": "view/frontend",
+                                "name": "frontend"
+                            }
+                        }
+                    ],
+                    "action": [
+                        {
+                            "path": {
+                                "folder": "action/backend",
+                                "file": "action.js",
+                                "name": "backend"
+                            }
+                        },
+                        {
+                            "path": {
+                                "folder": "action/frontend",
+                                "file": "action.js",
+                                "name": "frontend"
+                            }
+                        }
+                    ],
+                    "controller": [
+                        {
+                            "path": {
+                                "folder": "controller/backend",
+                                "file": "controller.js",
+                                "name": "backend"
+                            }
+                        },
+                        {
+                            "path": {
+                                "folder": "controller/frontend",
+                                "file": "controller.js",
+                                "name": "frontend"
+                            }
+                        }
+                    ],
+                    "route": [
+                        {
+                            path: {
+                                'name': 'backend',
+                                'folder': 'route/backend',
+                                'file': 'route.js',
+                                'prefix': '/admin'
+                            }
+                        },
+                        {
+                            path: {
+                                'name': 'frontend',
+                                'folder': 'route/frontend',
+                                'file': 'route.js'
+                            }
+                        }
+                    ]
+                }
+            });
+            application = new ArrowJS;
+            application.start().then(function () {
+                return done()
+            });
+
+        });
+        after(function (done) {
+            mockery.deregisterMock(__dirname + '/config/structure');
+            application.close(done);
+            fsExtra.removeSync(__dirname + "/log/");
+            fsExtra.removeSync(__dirname + "/config/");
+        });
+        it("Can loading multi route and controller", function (done) {
+            request.get("/admin")
+                .expect(200)
+                .end(function (err, res) {
+                    done()
+                });
+        });
+        it("A system manager can get view files", function (done) {
+            application.featuresManager.getViewFiles("demo");
+            application.featuresManager.getViewFiles("demo", "frontend");
+            done();
+        });
+    });
+
+    describe("test 2 with another structure", function () {
         var application;
         before(function (done) {
             mockery.registerMock(__dirname + '/config/structure', {
@@ -337,34 +478,8 @@ describe("Arrow Application", function () {
                     },
                     "model": {
                         "path": {
-                            "folder": "/models",
+                            "folder": "/model",
                             "file": "*.js"
-                        }
-                    },
-                    "view": {
-                        "path": {
-                            "folder": "view"
-                        }
-                    },
-                    "action": {
-                        "path": {
-                            "folder": "action",
-                            "file": "*.js"
-                        }
-                    },
-                    "controller": [{
-                        "path": {
-                            "folder": "controller",
-                            "file": "*.js"
-                        },
-                        "path": {
-                            "folder": "controller",
-                            "file": "*.js"
-                        }
-                    }],
-                    "route": {
-                        "path": {
-                            "file": "route.js"
                         }
                     }
                 }
@@ -376,32 +491,32 @@ describe("Arrow Application", function () {
 
         });
         after(function (done) {
+            mockery.deregisterMock(__dirname + '/config/structure');
             application.close(done);
             fsExtra.removeSync(__dirname + "/log/");
             fsExtra.removeSync(__dirname + "/config/");
         });
-        it("test with another structure", function () {
-
-        });
+        it("Can load folder from base folder", function () {
+            
+        })
     });
 
     describe("have multi static resource folder", function () {
         var application;
         before(function (done) {
             mockery.registerMock(__dirname + '/config/view', {
-                resource : {
-                    path : ['public','home'],
-                    option : {
+                resource: {
+                    path: ['public', 'home'],
+                    option: {
                         maxAge: 3600
                     }
                 },
-                viewExtension : "html",
+                viewExtension: "html",
                 pagination: {
                     number_item: 20
                 },
                 theme: "default",
-                nunjuckSettings : {
-                }
+                nunjuckSettings: {}
             });
             application = new ArrowJS;
             application.start().then(function () {
@@ -419,46 +534,27 @@ describe("Arrow Application", function () {
         });
     });
 
-    //describe("turn on redis", function () {
-    //    var application;
-    //    before(function (done) {
-    //        mockery.registerMock(__dirname + '/config/redis', {
-    //            redis: {
-    //                host: 'localhost',
-    //                port: '6379'
-    //            },
-    //            redis_prefix: 'arrowjs_',
-    //            redis_key : {
-    //                configs : "site_setting",
-    //                features : "all_features",
-    //                backend_menus : "backend_menus",
-    //                plugins : "all_plugins"
-    //            },
-    //            redis_event : {
-    //                update_config : "config_update",
-    //                update_feature : "feature_update"
-    //            }
-    //        });
-    //        application = new ArrowJS;
-    //        application.start().then(function () {
-    //            return done()
-    //        });
-    //
-    //    });
-    //    after(function (done) {
-    //        application.close(done);
-    //        fsExtra.removeSync(__dirname + "/log/");
-    //        fsExtra.removeSync(__dirname + "/config/");
-    //    });
-    //    it("turn on redis", function () {
-    //
-    //    });
-    //});
-
-    describe("structure.js no an object", function () {
+    describe("turn on redis", function () {
         var application;
         before(function (done) {
-            mockery.registerMock(__dirname + '/config/structure', function () {});
+            mockery.registerMock(__dirname + '/config/redis', {
+                redis: {
+                    host: 'localhost',
+                    port: '6379'
+                },
+                redis_prefix: 'arrowjs_',
+                redis_key: {
+                    configs: "site_setting",
+                    features: "all_features",
+                    backend_menus: "backend_menus",
+                    plugins: "all_plugins"
+                },
+                redis_event: {
+                    update_config: "config_update",
+                    update_feature: "feature_update"
+                }
+            });
+
             application = new ArrowJS;
             application.start().then(function () {
                 return done()
@@ -466,6 +562,28 @@ describe("Arrow Application", function () {
 
         });
         after(function (done) {
+            application.close(done);
+            fsExtra.removeSync(__dirname + "/log/");
+            fsExtra.removeSync(__dirname + "/config/");
+        });
+        it("turn on redis", function () {
+            expect("a").is.a.string;
+        });
+    });
+
+    describe("structure.js no an object", function () {
+        var application;
+        before(function (done) {
+            mockery.registerMock(__dirname + '/config/structure', function () {
+            });
+            application = new ArrowJS;
+            application.start().then(function () {
+                return done()
+            });
+
+        });
+        after(function (done) {
+            mockery.deregisterMock(__dirname + '/config/structure');
             application.close(done);
             fsExtra.removeSync(__dirname + "/log/");
             fsExtra.removeSync(__dirname + "/config/");
@@ -489,15 +607,120 @@ describe("Arrow Application", function () {
             fsExtra.removeSync(__dirname + "/log/");
             fsExtra.removeSync(__dirname + "/config/");
         });
-        it("Can call systemManager functions", function (done) {
-            application.featureManager.setCache().then(function () {
+        it("A system manager can setCache config", function (done) {
+            application.featuresManager.setCache().then(function () {
                 return done()
             })
         });
-        it("Can call systemManager functions", function (done) {
-            application.featureManager.getCache().then(function () {
+        it("A system manager can getCache config", function (done) {
+            application.featuresManager.getCache().then(function () {
                 return done()
             })
+        });
+
+        it("A system manager can reload config", function (done) {
+            application.featuresManager.reload().then(function () {
+                return done()
+            })
+        });
+
+        it("A system manager can get permissions", function (done) {
+            application.featuresManager.getPermissions("demo");
+            done();
+        });
+
+        it("A system manager can get attributes", function (done) {
+            application.featuresManager.getAttribute("testAttribute");
+            application.featuresManager.getAttribute("testAttribute2");
+            application.featuresManager.getAttribute();
+            done();
+        });
+
+        it("A system manager can get component", function (done) {
+            application.featuresManager.getComponent();
+            done();
+        });
+
+        it("A system manager can get view files", function (done) {
+            application.featuresManager.getViewFiles("demo");
+            done();
+        });
+
+        it("A config manager can update config", function (done) {
+            application.configManager.updateConfig({}).then(function () {
+                done();
+            });
         });
     });
+
+    describe("Application support functions", function () {
+        var application;
+        before(function (done) {
+            application = new ArrowJS;
+            application.beforeAuthenticate(function (req, res, next) {
+                next();
+            });
+            application.afterAuthenticate(function (req, res, next) {
+                next();
+            });
+            application.addGlobal({a: 1});
+            application.addPlugin(function () {
+                application.demoPlugin = 1;
+            });
+            application.start().then(function () {
+                return done()
+            });
+
+        });
+        after(function (done) {
+            application.close(done);
+            fsExtra.removeSync(__dirname + "/log/");
+            fsExtra.removeSync(__dirname + "/config/");
+        });
+
+        it("Can add global variable ", function () {
+            expect(Arrow.a).is.eql(1);
+        });
+
+        it("Can add plugin", function () {
+            expect(application.demoPlugin).is.eql(1)
+        });
+
+        it("Can add function beforeAuthenticate", function () {
+            expect(application.beforeAuth).to.have.length(1);
+        });
+
+        it("Can add function afterAuthenticate", function () {
+            expect(application.afterAuth).to.have.length(1);
+        });
+    });
+
+    describe("Arrowjs utils functions", function () {
+        var application;
+        before(function (done) {
+            application = new ArrowJS;
+            application.start().then(function () {
+                return done()
+            });
+
+        });
+        after(function (done) {
+            application.close(done);
+            fsExtra.removeSync(__dirname + "/log/");
+            fsExtra.removeSync(__dirname + "/config/");
+        });
+
+        it("Can add config with addConfig function", function () {
+            application.addConfig({test: 1});
+            expect(application.getConfig("test")).is.eql(1)
+        });
+
+        it("Can get setting by getDataByDotNotation", function () {
+            expect(application.utils.dotChain({a: {b: 1}}, "a.b")).is.eql(1);
+            expect(application.utils.dotChain({a: {b: 1}}, {})).is.eql(null);
+            expect(application.utils.dotChain({a: {b: 1}}, "a.c")).is.eql(null);
+            expect(application.utils.dotChain({a: {b: 1}}, "a")).is.eql({b: 1});
+        })
+    });
+
 });

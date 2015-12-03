@@ -65,11 +65,8 @@ class ConfigManager extends SystemManager {
      */
     updateConfig(setting) {
         let self = this;
-        if (setting) {
-            _.assign(this._app._config, setting);
-            return self.setCache().then(self.reload());
-        }
-        return Promise.resolve();
+        _.assign(this._app._config, setting);
+        return self.setCache().then(self.reload());
     }
 
 ;
@@ -81,8 +78,10 @@ class ConfigManager extends SystemManager {
                 if (data) {
                     let conf = JSON.parse(data);
                     _.assign(this._app._config, conf);
+                    return (this._app._config);
+                } else {
+                    return (this._app._config);
                 }
-                return (this._app._config);
             }.bind(this))
             .catch(function (err) {
                 log("Config Manager Class: ", err);

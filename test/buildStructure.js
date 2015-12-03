@@ -74,6 +74,7 @@ describe("Parse structure.js", function () {
                     }
                 }
             };
+            //TODO need check logic
             expect(buildStructure(testCase).widgets.path["0"]).to.have.ownProperty("controller");
             expect(buildStructure(testCase).widgets.path["0"]).not.to.have.ownProperty("view");
             expect(buildStructure(testCase).widgets.path["0"]).not.to.have.ownProperty("model");

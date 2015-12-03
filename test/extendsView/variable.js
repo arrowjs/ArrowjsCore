@@ -1,3 +1,6 @@
 module.exports = {
-    "theme_name": "ACME"
+    "theme_name": "ACME",
+    "demofunc": function () {
+        return "Test"
+    }
 };

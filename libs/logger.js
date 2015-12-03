@@ -15,17 +15,14 @@ module.exports.init = function (app) {
     let logDir = config.logFolder || ('log' + path.sep);
 
      // Or read from a configuration
-    if (!fs.existsSync(path.normalize(app.arrFolder + logDir))) {
-        // Create the directory if it does not exist
-        fs.mkdirSync(path.normalize(app.arrFolder + logDir));
-    }
+    !fs.existsSync(path.normalize(app.arrFolder + logDir)) && fs.mkdirSync(path.normalize(app.arrFolder + logDir));
 
     Object.keys(config.winstonLog).map(function (key) {
-        if(_.isArray(config.winstonLog[key])) {
+        _.isArray(config.winstonLog[key]) && (
             config.winstonLog[key].map(function (k) {
                 k.dirname = path.normalize(app.arrFolder + logDir)
             })
-        }
+        )
     });
     let log =  new ( winston.Logger )(config.winstonLog);
     _.assign(logger,log);
