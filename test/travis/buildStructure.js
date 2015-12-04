@@ -1,8 +1,8 @@
 "use strict";
 
 var expect = require("chai").expect;
-var buildStructure = require("../libs/buildStructure");
-var pathWithConfig = require("../libs/buildStructure").pathWithConfig;
+var buildStructure = require("../../libs/buildStructure");
+var pathWithConfig = require("../../libs/buildStructure").pathWithConfig;
 
 
 describe("Parse structure.js", function () {

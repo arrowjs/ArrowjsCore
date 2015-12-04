@@ -35,6 +35,7 @@ class SystemManager extends events.EventEmitter {
      */
     getCache() {
         let self = this;
+        /* istanbul ignore next */
         return this.pub.getAsync(self._app._config.redis_prefix + self._app._config.redis_key[self.name] || self.name)
             .then(function (data) {
                 if (data) {
@@ -54,7 +55,7 @@ class SystemManager extends events.EventEmitter {
      */
     setCache() {
         let self = this;
-
+        /* istanbul ignore next */
         if (self["_" + self.name]) {
             let data = getInfo(self["_" + self.name]);
             return this.pub.setAsync(self._app._config.redis_prefix + self._app._config.redis_key[self.name] || self.name, JSON.stringify(data));
@@ -187,13 +188,16 @@ class SystemManager extends events.EventEmitter {
         });
         //handle Database
         let defaultDatabase = {};
+        /* istanbul ignore next */
         let defaultQueryResolve = function () {
             return new Promise(function (fulfill, reject) {
                 fulfill("No models")
             })
         };
         Object.keys(components).map(function (key) {
+            /* istanbul ignore else */
             if (Object.keys(components[key].models).length > 0) {
+                /* istanbul ignore else */
                 if (_.isEmpty(defaultDatabase)) {
                     defaultDatabase = Database(_app);
                 }
@@ -283,10 +287,13 @@ class SystemManager extends events.EventEmitter {
     getViewFiles(componentName, name) {
         let self = this;
         let privateName = "_" + self.name;
+        /* istanbul ignore next */
         let extension = self._app._config.viewExtension || "html";
         let pathFolder = [];
         let result = [];
+        /* istanbul ignore else */
         if (componentName && self[privateName][componentName]) {
+            /* istanbul ignore if */
             if (name) {
                 if (self[privateName][componentName][name] && self[privateName][componentName][name].views) {
                     self[privateName][componentName][name].views.map(function (obj) {
@@ -295,17 +302,25 @@ class SystemManager extends events.EventEmitter {
                     })
                 }
             } else {
-                if (self[privateName][componentName].views) {
+                if (_.isArray(self[privateName][componentName].views)) {
                     self[privateName][componentName].views.map(function (obj) {
                         let miniPath = handleView(obj, self, componentName);
                         pathFolder.push(miniPath);
                     })
+                } else {
+                    Object.keys(self[privateName][componentName].views).map(function (key) {
+                        self[privateName][componentName].views[key].map(function (obj) {
+                            let miniPath = handleView(obj, self, componentName);
+                            pathFolder.push(miniPath);
+                        })
+                    });
                 }
             }
         }
-
+        /* istanbul ignore else */
         if (!_.isEmpty(pathFolder)) {
             pathFolder.map(function (link) {
+                /* istanbul ignore next */
                 __.getGlobbedFiles(link + "*." + extension).map(function (result_link) {
                     result.push(result_link)
                 })
@@ -335,6 +350,7 @@ class SystemManager extends events.EventEmitter {
 function handleView(obj, application, componentName) {
     let miniPath = obj.func(application._config, componentName);
     let normalizePath;
+    /* istanbul ignore if */
     if (miniPath[0] === path.sep) {
         normalizePath = path.normalize(obj.base + path.sep + miniPath);
     } else {
@@ -352,6 +368,7 @@ function handleView(obj, application, componentName) {
  */
 
 function makeRender(viewEngine, componentView, componentName, application) {
+    /* istanbul ignore next */
     return function (view, options, callback) {
 
         var done = callback;
@@ -385,13 +402,24 @@ function makeRender(viewEngine, componentView, componentName, application) {
  */
 
 function getInfo(obj) {
-    return JSON.parse(JSON.stringify(obj), function (key, value) {
+    /* istanbul ignore next */
+    var cache = [];
+    return JSON.parse(JSON.stringify(obj, function (key,value) {
+        if (typeof value === 'object' && value !== null) {
+            if (cache.indexOf(value) !== -1) {
+                return {};
+            }
+            cache.push(value);
+        }
+        return value;
+    }), function (key, value) {
         if (_.isEmpty(value) && !_.isNumber(value) && !_.isBoolean(value)) {
             return
         } else {
             return value
         }
     });
+    cache = null;
 }
 
 module.exports = SystemManager;

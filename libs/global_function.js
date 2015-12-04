@@ -49,7 +49,7 @@ exports.getAllVariable = function (env, viewSetting, app) {
             env.addGlobal(name, baseVariable[name]);
         }
     });
-
+    /* istanbul ignore else */
     if (typeof userVariable === 'object' && !_.isEmpty(userVariable)) {
         Object.keys(userVariable).map(function (name) {
             if (typeof userVariable[name] !== "function") {
@@ -422,7 +422,7 @@ module.exports.getRawConfig = function getRawConfig() {
         /* istanbul ignore else */
         if (err.code === 'ENOENT') {
             fsEx.copySync(path.resolve(__dirname, '..', 'config/env/development.js'), __base + 'config/env/' + env + '.js');
-            _.assign(conf, require(__base + 'config/env/' + env));
+            conf = _.merge(conf, require(__base + 'config/env/' + env));
         } else {
             throw err
         }

@@ -12,6 +12,7 @@ module.exports = logger;
 
 module.exports.init = function (app) {
     let config = app._config;
+    /* istanbul ignore next */
     let logDir = config.logFolder || ('log' + path.sep);
 
      // Or read from a configuration
