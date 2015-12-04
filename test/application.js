@@ -579,67 +579,67 @@ describe("Arrow Application", function () {
         });
     });
 
-    describe("SystemManager functions", function () {
-        var application;
-        before(function (done) {
-            application = new ArrowJS;
-            application.start().then(function () {
-                return done()
-            });
-
-        });
-        after(function (done) {
-            application.close().then(function () {
-                done()
-            });
-            fsExtra.removeSync(__dirname + "/log/");
-            fsExtra.removeSync(__dirname + "/config/");
-        });
-        it("A system manager can setCache config", function (done) {
-            application.featuresManager.setCache().then(function () {
-                return done()
-            })
-        });
-        it("A system manager can getCache config", function (done) {
-            application.featuresManager.getCache().then(function () {
-                return done()
-            })
-        });
-
-        it("A system manager can reload config", function (done) {
-            application.featuresManager.reload().then(function () {
-                return done()
-            })
-        });
-
-        it("A system manager can get permissions", function (done) {
-            application.featuresManager.getPermissions("demo");
-            done();
-        });
-
-        it("A system manager can get attributes", function (done) {
-            application.featuresManager.getAttribute("testAttribute");
-            application.featuresManager.getAttribute("testAttribute2");
-            application.featuresManager.getAttribute();
-            done();
-        });
-
-        it("A system manager can get component", function (done) {
-            application.featuresManager.getComponent();
-            done();
-        });
-
-        //it("A system manager can get view files", function (done) {
-        //    application.featuresManager.getViewFiles("demo");
-        //    done();
-        //});
-
-        it("A config manager can update config", function (done) {
-            application.configManager.updateConfig({}).then(function () {
-                done();
-            });
-        });
-    });
+    //describe("SystemManager functions", function () {
+    //    var application;
+    //    before(function (done) {
+    //        application = new ArrowJS;
+    //        application.start().then(function () {
+    //            return done()
+    //        });
+    //
+    //    });
+    //    after(function (done) {
+    //        application.close().then(function () {
+    //            done()
+    //        });
+    //        fsExtra.removeSync(__dirname + "/log/");
+    //        fsExtra.removeSync(__dirname + "/config/");
+    //    });
+    //    it("A system manager can setCache config", function (done) {
+    //        application.featuresManager.setCache().then(function () {
+    //            return done()
+    //        })
+    //    });
+    //    it("A system manager can getCache config", function (done) {
+    //        application.featuresManager.getCache().then(function () {
+    //            return done()
+    //        })
+    //    });
+    //
+    //    it("A system manager can reload config", function (done) {
+    //        application.featuresManager.reload().then(function () {
+    //            return done()
+    //        })
+    //    });
+    //
+    //    it("A system manager can get permissions", function (done) {
+    //        application.featuresManager.getPermissions("demo");
+    //        done();
+    //    });
+    //
+    //    it("A system manager can get attributes", function (done) {
+    //        application.featuresManager.getAttribute("testAttribute");
+    //        application.featuresManager.getAttribute("testAttribute2");
+    //        application.featuresManager.getAttribute();
+    //        done();
+    //    });
+    //
+    //    it("A system manager can get component", function (done) {
+    //        application.featuresManager.getComponent();
+    //        done();
+    //    });
+    //
+    //    //it("A system manager can get view files", function (done) {
+    //    //    application.featuresManager.getViewFiles("demo");
+    //    //    done();
+    //    //});
+    //
+    //    it("A config manager can update config", function (done) {
+    //        application.configManager.updateConfig({}).then(function () {
+    //            done();
+    //        });
+    //    });
+    //});
 
     describe("Arrow support functions", function () {
         var application;
