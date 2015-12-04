@@ -6,17 +6,19 @@ module.exports = function (component,application) {
             get : {
                 handler: component.controllers.index,
                 name : "hello",
-                order : 1
+                order : 3
             }
         },
         "/enableWebsocketCluster": {
             get : {
-                handler: component.controllers.enableWebsocketCluster
+                handler: component.controllers.enableWebsocketCluster,
+                order : 1
             }
         },
         "/linkto": {
             get : {
-                handler: component.controllers.linkto
+                handler: component.controllers.linkto,
+                order : 1
             }
         },
         "/applicationRender": {

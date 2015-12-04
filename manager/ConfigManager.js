@@ -57,7 +57,6 @@ class ConfigManager extends SystemManager {
         return self.setCache().then(self.reload());
     }
 
-;
     /**
      * Set multi config
      * @param setting
@@ -69,10 +68,10 @@ class ConfigManager extends SystemManager {
         return self.setCache().then(self.reload());
     }
 
-;
 
     getCache() {
         let self = this._app._config;
+        /* istanbul ignore next */
         return this.pub.getAsync(self.redis_prefix + self.redis_key.configs)
             .then(function (data) {
                 if (data) {

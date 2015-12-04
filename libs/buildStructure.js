@@ -31,6 +31,7 @@ function parseConfig_Structure(obj, key, level) {
     let wrapArray = [];
     if (_.isArray(obj)) {
         wrapArray = obj;
+        /* istanbul ignore else */
     } else if (_.isObject(obj)) {
         wrapArray.push(obj);
     }
@@ -63,6 +64,7 @@ function parseConfig_Structure(obj, key, level) {
                     //if (!_.isEmpty(data[key].path)) {
                     if (_.isArray(data[key])) {
                         data[key].map(function (data_key) {
+                            /* istanbul ignore else */
                             if (!data_key.path.singleton) {
                                 data_key.path.singleton = true;
                             }
@@ -78,6 +80,7 @@ function parseConfig_Structure(obj, key, level) {
                     }
                     //}
                 } else {
+                    /* istanbul ignore next */
                     if (key !== "extend" && key !== "path" && typeof data.key === 'object') {
                         newObj.path[pathKey][key] = data[key]
                     }
@@ -102,6 +105,7 @@ function parseConfig_Structure(obj, key, level) {
     }
 }
 function handlePath(pathInfo, attribute, level) {
+    /* istanbul ignore else */
     if (pathInfo) {
         let singleton = handleSingleton(pathInfo.singleton);
         let folderName = handleFolder(pathInfo.folder);
@@ -147,6 +151,7 @@ function handlePath(pathInfo, attribute, level) {
         });
         return [results, name];
     }
+    /* istanbul ignore next */
     return [null, null]
 }
 
@@ -157,6 +162,7 @@ function handleSingleton(singleton) {
 
 function handleFolder(folder) {
     let newFolder = [];
+    /* istanbul ignore next */
     if (_.isArray(folder)) {
         folder.map(function (folderInfo) {
             newFolder.push(folderInfo)
@@ -196,24 +202,28 @@ function handleFile(file) {
     return "";
 }
 
-function getConfigByKey(key) {
-    return function (key) {
-        let self = this;
-        return self._config[key]
-    }
-}
+//function getConfigByKey(key) {
+//    return function (key) {
+//        let self = this;
+//        return self._config[key]
+//    }
+//}
 
 function handlePrefix(prefix) {
+    /* istanbul ignore else */
     if (_.isString(prefix)) {
         return prefix
     }
+    /* istanbul ignore next */
     return "";
 }
 
 function handleAthenticate(authenticate) {
+    /* istanbul ignore else */
     if (_.isBoolean(authenticate)) {
         return authenticate
     }
+    /* istanbul ignore next */
     return false
 }
 
