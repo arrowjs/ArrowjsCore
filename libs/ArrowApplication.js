@@ -437,11 +437,6 @@ function associateModels(arrow) {
             })
         };
 
-        //Assign raw query function of Sequelize to arrow.models object
-        //See Sequelize raw query http://docs.sequelizejs.com/en/latest/docs/raw-queries/
-        /* istanbul ignore next */
-        arrow.models.rawQuery = defaultDatabase.query ? defaultDatabase.query.bind(defaultDatabase) : defaultQueryResolve;
-
         //Load model associate rules defined in /config/database.js
         let databaseFunction = require(arrow.arrFolder + "config/database");
 
@@ -454,7 +449,19 @@ function associateModels(arrow) {
             }).then(function () {
                 defaultDatabase.sync();  //Sequelize.sync: sync all defined models to the DB.
             })
+        } else {
+            Object.keys(arrow.models).forEach(function(modelName) {
+                if ("associate" in arrow.models[modelName]) {
+                    arrow.models[modelName].associate(arrow.models);
+                }
+            });
+            defaultDatabase.sync();
         }
+
+        //Assign raw query function of Sequelize to arrow.models object
+        //See Sequelize raw query http://docs.sequelizejs.com/en/latest/docs/raw-queries/
+        /* istanbul ignore next */
+        arrow.models.rawQuery = defaultDatabase.query ? defaultDatabase.query.bind(defaultDatabase) : defaultQueryResolve;
     }
     return arrow
 }
