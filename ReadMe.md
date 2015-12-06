@@ -1,6 +1,6 @@
 #ArrowJS for Node.js
 [![Build Status](https://travis-ci.org/arrowjs/ArrowjsCore.svg)](https://travis-ci.org/arrowjs/ArrowjsCore)
-[https://david-dm.org/arrowjs/ArrowjsCore.svg](https://david-dm.org/arrowjs/ArrowjsCore)
+[![david DM](https://david-dm.org/arrowjs/ArrowjsCore.svg)]](https://david-dm.org/arrowjs/ArrowjsCore)
 [![Code Climate](https://codeclimate.com/github/arrowjs/ArrowjsCore/badges/gpa.svg)](https://codeclimate.com/github/arrowjs/ArrowjsCore)
 
 ==================
