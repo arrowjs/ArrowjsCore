@@ -10,7 +10,6 @@ const getListFile = require('../helper/getListFile');
  */
 module.exports = function controllerAttribute(setting, fatherPath, component, application) {
     let files = getListFile(setting, fatherPath, application);
-    console.log(files);
     if (files.type === "single") {
         Object.keys(files).map(function (key) {
             if (key !== "type") {
