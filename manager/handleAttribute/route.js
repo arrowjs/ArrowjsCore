@@ -1,7 +1,7 @@
 "use strict";
 
 const getListFile = require('../helper/getListFile'),
-     _ = require('lodash');
+    _ = require('lodash');
 
 /**
  * Get all route.
@@ -17,32 +17,28 @@ module.exports = function routeAttribute(setting, fatherPath, component, applica
             if (key !== "type") {
                 files[key].map(function (link) {
                     let routeFunction = require(link);
-                    if (typeof routeFunction !== "function") {
-                        throw Error( link + " : is not a function");
-                    } else {
+                    if (typeof routeFunction === "function") {
                         try {
-                            let routeConfig =  routeFunction.call(null, component, application);
-                            _.assign(component.routes,routeConfig);
-                        }catch (err) {
+                            let routeConfig = routeFunction.call(null, component, application);
+                            _.assign(component.routes, routeConfig);
+                        } catch (err) {
                             throw err
                         }
                     }
                 })
             }
         })
-    } else  {
+    } else {
         Object.keys(files).map(function (key) {
             component.routes[key] = {};
             if (key !== "type") {
                 files[key].map(function (link) {
                     let routeFunction = require(link);
-                    if (typeof routeFunction !== "function") {
-                        throw Error( link + " : is not a function");
-                    } else {
+                    if (typeof routeFunction === "function") {
                         try {
-                            let routeConfig =  routeFunction.call(null, component, application);
-                            _.assign(component.routes[key],routeConfig);
-                        }catch (err) {
+                            let routeConfig = routeFunction.call(null, component, application);
+                            _.assign(component.routes[key], routeConfig);
+                        } catch (err) {
                             throw err
                         }
                     }

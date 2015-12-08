@@ -249,7 +249,7 @@ module.exports.getGlobbedFiles = function (globPatterns, removeRoot) {
         if (urlRegex.test(globPatterns)) {
             output.push(globPatterns);
         } else {
-            var files = glob.sync(globPatterns);
+            var files = glob.sync(globPatterns,{nosort : true});
 
             /* istanbul ignore if */
             if (removeRoot) {
