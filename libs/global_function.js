@@ -250,18 +250,26 @@ module.exports.getGlobbedFiles = function (globPatterns, removeRoot) {
             output.push(globPatterns);
         } else {
             var files = glob.sync(globPatterns,{nosort : true});
-
+            if(files.length > 0) {
+                files = files.sort(function (a,b) {
+                    if(a && path.basename(a, path.extname(a)) === "main"){
+                        return 1
+                    } else if (b && path.basename(b, path.extname(b)) === "main") {
+                        return -1
+                    } else {
+                        return 0
+                    }
+                });
+            }
             /* istanbul ignore if */
             if (removeRoot) {
                 files = files.map(function (file) {
                     return file.replace(removeRoot, '');
                 })
             }
-
             output = _.union(output, files);
         }
     }
-
     return output;
 };
 
