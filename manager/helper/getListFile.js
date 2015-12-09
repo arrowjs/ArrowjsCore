@@ -12,7 +12,7 @@ module.exports = function getListFile(componentSetting, fatherPath, application)
     let files = {};
     let componentPath = componentSetting.path;
     files.type = componentSetting.type;
-    componentPath && (
+    if(componentPath) {
         Object.keys(componentPath).map(function (id) {
             files[id] = [];
             componentPath[id].path.map(function (globByConfig) {
@@ -28,6 +28,6 @@ module.exports = function getListFile(componentSetting, fatherPath, application)
                 })
             })
         })
-    );
+    };
     return files
 };
