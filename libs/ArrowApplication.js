@@ -221,7 +221,7 @@ class ArrowApplication {
     beforeAuthenticate(func) {
         let self = this;
         /* istanbul ignore next */
-        return new Promise(function (fulfill,reject) {
+        return new Promise(function (fulfill, reject) {
             if (typeof func == "function") {
                 self.beforeAuth.push(func.bind(self));
                 fulfill()
@@ -239,7 +239,7 @@ class ArrowApplication {
     afterAuthenticate(func) {
         let self = this;
         /* istanbul ignore next */
-        return new Promise(function (fulfill,reject) {
+        return new Promise(function (fulfill, reject) {
             if (typeof func == "function") {
                 self.afterAuth.push(func.bind(self));
                 fulfill()
@@ -256,7 +256,7 @@ class ArrowApplication {
 
     addGlobal(obj) {
         /* istanbul ignore next */
-        return new Promise(function (fulfill,reject) {
+        return new Promise(function (fulfill, reject) {
             if (_.isObject(obj)) {
                 _.assign(Arrow, obj);
                 fulfill()
@@ -274,7 +274,7 @@ class ArrowApplication {
     addPlugin(plugin) {
         let self = this;
         /* istanbul ignore next */
-        return new Promise(function (fulfill,reject) {
+        return new Promise(function (fulfill, reject) {
             if (_.isFunction(plugin)) {
                 self.plugins.push(plugin.bind(self));
                 fulfill()
@@ -450,7 +450,7 @@ function associateModels(arrow) {
                 defaultDatabase.sync();  //Sequelize.sync: sync all defined models to the DB.
             })
         } else {
-            Object.keys(arrow.models).forEach(function(modelName) {
+            Object.keys(arrow.models).forEach(function (modelName) {
                 if ("associate" in arrow.models[modelName]) {
                     arrow.models[modelName].associate(arrow.models);
                 }
@@ -550,18 +550,17 @@ function handleComponentRouteSetting(arrow, componentRouteSetting, defaultRouteC
             if (componentRouteSetting[path_name][method].name) {
                 arrow._arrRoutes[componentRouteSetting[path_name][method].name] = path.normalize(prefix + routePath);
             }
-
             //handle function
             let routeHandler;
             try {
                 routeHandler = componentRouteSetting[path_name][method].handler;
-                if(!routeHandler) {
-                    routeHandler = function (req,res,next) {
+                if (!routeHandler) {
+                    routeHandler = function (req, res, next) {
                         next(new Error("Cant find controller"));
                     }
                 }
-            } catch(err) {
-                routeHandler = function (req,res,next) {
+            } catch (err) {
+                routeHandler = function (req, res, next) {
                     next(new Error("Cant find controller"));
                 }
             }

@@ -11,7 +11,7 @@ module.exports = function getListFunction(componentSetting, fatherPath, applicat
     let functions = {};
     let componentPath = componentSetting.path;
     functions.type = componentSetting.type;
-    componentPath && (
+    if (componentPath) {
         Object.keys(componentPath).map(function (id) {
             functions[id] = [];
             componentPath[id].path.map(function (globByConfig) {
@@ -22,6 +22,6 @@ module.exports = function getListFunction(componentSetting, fatherPath, applicat
                 functions[id].push(miniFunction);
             })
         })
-    );
+    };
     return functions
 };
