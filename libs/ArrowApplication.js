@@ -967,7 +967,16 @@ function handleError(app) {
     }
 
     app.use("*", function (req, res) {
-        res.redirect('/404')
+        let h = req.header("Accept");
+        try {
+            if (h.indexOf('text/html') > -1) {
+                res.redirect('/404');
+            } else {
+                res.sendStatus(404);
+            }
+        } catch (err) {
+            res.sendStatus(404);
+        }
     });
 
     return app
