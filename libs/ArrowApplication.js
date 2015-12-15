@@ -461,7 +461,13 @@ function associateModels(arrow) {
         //Assign raw query function of Sequelize to arrow.models object
         //See Sequelize raw query http://docs.sequelizejs.com/en/latest/docs/raw-queries/
         /* istanbul ignore next */
-        arrow.models.rawQuery = defaultDatabase.query ? defaultDatabase.query.bind(defaultDatabase) : defaultQueryResolve;
+        if (defaultDatabase.query) {
+            arrow.models.rawQuery =  defaultDatabase.query.bind(defaultDatabase);
+            _.assign(arrow.models, defaultDatabase);
+        } else {
+            arrow.models.rawQuery = defaultQueryResolve;
+        }
+
     }
     return arrow
 }
