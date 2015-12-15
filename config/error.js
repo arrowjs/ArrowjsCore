@@ -19,7 +19,7 @@ module.exports = {
             }),
             new winston.transports.File({
                 level : "error",
-                filename: '/error.log',
+                filename: 'error.log',
                 maxsize: 1024 * 1024 * 10, // 10MB
                 name : "error-log"
             })

@@ -1,0 +1,16 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+</head>
+<body>
+{{ useSocket() }}
+
+<a href="{{ link_to("hello") }}"></a>
+
+<a href="{{ link_to("hello",{a : 1}) }}"></a>
+
+<h1>{{ getConfig("theme") }}</h1>
+{{ {a : 1} |stringify }}
+</body>
+</html>
