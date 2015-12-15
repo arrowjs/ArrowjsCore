@@ -21,7 +21,7 @@ module.exports = function getListFunction(componentSetting, fatherPath, applicat
                 miniFunction.fatherBase = fatherPath;
                 functions[id].push(miniFunction);
             })
-        });
-    }
+        })
+    };
     return functions
 };

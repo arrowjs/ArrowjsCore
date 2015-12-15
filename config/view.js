@@ -16,9 +16,9 @@ module.exports = {
         number_item: 20
     },
     theme: "default",
-    //functionFolder : '/extendsView/function',
-    //filterFolder : '/extendsView/filter',
-    //variableFile : '/extendsView/variable.js',
+    functionFolder : '/extendsView/function',
+    filterFolder : '/extendsView/filter',
+    variableFile : '/extendsView/variable.js',
     nunjuckSettings : {
         autoescape: true,
         throwOnUndefined: false,

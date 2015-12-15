@@ -20,25 +20,29 @@ const fs = require('fs'),
     buildStructure = require("./buildStructure"),
     socket_io = require('socket.io'),
     http = require('http'),
-    cluster = require('cluster'),
     socketRedisAdapter = require('socket.io-redis'),
     ViewEngine = require("../libs/ViewEngine"),
     fsExtra = require('fs-extra'),
     loadingLanguage = require("./i18n").loadLanguage;
 
 /**
- * Singleton object. It is heart of Arrowjs.io web app. it wraps Express and adds following functions:
+ * ArrowApplication is a singleton object. It is heart of Arrowjs.io web app. it wraps Express and adds following functions:
  * support Redis, multi-languages, passport, check permission and socket.io / websocket
  */
 
-let arrowErrorLink = {};
 class ArrowApplication {
     /**
-     * Constructor
-     * @param setting
+     *
+     * @param {object} setting - {passport: bool ,role : bool, order :bool}
+     * <ul>
+     *     <li>passport: true, turn on authentication using Passport module</li>
+     *     <li>role: true, turn on permission checking, RBAC</li>
+     *     <li>order: true, order router priority rule.</li>
+     * </ul>
      */
     constructor(setting) {
         //if NODE_ENV does not exist, use development by default
+        /* istanbul ignore next */
         process.env.NODE_ENV = process.env.NODE_ENV || 'development';
 
         this.beforeAuth = [];  //add middle-wares before user authenticates
@@ -48,6 +52,7 @@ class ArrowApplication {
 
         global.Arrow = {};
 
+        this.arrowErrorLink = {};
         //Move all functions of express to ArrowApplication
         //So we can call ArrowApplication.listen(port)
         _.assign(this, app);
@@ -78,6 +83,7 @@ class ArrowApplication {
         installLog(this);
         this.logger = logger;
         //Make redis cache
+        /* istanbul ignore next */
         let redisConfig = this._config.redis || {};
         let redisFunction = RedisCache(redisConfig);
         var redisClient, redisSubscriber;
@@ -149,7 +155,7 @@ class ArrowApplication {
             var done = callback;
 
             var opts = options || {};
-
+            /* istanbul ignore else */
             if (typeof options === "function") {
                 done = options;
                 opts = {};
@@ -210,43 +216,78 @@ class ArrowApplication {
      * When user requests an URL, execute this function before server checks in session if user has authenticates
      * If web app does not require authentication, beforeAuthenticate and afterAuthenticate are same. <br>
      * beforeAuthenticate > authenticate > afterAuthenticate
-     * @param func
+     * @param {function} func - function that executes before authentication
      */
     beforeAuthenticate(func) {
         let self = this;
-        if (typeof func == "function") {
-            self.beforeAuth.push(func.bind(self));
-        }
+        /* istanbul ignore next */
+        return new Promise(function (fulfill, reject) {
+            if (typeof func == "function") {
+                self.beforeAuth.push(func.bind(self));
+                fulfill()
+            } else {
+                reject(new Error("Cant beforeAuthenticate: not an function"));
+            }
+        });
     }
 
     /**
      * When user requests an URL, execute this function after server checks in session if user has authenticates
      * This function always runs regardless user has authenticated or not
-     * @param func
+     * @param {function} func - function that executes after authentication
      */
     afterAuthenticate(func) {
         let self = this;
-        if (typeof func == "function") {
-            self.afterAuth.push(func.bind(self));
-        }
+        /* istanbul ignore next */
+        return new Promise(function (fulfill, reject) {
+            if (typeof func == "function") {
+                self.afterAuth.push(func.bind(self));
+                fulfill()
+            } else {
+                reject(new Error("Cant afterAuthenticate: not an function"));
+            }
+        })
     }
+
+    /**
+     * Turn object to become property of ArrowApplication
+     * @param {object} obj - object parameter
+     */
 
     addGlobal(obj) {
-        if (_.isObject(obj)) {
-            _.assign(Arrow, obj);
-        }
+        /* istanbul ignore next */
+        return new Promise(function (fulfill, reject) {
+            if (_.isObject(obj)) {
+                _.assign(Arrow, obj);
+                fulfill()
+            } else {
+                reject(new Error("Cant addGlobal: not an Object"));
+            }
+        });
     }
 
+    /**
+     * Add plugin function to ArrowApplication.plugins, bind this plugin function to ArrowApplication object
+     * @param {function} plugin - plugin function
+     * <p><a target="_blank" href="http://www.smashingmagazine.com/2014/01/understanding-javascript-function-prototype-bind/">See more about bind</a></p>
+     */
     addPlugin(plugin) {
         let self = this;
-        if (_.isFunction(plugin)) {
-            self.plugins.push(plugin.bind(self));
-        }
+        /* istanbul ignore next */
+        return new Promise(function (fulfill, reject) {
+            if (_.isFunction(plugin)) {
+                self.plugins.push(plugin.bind(self));
+                fulfill()
+            } else {
+                reject(new Error("Cant addPlugin: not an Function"));
+            }
+        })
+
     }
 
     /**
      * Kick start express application and listen at default port
-     * @param setting - passport: boolean, role: boolean
+     * @param {object} setting - {passport: boolean, role: boolean}
      */
     start(setting) {
         let self = this;
@@ -283,13 +324,16 @@ class ArrowApplication {
                 return configureExpressApp(self, self.getConfig(), setting)
             })
             .then(function () {
+                return associateModels(self);
+            })
+            .then(function () {
                 return circuit_breaker(self)
             })
             .then(function () {
                 if (setting && setting.order) {
                     stackBegin = self._router.stack.length;
                 }
-                return loadModel_Route_Render(self, setting);
+                return loadRoute_Render(self, setting);
             })
             .then(function () {
                 if (setting && setting.order) {
@@ -325,6 +369,7 @@ class ArrowApplication {
                 return http.createServer(self.expressApp);
             })
             .then(function (server) {
+                self.httpServer = server;
                 if (self.getConfig('websocket_enable') && self.getConfig('websocket_folder')) {
                     let io = socket_io(server);
                     if (self.getConfig('redis.type') !== 'fakeredis') {
@@ -335,6 +380,7 @@ class ArrowApplication {
 
                     __.getGlobbedFiles(path.normalize(self.arrFolder + self.getConfig('websocket_folder'))).map(function (link) {
                         let socketFunction = require(link);
+                        /* istanbul ignore else */
                         if (_.isFunction(socketFunction)) {
                             socketFunction(io);
                         }
@@ -345,54 +391,99 @@ class ArrowApplication {
                     logger.info('Application loaded using the "' + process.env.NODE_ENV + '" environment configuration');
                     logger.info('Application started on port ' + self.getConfig("port"), ', Process ID: ' + process.pid);
                 });
-            })
-            .catch(function (err) {
+                /* istanbul ignore next */
+            }).catch(
+            function (err) {
                 logger.error(err)
-            });
+            }
+        );
 
+    }
+
+    close() {
+        var self = this;
+        return new Promise(function (fulfill, reject) {
+            /* istanbul ignore else */
+            if (self.httpServer) {
+                self.httpServer.close(function (err) {
+                    /* istanbul ignore if */
+                    if (err) {
+                        reject(err)
+                    } else {
+                        fulfill(self.httpServer)
+                    }
+                })
+            } else {
+                fulfill(self.httpServer)
+            }
+        })
     }
 }
 
 /**
- * Supporting functions
+ * Associate all models that are loaded into ArrowApplication.models. Associate logic defined in /config/database.js
+ * @param {ArrowApplication} arrow
+ * @return {ArrowApplication} arrow
  */
 
-
-/**
- *
- * @param arrow
- * @param userSetting
- */
-function loadModel_Route_Render(arrow, userSetting) {
+function associateModels(arrow) {
     let defaultDatabase = require('./database').db();
 
     if (arrow.models && Object.keys(arrow.models).length > 0) {
+        /* istanbul ignore next */
         let defaultQueryResolve = function () {
             return new Promise(function (fulfill, reject) {
                 fulfill("No models")
             })
         };
-        arrow.models.rawQuery = defaultDatabase.query ? defaultDatabase.query.bind(defaultDatabase) : defaultQueryResolve;
 
-        //New way to associate db:
-
+        //Load model associate rules defined in /config/database.js
         let databaseFunction = require(arrow.arrFolder + "config/database");
 
+        /* istanbul ignore else */
         if (databaseFunction.associate) {
             let resolve = Promise.resolve();
             resolve.then(function () {
+                //Execute models associate logic in /config/database.js
                 return databaseFunction.associate(arrow.models)
             }).then(function () {
-                defaultDatabase.sync();
+                defaultDatabase.sync();  //Sequelize.sync: sync all defined models to the DB.
             })
+        } else {
+            Object.keys(arrow.models).forEach(function (modelName) {
+                if ("associate" in arrow.models[modelName]) {
+                    arrow.models[modelName].associate(arrow.models);
+                }
+            });
+            defaultDatabase.sync();
         }
+
+        //Assign raw query function of Sequelize to arrow.models object
+        //See Sequelize raw query http://docs.sequelizejs.com/en/latest/docs/raw-queries/
+        /* istanbul ignore next */
+        if (defaultDatabase.query) {
+            arrow.models.rawQuery =  defaultDatabase.query.bind(defaultDatabase);
+            _.assign(arrow.models, defaultDatabase);
+        } else {
+            arrow.models.rawQuery = defaultQueryResolve;
+        }
+
     }
+    return arrow
+}
+
+
+/**
+ * load feature's routes and render
+ * @param {ArrowApplication } arrow
+ * @param {object} userSetting
+ */
+function loadRoute_Render(arrow, userSetting) {
 
     arrow._componentList.map(function (key) {
         Object.keys(arrow[key]).map(function (componentKey) {
-            if (cluster.isMaster) {
-                logger.info("Arrow loaded: '" + key + "' - '" + componentKey + "'");
-            }
+            /** display loaded feature in console log when booting Arrowjs application */
+            logger.info("Arrow loaded: '" + key + "' - '" + componentKey + "'");
             let routeConfig = arrow[key][componentKey]._structure.route;
             if (routeConfig) {
                 Object.keys(routeConfig.path).map(function (second_key) {
@@ -408,8 +499,8 @@ function loadModel_Route_Render(arrow, userSetting) {
                 });
             }
         })
-    })
-    return arrow
+    });
+    return arrow;
 }
 
 /**
@@ -421,10 +512,11 @@ function loadModel_Route_Render(arrow, userSetting) {
 function configureExpressApp(app, config, setting) {
     return new Promise(function (fulfill, reject) {
         let expressFunction;
+        /* istanbul ignore else */
         if (fs.existsSync(path.resolve(app.arrFolder + "config/express.js"))) {
             expressFunction = require(app.arrFolder + "config/express");
         } else {
-            expressFunction = require("../config/express");
+            reject(new Error("Cant find express.js in folder config"))
         }
         fulfill(expressFunction(app, config, setting));
     });
@@ -450,21 +542,34 @@ function handleComponentRouteSetting(arrow, componentRouteSetting, defaultRouteC
 
     Object.keys(componentRouteSetting).map(function (path_name) {
         //Check path_name
-        let routePath = path_name[0] === '/' ? path_name : "/" + componentName + "/" + path_name;
+        /* istanbul ignore next */
+        let routePath = path_name[0] === path.sep ? path_name : path.sep + componentName + path.sep + path_name;
 
         //handle prefix
-        if (defaultRouteConfig.prefix && defaultRouteConfig.prefix[0] !== "/") {
-            defaultRouteConfig.prefix = "/" + defaultRouteConfig.prefix
+        /* istanbul ignore if */
+        if (defaultRouteConfig.prefix && defaultRouteConfig.prefix[0] !== path.sep) {
+            defaultRouteConfig.prefix = path.sep + defaultRouteConfig.prefix
         }
-        let prefix = defaultRouteConfig.prefix || '/';
+        let prefix = defaultRouteConfig.prefix || path.sep;
 
         let arrayMethod = Object.keys(componentRouteSetting[path_name]).filter(function (method) {
             if (componentRouteSetting[path_name][method].name) {
                 arrow._arrRoutes[componentRouteSetting[path_name][method].name] = path.normalize(prefix + routePath);
             }
-
             //handle function
-            let routeHandler = componentRouteSetting[path_name][method].handler;
+            let routeHandler;
+            try {
+                routeHandler = componentRouteSetting[path_name][method].handler;
+                if (!routeHandler) {
+                    routeHandler = function (req, res, next) {
+                        next(new Error("Cant find controller"));
+                    }
+                }
+            } catch (err) {
+                routeHandler = function (req, res, next) {
+                    next(new Error("Cant find controller"));
+                }
+            }
             let authenticate = componentRouteSetting[path_name][method].authenticate !== undefined ? componentRouteSetting[path_name][method].authenticate : defaultRouteConfig.authenticate;
 
             let arrayHandler = [];
@@ -591,6 +696,7 @@ function makeRender(req, res, application, componentView, componentName, compone
         delete req.session.flash;
 
         // support callback function as second arg
+        /* istanbul ignore if */
         if (typeof options === 'function') {
             done = options;
             opts = res.locals || {};
@@ -625,6 +731,7 @@ function makeRender(req, res, application, componentView, componentName, compone
 function handleView(obj, application, componentName) {
     let miniPath = obj.func(application._config, componentName);
     let normalizePath;
+    /* istanbul ignore if */
     if (miniPath[0] === path.sep) {
         normalizePath = path.normalize(obj.base + path.sep + miniPath);
     } else {
@@ -633,6 +740,7 @@ function handleView(obj, application, componentName) {
     return normalizePath
 }
 
+/* istanbul ignore next */
 function handleAuthenticate(application, name) {
     let passport = application.passport;
     if (_.isString(name)) {
@@ -660,6 +768,7 @@ function handleAuthenticate(application, name) {
  * @param key
  * @returns {handleRoles}
  */
+/* istanbul ignore next */
 function handleRole(application, permissions, componentName, key) {
     let arrayPermissions = [];
     if (_.isArray(permissions)) {
@@ -698,6 +807,7 @@ function loadingGlobalFunction(self) {
     __.getGlobbedFiles(path.resolve(__dirname, "..", "helpers/*.js")).map(function (link) {
         let arrowObj = require(link);
         Object.keys(arrowObj).map(function (key) {
+            /* istanbul ignore else */
             if (_.isFunction(arrowObj[key])) {
                 ArrowHelper[key] = arrowObj[key].bind(self)
             } else {
@@ -739,7 +849,7 @@ function addRoles(self) {
 function circuit_breaker(app) {
     if (app.getConfig('fault_tolerant.enable')) {
         app.use(function (req, res, next) {
-            if (arrowErrorLink[req.url]) {
+            if (app.arrowErrorLink[req.url]) {
                 let redirectLink = app.getConfig('fault_tolerant.redirect');
                 redirectLink = _.isString(redirectLink) ? redirectLink : "404";
                 res.redirect(path.normalize(path.sep + redirectLink));
@@ -755,6 +865,7 @@ function circuit_breaker(app) {
  * Handle Error and redirect error
  * @param app
  */
+/* istanbul ignore next */
 function handleError(app) {
     /** Assume 'not found' in the error msg is a 404.
      * This is somewhat silly, but valid, you can do whatever you like, set properties, use instanceof etc.
@@ -764,7 +875,7 @@ function handleError(app) {
         let error = {};
         if (!err) return next();
         if (app.getConfig('fault_tolerant.enable')) {
-            arrowErrorLink[req.url] = true;
+            app.arrowErrorLink[req.url] = true;
             error[req.url] = {};
             error[req.url].error = err.stack;
             error[req.url].time = Date.now();
@@ -856,7 +967,16 @@ function handleError(app) {
     }
 
     app.use("*", function (req, res) {
-        res.redirect('/404')
+        let h = req.header("Accept");
+        try {
+            if (h.indexOf('text/html') > -1) {
+                res.redirect('/404');
+            } else {
+                res.sendStatus(404);
+            }
+        } catch (err) {
+            res.sendStatus(404);
+        }
     });
 
     return app
@@ -884,7 +1004,7 @@ function getDataByDotNotation(obj, key) {
         return null
     }
 }
-
+/* istanbul ignore next */
 function loadSetting(des, source) {
     let baseFolder = this.arrFolder;
     let setting = {};
@@ -910,7 +1030,7 @@ function addConfig(obj) {
         _.assign(config, obj);
     }
 }
-
+/* istanbul ignore next */
 function addConfigFile(filename) {
     let app = this;
     let configFile = path.normalize(app.arrFolder + "/" + filename);

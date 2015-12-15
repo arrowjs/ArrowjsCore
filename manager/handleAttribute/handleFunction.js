@@ -6,8 +6,8 @@ const pathAttribute = require('./path'),
     routeAttribute = require('./route'),
     viewAttribute = require('./view'),
     actionAttribute = require('./action'),
-    controllerAttribute = require('./controller'),
-    otherAttribute = require('./other');
+    controllerAttribute = require('./controller');
+    //otherAttribute = require('./other');
 
 /**
  * Get config by attribute of feature
@@ -35,6 +35,6 @@ module.exports = function actionByAttribute(attName, component, fatherPath, appl
         case "controller":
             return controllerAttribute(setting, fatherPath, component, application);
         default :
-            return otherAttribute(setting, attName, component);
+            return null;
     }
 };

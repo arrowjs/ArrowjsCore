@@ -15,9 +15,7 @@ module.exports = function controllerAttribute(setting, fatherPath, component, ap
             if (key !== "type") {
                 files[key].map(function (link) {
                     let controllerFunction = require(link);
-                    if (typeof controllerFunction !== "function") {
-                        throw Error( link + " : is not a function");
-                    } else {
+                    if (typeof controllerFunction === "function") {
                         try {
                             controllerFunction.call(null, component.controllers, component, application)
                         } catch (err) {
@@ -27,15 +25,13 @@ module.exports = function controllerAttribute(setting, fatherPath, component, ap
                 })
             }
         })
-    } else if (files.type === "multi") {
+    } else {
         Object.keys(files).map(function (key) {
             if (key !== "type") {
                 component.controllers[key] = {};
                 files[key].map(function (link) {
                     let controllerFunction = require(link);
-                    if (typeof controllerFunction !== "function") {
-                        throw Error( link + " : is not a function");
-                    } else {
+                    if (typeof controllerFunction === "function") {
                         try {
                             controllerFunction.call(null, component.controllers[key], component, application)
                         } catch (err) {

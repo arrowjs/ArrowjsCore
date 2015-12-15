@@ -38,17 +38,18 @@ exports.getAllVariable = function (env, viewSetting, app) {
     try {
         userVariable = require(path.normalize(__base + viewSetting.variableFile));
     } catch (err) {
+        /* istanbul ignore next */
         logger.warn('Cant find file :' + path.normalize(__base + viewSetting.variableFile))
     }
     let baseVariable = require(path.resolve(__dirname, '..', 'templateExtends/variable.js'));
 
+    /* istanbul ignore next */
     Object.keys(baseVariable).map(function (name) {
         if (typeof baseVariable[name] !== "function") {
             env.addGlobal(name, baseVariable[name]);
         }
     });
-
-
+    /* istanbul ignore else */
     if (typeof userVariable === 'object' && !_.isEmpty(userVariable)) {
         Object.keys(userVariable).map(function (name) {
             if (typeof userVariable[name] !== "function") {
@@ -71,7 +72,7 @@ exports.getAllExtensions = function (env, viewSetting, app) {
     let basePath = path.resolve(__dirname, '..', 'templateExtends/extensions');
     let baseFunctionLinks = self.getGlobbedFiles(path.normalize(basePath + "/*.js"));
 
-
+    /* istanbul ignore next */
     baseFunctionLinks.map(function (link) {
         let viewExtension = require(link);
         let extensionName = path.basename(link, ".js");
@@ -92,14 +93,19 @@ exports.getAllFunction = function (env, viewSetting, app) {
     let baseFunctionLinks = self.getGlobbedFiles(path.normalize(basePath + "/*.js"));
     baseFunctionLinks.map(function (link) {
         let viewFunction = require(link);
+        /* istanbul ignore else */
         if (typeof viewFunction === 'object' && !_.isEmpty(viewFunction)) {
             let name = path.basename(link, ".js");
             let func = require(link);
+            /* istanbul ignore else */
             if (typeof func === 'object' && !_.isEmpty(func)) {
                 func.name = func.name || name;
+                /* istanbul ignore else */
                 if (func.handler) {
                     func.async = func.async || false;
                     func.handler = func.handler.bind(app);
+
+                    /* istanbul ignore if */
                     if (func.async) {
                         env.addGlobal(func.name, function () {
                             var argsAsArray = Array.prototype.slice.call(arguments);
@@ -116,11 +122,14 @@ exports.getAllFunction = function (env, viewSetting, app) {
     let functionLinks = self.getGlobbedFiles(path.normalize(__base + viewSetting.functionFolder + "/*.js"));
     functionLinks.map(function (link) {
         let viewFunction = require(link);
+        /* istanbul ignore else */
         if (typeof viewFunction === 'object' && !_.isEmpty(viewFunction)) {
             let name = path.basename(link, ".js");
             let func = require(link);
+            /* istanbul ignore else */
             if (typeof func === 'object' && !_.isEmpty(func)) {
                 func.name = func.name || name;
+                /* istanbul ignore else */
                 if (func.handler) {
                     func.async = func.async || false;
                     func.handler = func.handler.bind(app);
@@ -153,8 +162,11 @@ exports.getAllCustomFilter = function (env, viewSetting, app) {
     baseFilterLinks.map(function (link) {
         let name = path.basename(link, ".js")
         let filter = require(link);
+        /* istanbul ignore else */
         if (typeof filter === 'object' && !_.isEmpty(filter)) {
             filter.name = filter.name || name;
+
+            /* istanbul ignore else */
             if (filter.handler) {
                 filter.handler = filter.handler.bind(app);
                 filter.async = filter.async || false;
@@ -171,8 +183,11 @@ exports.getAllCustomFilter = function (env, viewSetting, app) {
     filterLinks.map(function (link) {
         let name = path.basename(link, ".js");
         let filter = require(link);
+        /* istanbul ignore else */
         if (typeof filter === 'object' && !_.isEmpty(filter)) {
             filter.name = filter.name || name;
+
+            /* istanbul ignore else */
             if (filter.handler) {
                 filter.handler = filter.handler.bind(app);
                 filter.async = filter.async || false;
@@ -187,17 +202,6 @@ exports.getAllCustomFilter = function (env, viewSetting, app) {
     return env
 };
 
-/**
- * Add global variables to Environment
- * @param {object} env - Environment to add global variable
- * @returns {object}
- */
-exports.getAllGlobalVariable = function (env) {
-    env.addGlobal('create_link', function (module_name, link) {
-        return module_name + '/' + link;
-    });
-    return env;
-};
 
 ///**
 // * Send mail with provided options
@@ -231,79 +235,42 @@ module.exports.getGlobbedFiles = function (globPatterns, removeRoot) {
     let output = [];
 
     // If glob pattern is array so we use each pattern in a recursive way, otherwise we use glob
+
+    /* istanbul ignore if */
     if (_.isArray(globPatterns)) {
         globPatterns.forEach(function (globPattern) {
             output = _.union(output, _this.getGlobbedFiles(globPattern, removeRoot));
         });
+
+        /* istanbul ignore else */
     } else if (_.isString(globPatterns)) {
+
+        /* istanbul ignore if */
         if (urlRegex.test(globPatterns)) {
             output.push(globPatterns);
         } else {
-            var files = glob.sync(globPatterns);
+            var files = glob.sync(globPatterns,{nosort : true});
+            if(files.length > 0) {
+                files = files.sort(function (a,b) {
+                    if(a && path.basename(a, path.extname(a)) === "main"){
+                        return 1
+                    } else if (b && path.basename(b, path.extname(b)) === "main") {
+                        return -1
+                    } else {
+                        return 0
+                    }
+                });
+            }
+            /* istanbul ignore if */
             if (removeRoot) {
                 files = files.map(function (file) {
                     return file.replace(removeRoot, '');
                 })
             }
-
             output = _.union(output, files);
         }
     }
-
     return output;
-};
-
-/**
- * Replace paths with same name in "checkIndex" position (calculate from end string when split with "/")
- */
-module.exports.overrideCorePath = function (paths, routePath, checkIndex) {
-    let arr_path = routePath.split('/');
-    let checkName = arr_path[arr_path.length - checkIndex];
-
-    let check_obj = {};
-    check_obj[checkName] = routePath;
-
-    _.assign(paths, check_obj);
-    return paths;
-};
-
-/**
- * Replace core paths with app paths if they have same name in "checkIndex" position using overrideCorePath
- */
-module.exports.getOverrideCorePath = function (corePath, appPath, checkIndex) {
-    let paths = [];
-    let self = this;
-
-    self.getGlobbedFiles(corePath).forEach(function (routePath) {
-        paths = self.overrideCorePath(paths, routePath, checkIndex);
-    });
-
-    self.getGlobbedFiles(appPath).forEach(function (routePath) {
-        paths = self.overrideCorePath(paths, routePath, checkIndex);
-    });
-
-    return paths;
-};
-
-module.exports.getOverrideArrayPath = function (arrayPath) {
-
-
-};
-
-/**
- * Merge all paths in same directory
- */
-module.exports.mergePath = function (paths, routePath, checkIndex) {
-    let arr_path = routePath.split('/');
-    let checkName = arr_path[arr_path.length - checkIndex];
-
-    if (paths.hasOwnProperty(checkName)) {
-        paths[checkName].push(routePath);
-    } else {
-        paths[checkName] = [routePath];
-    }
-
-    return paths;
 };
 
 /**
@@ -319,6 +286,8 @@ module.exports.getRawConfig = function getRawConfig() {
         fs.accessSync(__base + 'config/config.js');
         _.assign(conf, require(__base + 'config/config'));
     } catch (err) {
+
+        /* istanbul ignore else */
         if (err.code === 'ENOENT') {
             fsEx.copySync(path.resolve(__dirname, '..', 'config/config.js'), __base + 'config/config.js');
             _.assign(conf, require(__base + 'config/config'));
@@ -332,10 +301,13 @@ module.exports.getRawConfig = function getRawConfig() {
         fs.accessSync(__base + 'config/websocket.js');
         _.assign(conf, require(__base + 'config/websocket'));
     } catch (err) {
+
+        /* istanbul ignore else */
         if (err.code === 'ENOENT') {
             fsEx.copySync(path.resolve(__dirname, '..', 'config/websocket.js'), __base + 'config/websocket.js');
             _.assign(conf, require(__base + 'config/websocket'));
         } else {
+
             throw err
         }
     }
@@ -345,6 +317,8 @@ module.exports.getRawConfig = function getRawConfig() {
         fs.accessSync(__base + 'config/error.js');
         _.assign(conf, require(__base + 'config/error'));
     } catch (err) {
+
+        /* istanbul ignore else */
         if (err.code === 'ENOENT') {
             fsEx.copySync(path.resolve(__dirname, '..', 'config/error.js'), __base + 'config/error.js');
             _.assign(conf, require(__base + 'config/error'));
@@ -358,6 +332,7 @@ module.exports.getRawConfig = function getRawConfig() {
         fs.accessSync(__base + 'config/redis.js');
         _.assign(conf, require(__base + 'config/redis'));
     } catch (err) {
+        /* istanbul ignore else */
         if (err.code === 'ENOENT') {
             fsEx.copySync(path.resolve(__dirname, '..', 'config/redis.js'), __base + 'config/redis.js');
             _.assign(conf, require(__base + 'config/redis'));
@@ -371,6 +346,7 @@ module.exports.getRawConfig = function getRawConfig() {
         fs.accessSync(__base + 'config/view.js');
         _.assign(conf, require(__base + 'config/view'));
     } catch (err) {
+        /* istanbul ignore else */
         if (err.code === 'ENOENT') {
             fsEx.copySync(path.resolve(__dirname, '..', 'config/view.js'), __base + 'config/view.js');
             _.assign(conf, require(__base + 'config/view'));
@@ -383,6 +359,7 @@ module.exports.getRawConfig = function getRawConfig() {
     try {
         fs.accessSync(__base + 'config/session.js');
     } catch (err) {
+        /* istanbul ignore else */
         if (err.code === 'ENOENT') {
             fsEx.copySync(path.resolve(__dirname, '..', 'config/session.js'), __base + 'config/session.js');
         } else {
@@ -394,6 +371,7 @@ module.exports.getRawConfig = function getRawConfig() {
     try {
         fs.accessSync(__base + 'config/express.js');
     } catch (err) {
+        /* istanbul ignore else */
         if (err.code === 'ENOENT') {
             fsEx.copySync(path.resolve(__dirname, '..', 'config/express.js'), __base + 'config/express.js');
         } else {
@@ -405,6 +383,7 @@ module.exports.getRawConfig = function getRawConfig() {
     try {
         fs.accessSync(__base + 'config/passport.js');
     } catch (err) {
+        /* istanbul ignore else */
         if (err.code === 'ENOENT') {
             fsEx.copySync(path.resolve(__dirname, '..', 'config/passport.js'), __base + 'config/passport.js');
         } else {
@@ -417,6 +396,7 @@ module.exports.getRawConfig = function getRawConfig() {
         fs.accessSync(__base + 'config/database.js');
         _.assign(conf, require(__base + 'config/database'));
     } catch (err) {
+        /* istanbul ignore else */
         if (err.code === 'ENOENT') {
             fsEx.copySync(path.resolve(__dirname, '..', 'config/database.js'), __base + 'config/database.js');
             _.assign(conf, require(__base + 'config/database'));
@@ -426,10 +406,11 @@ module.exports.getRawConfig = function getRawConfig() {
     }
 
     //setup strategy
-    this.createDirectory('config/strategies');
+    createDirectory('config/strategies');
     try {
         fs.accessSync(__base + 'config/strategies/local.js');
     } catch (err) {
+        /* istanbul ignore else */
         if (err.code === 'ENOENT') {
             fsEx.copySync(path.resolve(__dirname, '..', 'config/strategies/local.js'), __base + 'config/strategies/local.js');
         } else {
@@ -439,14 +420,17 @@ module.exports.getRawConfig = function getRawConfig() {
 
 
     //get ENV config
+    /* istanbul ignore next */
     let env = process.env.NODE_ENV || "development";
     try {
         fs.accessSync(__base + 'config/env/' + env + ".js");
         _.assign(conf, require(__base + 'config/env/' + env));
     } catch (err) {
+
+        /* istanbul ignore else */
         if (err.code === 'ENOENT') {
             fsEx.copySync(path.resolve(__dirname, '..', 'config/env/development.js'), __base + 'config/env/' + env + '.js');
-            _.assign(conf, require(__base + 'config/env/' + env));
+            conf = _.merge(conf, require(__base + 'config/env/' + env));
         } else {
             throw err
         }
@@ -460,8 +444,11 @@ module.exports.getStructure = function getStructure() {
     let structure = {};
     try {
         fs.accessSync(__base + 'config/structure.js');
+
+        /* istanbul ignore next */
         _.assign(structure, require(__base + 'config/structure'));
     } catch (err) {
+        /* istanbul ignore else */
         if (err.code === 'ENOENT') {
             fsEx.copySync(path.resolve(__dirname, '..', 'config/structure.js'), __base + 'config/structure.js');
             _.assign(structure, require(__base + 'config/structure'));
@@ -478,8 +465,11 @@ module.exports.getStructure = function getStructure() {
  * @param {string} path
  * return {void}
  */
-exports.createDirectory = function (path) {
+
+function createDirectory(path) {
     fs.mkdir(__base + path, function (err) {
-        if (err == null) console.log('Create directory ' + path);
+        //if (err == null) console.log('Create directory ' + path);
     });
 };
+
+exports.createDirectory = createDirectory

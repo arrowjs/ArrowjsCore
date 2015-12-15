@@ -1,0 +1,17 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>{{title}}</title>
+</head>
+<body>
+{{ useSocket() }}
+{#{{ hello() | async }}#}
+
+<a href="{{ link_to("hello") }}"></a>
+
+<a href="{{ link_to("hello",{a : 1}) }}"></a>
+
+<h1>{{ getConfig("theme") }}</h1>
+</body>
+</html>

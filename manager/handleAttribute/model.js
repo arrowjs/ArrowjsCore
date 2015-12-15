@@ -28,7 +28,7 @@ module.exports = function modelAttribute(setting, fatherPath, component, applica
                 })
             }
         });
-    } else if (files.type === "multi") {
+    } else {
         Object.keys(files).map(function (key) {
             if (key !== "type") {
                 component.models[key] = {};

@@ -1,6 +1,7 @@
 'use strict';
 let fs = require('fs');
 let passport = require("passport");
+let http = require("http");
 let __ = require('../../libs/global_function');
 let path = require('path');
 
@@ -24,6 +25,25 @@ module.exports = function loadPassport(setting) {
         passport.deserializeUser(passportConfig.deserializeUser) ;
     }
 
+    //Monkey patch
+    let passportLogout = function () {
+        var property = 'user';
+        if (this._passport && this._passport.instance) {
+            property = this._passport.instance._userProperty || 'user';
+        }
+
+        this[property] = null;
+        if (this._passport && this._passport.session) {
+            if (this.session && this.session.permissions) {
+                delete this.session.permissions
+            }
+            delete this._passport.session.user;
+        }
+
+    };
+
+    http.IncomingMessage.prototype.logout =
+    http.IncomingMessage.prototype.logOut = passportLogout;
     app.passportSetting  = passportConfig;
     app.passport  = passport;
 
