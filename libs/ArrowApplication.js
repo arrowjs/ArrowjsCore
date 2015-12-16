@@ -562,12 +562,12 @@ function handleComponentRouteSetting(arrow, componentRouteSetting, defaultRouteC
                 routeHandler = componentRouteSetting[path_name][method].handler;
                 if (!routeHandler) {
                     routeHandler = function (req, res, next) {
-                        next(new Error("Cant find controller"));
+                        next(new Error("Cant find controller for route:" + path.normalize(prefix + routePath)));
                     }
                 }
             } catch (err) {
                 routeHandler = function (req, res, next) {
-                    next(new Error("Cant find controller"));
+                    next(new Error("Cant find controller for route:" + path.normalize(prefix + routePath)));
                 }
             }
             let authenticate = componentRouteSetting[path_name][method].authenticate !== undefined ? componentRouteSetting[path_name][method].authenticate : defaultRouteConfig.authenticate;
