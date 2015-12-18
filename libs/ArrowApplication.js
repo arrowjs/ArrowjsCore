@@ -440,6 +440,12 @@ function associateModels(arrow) {
         //Load model associate rules defined in /config/database.js
         let databaseFunction = require(arrow.arrFolder + "config/database");
 
+        Object.keys(arrow.models).forEach(function (modelName) {
+            if ("associate" in arrow.models[modelName]) {
+                arrow.models[modelName].associate(arrow.models);
+            }
+        });
+
         /* istanbul ignore else */
         if (databaseFunction.associate) {
             let resolve = Promise.resolve();
@@ -449,14 +455,8 @@ function associateModels(arrow) {
             }).then(function () {
                 defaultDatabase.sync();  //Sequelize.sync: sync all defined models to the DB.
             })
-        } else {
-            Object.keys(arrow.models).forEach(function (modelName) {
-                if ("associate" in arrow.models[modelName]) {
-                    arrow.models[modelName].associate(arrow.models);
-                }
-            });
-            defaultDatabase.sync();
         }
+
 
         //Assign raw query function of Sequelize to arrow.models object
         //See Sequelize raw query http://docs.sequelizejs.com/en/latest/docs/raw-queries/
