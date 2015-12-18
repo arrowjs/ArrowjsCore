@@ -462,7 +462,7 @@ function associateModels(arrow) {
         //See Sequelize raw query http://docs.sequelizejs.com/en/latest/docs/raw-queries/
         /* istanbul ignore next */
         if (defaultDatabase.query) {
-            arrow.models.rawQuery =  defaultDatabase.query.bind(defaultDatabase);
+            arrow.models.rawQuery = defaultDatabase.query.bind(defaultDatabase);
             _.assign(arrow.models, defaultDatabase);
         } else {
             arrow.models.rawQuery = defaultQueryResolve;
@@ -558,18 +558,14 @@ function handleComponentRouteSetting(arrow, componentRouteSetting, defaultRouteC
             }
             //handle function
             let routeHandler;
-            try {
-                routeHandler = componentRouteSetting[path_name][method].handler;
-                if (!routeHandler) {
-                    routeHandler = function (req, res, next) {
-                        next(new Error("Cant find controller"));
-                    }
-                }
-            } catch (err) {
-                routeHandler = function (req, res, next) {
-                    next(new Error("Cant find controller"));
-                }
-            }
+
+            componentRouteSetting[path_name][method].handler = componentRouteSetting[path_name][method].handler || function (req, res, next) {
+                next(new Error("Cant find controller"));
+            };
+
+
+            routeHandler = componentRouteSetting[path_name][method].handler;
+
             let authenticate = componentRouteSetting[path_name][method].authenticate !== undefined ? componentRouteSetting[path_name][method].authenticate : defaultRouteConfig.authenticate;
 
             let arrayHandler = [];
