@@ -558,14 +558,12 @@ function handleComponentRouteSetting(arrow, componentRouteSetting, defaultRouteC
             }
             //handle function
             let routeHandler;
-
             componentRouteSetting[path_name][method].handler = componentRouteSetting[path_name][method].handler || function (req, res, next) {
                 next(new Error("Cant find controller"));
             };
 
 
             routeHandler = componentRouteSetting[path_name][method].handler;
-
             let authenticate = componentRouteSetting[path_name][method].authenticate !== undefined ? componentRouteSetting[path_name][method].authenticate : defaultRouteConfig.authenticate;
 
             let arrayHandler = [];
