@@ -683,21 +683,22 @@ function makeRender(req, res, application, componentView, componentName, compone
     return function (view, options, callback) {
 
         var done = callback;
-        var opts = options || {};
+        var opts =  {};
 
         //remove flash message
         delete req.session.flash;
+
+        // merge res.locals
+        _.assign(opts, application.locals);
+        _.assign(opts, res.locals);
 
         // support callback function as second arg
         /* istanbul ignore if */
         if (typeof options === 'function') {
             done = options;
-            opts =  {};
+        } else {
+            _.assign(opts, options);
         }
-        // merge res.locals
-        _.assign(opts, res.locals);
-        _.assign(opts, application.locals);
-
         // default callback to respond
         done = done || function (err, str) {
             if (err) return req.next(err);
