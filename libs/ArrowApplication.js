@@ -545,14 +545,14 @@ function handleComponentRouteSetting(arrow, componentRouteSetting, defaultRouteC
     Object.keys(componentRouteSetting).map(function (path_name) {
         //Check path_name
         /* istanbul ignore next */
-        let routePath = path_name[0] === path.sep ? path_name : path.sep + componentName + path.sep + path_name;
+        let routePath = path_name[0] === "/" ? path_name : "/" + componentName + "/" + path_name;
 
         //handle prefix
         /* istanbul ignore if */
-        if (defaultRouteConfig.prefix && defaultRouteConfig.prefix[0] !== path.sep) {
-            defaultRouteConfig.prefix = path.sep + defaultRouteConfig.prefix
+        if (defaultRouteConfig.prefix && defaultRouteConfig.prefix[0] !== "/") {
+            defaultRouteConfig.prefix = "/" + defaultRouteConfig.prefix
         }
-        let prefix = defaultRouteConfig.prefix || path.sep;
+        let prefix = defaultRouteConfig.prefix || "/";
 
         let arrayMethod = Object.keys(componentRouteSetting[path_name]).filter(function (method) {
             if (componentRouteSetting[path_name][method].name) {
