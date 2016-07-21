@@ -76,6 +76,9 @@ class ConfigManager extends SystemManager {
             .then(function (data) {
                 if (data) {
                     let conf = JSON.parse(data);
+                    delete conf.port;
+                    delete conf.db;
+                    delete conf.redis;
                     _.assign(this._app._config, conf);
                     return (this._app._config);
                 } else {
