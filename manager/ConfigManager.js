@@ -44,8 +44,7 @@ class ConfigManager extends SystemManager {
         }
     }
 
-    ;
-
+;
     /**
      * Set config
      * @param key
@@ -77,7 +76,7 @@ class ConfigManager extends SystemManager {
             .then(function (data) {
                 if (data) {
                     let conf = JSON.parse(data);
-                    this._app._config = _.assign({}, conf, this._app._config);
+                    _.assign(this._app._config, conf);
                     return (this._app._config);
                 } else {
                     return (this._app._config);
