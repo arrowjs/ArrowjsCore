@@ -186,24 +186,24 @@ class SystemManager extends events.EventEmitter {
                 });
             }
         });
-        //handle Database
-        let defaultDatabase = {};
-        /* istanbul ignore next */
-        let defaultQueryResolve = function () {
-            return new Promise(function (fulfill, reject) {
-                fulfill("No models")
-            })
-        };
-        Object.keys(components).map(function (key) {
-            /* istanbul ignore else */
-            if (Object.keys(components[key].models).length > 0) {
-                /* istanbul ignore else */
-                if (_.isEmpty(defaultDatabase)) {
-                    defaultDatabase = Database(_app);
-                }
-            }
-            components[key].models.rawQuery = defaultDatabase.query ? defaultDatabase.query.bind(defaultDatabase) : defaultQueryResolve;
-        });
+        // //handle Database
+        // let defaultDatabase = {};
+        // /* istanbul ignore next */
+        // let defaultQueryResolve = function () {
+        //     return new Promise(function (fulfill, reject) {
+        //         fulfill("No models")
+        //     })
+        // };
+        // Object.keys(components).map(function (key) {
+        //     /* istanbul ignore else */
+        //     if (Object.keys(components[key].models).length > 0) {
+        //         /* istanbul ignore else */
+        //         if (_.isEmpty(defaultDatabase)) {
+        //             defaultDatabase = Database(_app);
+        //         }
+        //     }
+        //     components[key].models.rawQuery = defaultDatabase.query ? defaultDatabase.query.bind(defaultDatabase) : defaultQueryResolve;
+        // });
 
         let featureViewEngine = this.viewEngine;
         let viewEngineSetting = _.assign(_app._config.nunjuckSettings || {}, {express: _app._expressApplication});

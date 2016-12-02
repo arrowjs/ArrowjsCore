@@ -15,8 +15,7 @@ let Database = require("../../libs/database");
  */
 module.exports = function modelAttribute(setting, fatherPath, component, application) {
     let files = getListFile(setting, fatherPath, application);
-    let database = Database(application);
-
+    let database = Database.db();
     application.models = application.models || {};
     if (files.type === "single") {
         Object.keys(files).map(function (key) {
