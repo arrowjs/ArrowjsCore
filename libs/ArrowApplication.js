@@ -24,7 +24,7 @@ const fs = require('fs'),
     ViewEngine = require("../libs/ViewEngine"),
     fsExtra = require('fs-extra'),
     loadingLanguage = require("./i18n").loadLanguage;
-
+let eventEmitter;
 /**
  * ArrowApplication is a singleton object. It is heart of Arrowjs.io web app. it wraps Express and adds following functions:
  * support Redis, multi-languages, passport, check permission and socket.io / websocket
@@ -82,26 +82,6 @@ class ArrowApplication {
 
         installLog(this);
         this.logger = logger;
-        //Make redis cache
-        /* istanbul ignore next */
-        let redisConfig = this._config.redis || {};
-        let redisFunction = RedisCache(redisConfig);
-        var redisClient, redisSubscriber;
-
-        /* In config/env/development.js , section Redis:
-         if real Redis server is not available, set type = 'fakeredis'
-         if real Redis server present, set type = 'redis', host and port correctly
-         */
-        if (redisConfig.type === "fakeredis") {
-            redisClient = redisFunction("client");
-            redisSubscriber = redisFunction.bind(null, redisConfig);
-        } else {
-            redisClient = redisFunction(redisConfig);
-            redisSubscriber = redisFunction.bind(null, redisConfig);
-        }
-
-        this.redisClient = redisClient;
-        this.redisSubscriber = redisSubscriber;
 
         this.middleware = Object.create(null);
         //Add passport and its authentication strategies
@@ -130,77 +110,6 @@ class ArrowApplication {
         //Bind all global functions to ArrowApplication object
         loadingGlobalFunction(this);
 
-        this.configManager = new ConfigManager(this, "config");
-
-        //Share eventEmitter among all kinds of Managers. This helps Manager object notifies each other
-        //when configuration is changed
-        let eventEmitter = new EventEmitter();
-
-        //subscribes to get notification from shared eventEmitter object
-        this.configManager.eventHook(eventEmitter);
-
-        //Create shortcut call
-        this.addConfig = addConfig.bind(this);
-        this.addConfigFile = addConfigFile.bind(this);
-        this.getConfig = this.configManager.getConfig.bind(this.configManager);
-        this.setConfig = this.configManager.setConfig.bind(this.configManager);
-        this.updateConfig = this.configManager.updateConfig.bind(this.configManager);
-
-        let viewEngineSetting = _.assign(this._config.nunjuckSettings || {}, {express: this._expressApplication});
-        let applicationView = ViewEngine(this.arrFolder, viewEngineSetting, this);
-        this.applicationENV = applicationView;
-
-        this.render = function (view, options, callback) {
-            let application = this;
-            var done = callback;
-
-            var opts = options || {};
-            /* istanbul ignore else */
-            if (typeof options === "function") {
-                done = options;
-                opts = {};
-            }
-
-            _.assign(opts, application.locals);
-
-            if (application._config.viewExtension && view.indexOf(application._config.viewExtension) === -1 && view.indexOf(".") === -1) {
-                view += "." + application._config.viewExtension;
-            }
-
-            let arrayPart = view.split(path.sep);
-            arrayPart = arrayPart.map(function (key) {
-                if (key[0] === ":") {
-                    key = key.replace(":", "");
-                    return application.getConfig(key);
-                } else {
-                    return key
-                }
-            });
-
-            let newLink = arrayPart.join(path.sep);
-
-            newLink = path.normalize(application.arrFolder + newLink);
-
-            application.applicationENV.loaders[0].pathsToNames = {};
-            application.applicationENV.loaders[0].cache = {};
-            application.applicationENV.loaders[0].searchPaths = [path.dirname(newLink) + path.sep];
-            return application.applicationENV.render(newLink, opts, done);
-        }.bind(this);
-
-        this.renderString = applicationView.renderString.bind(applicationView);
-
-        //_componentList contains name property of composite features, singleton features, widgets, plugins
-        this._componentList = [];
-        Object.keys(this.structure).map(function (managerKey) {
-            let key = managerKey;
-            let managerName = managerKey + "Manager";
-            this[managerName] = new DefaultManager(this, key);
-            this[managerName].eventHook(eventEmitter);
-            //load sub components of
-            this[managerName].loadComponents(key);
-            this[key] = this[managerName]["_" + key];
-            this._componentList.push(key);
-        }.bind(this));
 
         //Declare _arrRoutes to store all routes of features
         this._arrRoutes = Object.create(null);
@@ -297,6 +206,97 @@ class ArrowApplication {
         self.arrowSettings = setting;
         let stackBegin;
         return Promise.resolve()
+            .then(function connectRedis() {
+                //Redis connection
+                let redisConfig = self._config.redis || {};
+                return RedisCache(redisConfig);
+            })
+            .then(function (redisFunction) {
+                //Make redis cache
+                /* istanbul ignore next */
+                let redisConfig = self._config.redis || {};
+                let redisClient = redisFunction(redisConfig);
+                let redisSubscriber = redisFunction.bind(null, redisConfig);
+
+                self.redisClient = redisClient;
+                self.redisSubscriber = redisSubscriber;
+            })
+            .then(function connectDatabase() {
+                return require('./database').connectDB(self)
+            })
+            .then(function setupManager() {
+                //Share eventEmitter among all kinds of Managers. This helps Manager object notifies each other
+                //when configuration is changed
+                eventEmitter = new EventEmitter();
+
+                self.configManager = new ConfigManager(self, "config");
+                //subscribes to get notification from shared eventEmitter object
+                self.configManager.eventHook(eventEmitter);
+
+                //Create shortcut call
+                self.addConfig = addConfig.bind(self);
+                self.addConfigFile = addConfigFile.bind(self);
+                self.getConfig = self.configManager.getConfig.bind(self.configManager);
+                self.setConfig = self.configManager.setConfig.bind(self.configManager);
+                self.updateConfig = self.configManager.updateConfig.bind(self.configManager);
+
+                //_componentList contains name property of composite features, singleton features, widgets, plugins
+                self._componentList = [];
+                Object.keys(self.structure).map(function (managerKey) {
+                    let key = managerKey;
+                    let managerName = managerKey + "Manager";
+                    self[managerName] = new DefaultManager(self, key);
+                    self[managerName].eventHook(eventEmitter);
+                    //load sub components of
+                    self[managerName].loadComponents(key);
+                    self[key] = self[managerName]["_" + key];
+                    self._componentList.push(key);
+                }.bind(self));
+            })
+            .then(function configRenderLayout() {
+                let viewEngineSetting = _.assign(self._config.nunjuckSettings || {}, {express: self._expressApplication});
+                let applicationView = ViewEngine(self.arrFolder, viewEngineSetting, self);
+                self.applicationENV = applicationView;
+
+                self.render = function (view, options, callback) {
+                    let application = self;
+                    var done = callback;
+
+                    var opts = options || {};
+                    /* istanbul ignore else */
+                    if (typeof options === "function") {
+                        done = options;
+                        opts = {};
+                    }
+
+                    _.assign(opts, application.locals);
+
+                    if (application._config.viewExtension && view.indexOf(application._config.viewExtension) === -1 && view.indexOf(".") === -1) {
+                        view += "." + application._config.viewExtension;
+                    }
+
+                    let arrayPart = view.split(path.sep);
+                    arrayPart = arrayPart.map(function (key) {
+                        if (key[0] === ":") {
+                            key = key.replace(":", "");
+                            return application.getConfig(key);
+                        } else {
+                            return key
+                        }
+                    });
+
+                    let newLink = arrayPart.join(path.sep);
+
+                    newLink = path.normalize(application.arrFolder + newLink);
+
+                    application.applicationENV.loaders[0].pathsToNames = {};
+                    application.applicationENV.loaders[0].cache = {};
+                    application.applicationENV.loaders[0].searchPaths = [path.dirname(newLink) + path.sep];
+                    return application.applicationENV.render(newLink, opts, done);
+                }.bind(self);
+
+                self.renderString = applicationView.renderString.bind(applicationView);
+            })
             .then(function () {
                 let resolve = Promise.resolve();
                 self.plugins.map(function (plug) {
@@ -394,12 +394,10 @@ class ArrowApplication {
                     logger.info('Application started on port ' + self.getConfig("port"), ', Process ID: ' + process.pid);
                 });
                 /* istanbul ignore next */
-            }).catch(
-            function (err) {
+            })
+            .catch(function (err) {
                 logger.error(err)
-            }
-        );
-
+            });
     }
 
     close() {
@@ -430,7 +428,6 @@ class ArrowApplication {
 
 function associateModels(arrow) {
     let defaultDatabase = require('./database').db();
-
     if (arrow.models && Object.keys(arrow.models).length > 0) {
         /* istanbul ignore next */
         let defaultQueryResolve = function () {
@@ -561,8 +558,8 @@ function handleComponentRouteSetting(arrow, componentRouteSetting, defaultRouteC
             //handle function
             let routeHandler;
             componentRouteSetting[path_name][method].handler = componentRouteSetting[path_name][method].handler || function (req, res, next) {
-                next(new Error("Cant find controller"));
-            };
+                    next(new Error("Cant find controller"));
+                };
 
 
             routeHandler = componentRouteSetting[path_name][method].handler;
@@ -683,7 +680,7 @@ function makeRender(req, res, application, componentView, componentName, compone
     return function (view, options, callback) {
 
         var done = callback;
-        var opts =  {};
+        var opts = {};
 
         //remove flash message
         delete req.session.flash;
@@ -701,9 +698,9 @@ function makeRender(req, res, application, componentView, componentName, compone
         }
         // default callback to respond
         done = done || function (err, str) {
-            if (err) return req.next(err);
-            res.send(str);
-        };
+                if (err) return req.next(err);
+                res.send(str);
+            };
 
         if (application._config.viewExtension && view.indexOf(application._config.viewExtension) === -1 && view.indexOf(".") === -1) {
             view += "." + application._config.viewExtension;
