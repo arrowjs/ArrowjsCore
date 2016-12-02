@@ -2,14 +2,11 @@
 const redis = require('redis'),
     bluebird = require('bluebird'),
     __ = require('./global_function'),
-    fakeRedis = require("fakeredis"),
     logger = require("./logger");
 
 bluebird.promisifyAll(redis.RedisClient.prototype);
 bluebird.promisifyAll(redis.Multi.prototype);
 
-bluebird.promisifyAll(fakeRedis.RedisClient.prototype);
-bluebird.promisifyAll(fakeRedis.Multi.prototype);
 
 /**
  * If Redis server presents then create client to connect to it else create fakeRedis
@@ -17,9 +14,6 @@ bluebird.promisifyAll(fakeRedis.Multi.prototype);
  * @returns {Promise}
  */
 module.exports = function (config) {
-    if (config.type === 'fakeredis') {
-        return fakeRedis.createClient;
-    }
     let client = redis.createClient(config);
 
     /* istanbul ignore next */
