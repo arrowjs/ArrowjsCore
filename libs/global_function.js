@@ -418,6 +418,21 @@ module.exports.getRawConfig = function getRawConfig() {
         }
     }
 
+    //get default config
+
+    try {
+        fs.accessSync(__base + 'config/env/default.js');
+        _.assign(conf, require(__base + 'config/env/default.js'));
+    } catch (err) {
+        /* istanbul ignore else */
+        if (err.code === 'ENOENT') {
+            fsEx.copySync(path.resolve(__dirname, '..', 'config/env/default.js'), __base + 'config/env/default.js');
+            conf = _.merge(conf, require(__base + 'config/env/default.js'));
+        } else {
+            throw err
+        }
+    }
+
 
     //get ENV config
     /* istanbul ignore next */

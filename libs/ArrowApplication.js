@@ -465,7 +465,7 @@ function associateModels(arrow) {
         /* istanbul ignore next */
         if (defaultDatabase.query) {
             arrow.models.rawQuery = defaultDatabase.query.bind(defaultDatabase);
-            _.assign(arrow.models, defaultDatabase);
+            _.merge(arrow.models, defaultDatabase);
         } else {
             arrow.models.rawQuery = defaultQueryResolve;
         }

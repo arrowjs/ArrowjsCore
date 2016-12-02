@@ -38,7 +38,7 @@ module.exports = function (app, config, setting) {
         app.locals.cache = 'memory';
     }
 
-    app.use(app.middleware.bodyParser.urlencoded({ extended: false }));
+    app.use(app.middleware.bodyParser.urlencoded({extended: false}));
     app.use(app.middleware.bodyParser.json());
     app.use(app.middleware.methodOverride());
 
@@ -57,10 +57,7 @@ module.exports = function (app, config, setting) {
     /** Use helmet to secure Express headers */
     let helmet = app.middleware.helmet;
 
-    app.use(helmet.xframe());
-    app.use(helmet.xssFilter());
-    app.use(helmet.nosniff());
-    app.use(helmet.ienoopen());
+    app.use(helmet())
     app.disable('x-powered-by');
 
     /** Passing the variables to environment locals */
