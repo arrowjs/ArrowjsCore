@@ -31,3 +31,5 @@ $ npm install arrowjs --save
 ## License
 
 The MIT License (MIT)
+
+MASTER GIT CLASSS WAS HERE!
