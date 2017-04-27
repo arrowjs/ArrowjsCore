@@ -2,9 +2,11 @@
 
 const exec = require('child_process').exec;
 const path = require('path');
-
 module.exports = function (env) {
-  exec(path.resolve(__dirname,'..') + '/node_modules/nodemon/bin/nodemon.js index.js',(error, stdout, stderr) => {
-    console.log(error)
-  })
+  exec('pwd', (error, stdout, stderr) => {
+    if (error) return console.error(error)
+    require('child_process').fork(path.resolve(__dirname,'..') + '/node_modules/nodemon/bin/nodemon.js',
+      [path.join(stdout.replace(/\n$/, '') + '/index.js')]);
+  });
 }
+

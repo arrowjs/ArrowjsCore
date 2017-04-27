@@ -9,6 +9,7 @@ const init = require('./init');
 const dev = require('./dev');
 const start = require('./start');
 const test = require('./test');
+const create = require('./create');
 
 program
   .version('1.0.0')
@@ -36,6 +37,9 @@ switch (cmdValue) {
     break;
   case 'start':
     start(envValue);
+    break;
+  case 'create':
+    create(envValue);
     break;
   default:
     noCommand()
