@@ -8,6 +8,7 @@ const program = require('commander');
 const init = require('./init');
 const dev = require('./dev');
 const start = require('./start');
+const test = require('./test');
 
 program
   .version('1.0.0')
@@ -29,6 +30,9 @@ switch (cmdValue) {
     break;
   case 'dev':
     dev(envValue);
+    break;
+  case 'test':
+    test(envValue);
     break;
   case 'start':
     start(envValue);

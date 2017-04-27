@@ -487,4 +487,8 @@ function createDirectory(path) {
     });
 };
 
+module.exports.createArrowStructure = function createArrowStructure(folder) {
+    fsEx.copySync(path.resolve(__dirname, '..', 'appTemplate'), folder);
+}
+
 exports.createDirectory = createDirectory
