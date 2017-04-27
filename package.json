@@ -8,6 +8,9 @@
     "watch": "./node_modules/.bin/mocha -u bdd -R spec -t 500 -w",
     "covertest": "./node_modules/.bin/istanbul cover ./node_modules/.bin/_mocha --recursive"
   },
+  "bin": {
+    "arrow": "./bin/index.js"
+  },
   "repository": {
     "type": "git",
     "url": "git+https://github.com/arrowjs/ArrowjsCore.git"
@@ -17,6 +20,7 @@
   "dependencies": {
     "bluebird": "^3.4.6",
     "body-parser": "^1.14.1",
+    "commander": "^2.9.0",
     "connect-flash": "^0.1.1",
     "connect-redis": "^3.1.0",
     "cookie-parser": "~1.4.0",
@@ -27,9 +31,12 @@
     "fs-extra": "^1.0.0",
     "glob": "^7.1.1",
     "helmet": "^3.1.0",
+    "i18n": "^0.8.3",
+    "kue": "^0.11.5",
     "lodash": "^4.17.2",
     "longjohn": "^0.2.10",
     "method-override": "^2.3.5",
+    "mongoose": "^4.9.6",
     "morgan": "^1.7.0",
     "mysql": "^2.9.0",
     "nunjucks": "^3.0.0",
@@ -51,6 +58,7 @@
     "istanbul": "^0.4.1",
     "mocha": "^3.2.0",
     "mockery": "^2.0.0",
+    "nodemon": "^1.11.0",
     "sinon": "^1.17.2",
     "sinon-chai": "^2.8.0",
     "supertest": "^2.0.1"
