@@ -500,14 +500,14 @@ module.exports.createFeature = function createFeature(name, options, folder) {
     fs.mkdirSync(`${folder}/features/${name}`)
     const featureInfo = nunjucks.render('feature.js', {name : capName})
     fs.writeFileSync(`${folder}/features/${name}/feature.js`, featureInfo)
-    if (dbType === 'mongodb') {
+    if (options.dbType === 'mongodb') {
         fs.mkdirSync(`${folder}/features/${name}/models`)
-        const modelInfo = nunjucks.render('model/mongo.js', {name : capName})
-        fs.writeFileSync(`${folder}/features/${name}/models/${capName}.jst`, modelInfo)
+        const modelInfo = nunjucks.render('model/mongo.jst', {name : capName})
+        fs.writeFileSync(`${folder}/features/${name}/models/${capName}.js`, modelInfo)
     } else {
         fs.mkdirSync(`${folder}/features/${name}/models`)
-        const modelInfo = nunjucks.render('model/sql.js', {name : capName})
-        fs.writeFileSync(`${folder}/features/${name}/models/${capName}.jst`, modelInfo)
+        const modelInfo = nunjucks.render('model/sql.jst', {name : capName})
+        fs.writeFileSync(`${folder}/features/${name}/models/${capName}.js`, modelInfo)
     }
 
     const routeInfo = nunjucks.render('route/no_template.js', {name : pluralName})
