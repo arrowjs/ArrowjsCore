@@ -40,15 +40,15 @@ class ArrowApplication {
      *     <li>order: true, order router priority rule.</li>
      * </ul>
      */
-    constructor(setting) {
+    constructor(setting = {}) {
         //if NODE_ENV does not exist, use development by default
         /* istanbul ignore next */
         process.env.NODE_ENV = process.env.NODE_ENV || 'development';
 
         this.beforeAuth = [];  //add middle-wares before user authenticates
         this.afterAuth = [];   //add middle-ware after user authenticates
-        this.plugins = [];   //add middle-ware after user authenticates
-        let app = express();
+        this.plugins = [];   //add arrow plugin after user authenticates
+        const app = express();
 
         global.Arrow = {};
 
@@ -103,13 +103,11 @@ class ArrowApplication {
         this.middleware.morgan = require("morgan");
         this.middleware.methodOverride = require('method-override');
 
-
         //Load available languages. See config/i18n.js and folder /lang
         loadingLanguage(this._config);
 
         //Bind all global functions to ArrowApplication object
         loadingGlobalFunction(this);
-
 
         //Declare _arrRoutes to store all routes of features
         this._arrRoutes = Object.create(null);
@@ -120,7 +118,7 @@ class ArrowApplication {
         this.utils.loadAndCreate = loadSetting.bind(this);
         this.utils.markSafe = r.markSafe;
 
-        this.arrowSettings = Object.create(null);
+        this.arrowSettings = setting;
     }
 
     /**
@@ -200,11 +198,10 @@ class ArrowApplication {
      * Kick start express application and listen at default port
      * @param {object} setting - {passport: boolean, role: boolean}
      */
-    start(setting) {
+    start() {
         let self = this;
-
-        self.arrowSettings = setting;
         let stackBegin;
+        const setting = self.arrowSettings
         return Promise.resolve()
             .then(function connectRedis() {
                 //Redis connection
@@ -428,7 +425,7 @@ class ArrowApplication {
 
 function associateModels(arrow) {
     let defaultDatabase = require('./database').db();
-    if (arrow.models && Object.keys(arrow.models).length > 0) {
+    if (defaultDatabase.__arrowDB.dialect !== 'mongodb' && arrow.models && Object.keys(arrow.models).length > 0) {
         /* istanbul ignore next */
         let defaultQueryResolve = function () {
             return new Promise(function (fulfill, reject) {

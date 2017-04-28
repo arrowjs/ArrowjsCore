@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="">
+    <meta name="author" content="">
+
+    {% block headExtends %}
+
+    {% endblock %}
+
+    <link href="/css/style.css" rel="stylesheet">
+    {% block cssExtends %}{% endblock %}
+</head>
+<!--/head-->
+
+<body>
+
+<!--header start-->
+{% include '_header.twig' %}
+<!--header end-->
+
+{% block content %}
+{% endblock %}
+
+<!--footer start-->
+{% include '_footer.twig' %}
+<!--footer end-->
+
+{% block jsExtends %}{% endblock %}
+</body>
+</html>

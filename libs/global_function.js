@@ -6,8 +6,8 @@ const _ = require('lodash'),
     fsEx = require('fs-extra'),
     path = require('path'),
     logger = require('./logger'),
-    nunjucks = require('nunjucks');
-
+    nunjucks = require('nunjucks'),
+    pluralize = require('pluralize');
 
 /**
  * Create Environment to handles templates
@@ -489,6 +489,29 @@ function createDirectory(path) {
 
 module.exports.createArrowStructure = function createArrowStructure(folder) {
     fsEx.copySync(path.resolve(__dirname, '..', 'appTemplate'), folder);
+    fsEx.copySync(path.resolve(__dirname, '..', 'config'), folder + '/config');
+}
+
+module.exports.createFeature = function createFeature(name, options, folder) {
+    const arrowFolder = path.resolve(__dirname, '..')
+    const capName = _.capitalize(name)
+    const pluralName = pluralize(name)
+    nunjucks.configure(arrowFolder + '/generator');
+    fs.mkdirSync(`${folder}/features/${name}`)
+    const featureInfo = nunjucks.render('feature.js', {name : capName})
+    fs.writeFileSync(`${folder}/features/${name}/feature.js`, featureInfo)
+    if (dbType === 'mongodb') {
+        fs.mkdirSync(`${folder}/features/${name}/models`)
+        const modelInfo = nunjucks.render('model/mongo.js', {name : capName})
+        fs.writeFileSync(`${folder}/features/${name}/models/${capName}.jst`, modelInfo)
+    } else {
+        fs.mkdirSync(`${folder}/features/${name}/models`)
+        const modelInfo = nunjucks.render('model/sql.js', {name : capName})
+        fs.writeFileSync(`${folder}/features/${name}/models/${capName}.jst`, modelInfo)
+    }
+
+    const routeInfo = nunjucks.render('route/no_template.js', {name : pluralName})
+    fs.writeFileSync(`${folder}/features/${name}/route.js`, routeInfo)
 }
 
 exports.createDirectory = createDirectory

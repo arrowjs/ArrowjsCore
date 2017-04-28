@@ -17,19 +17,22 @@ module.exports = {
         },
         "model": {
             "path": {
-                "folder": "model",
+                "folder": "models",
                 "file": "*.js"
             }
         },
         "view": {
             "path": {
-                "folder": "view"
+                "folder": [
+                  "view",
+                  "/layouts"
+                  ]
             }
         },
         "controller": {
             "path": {
                 "folder": "controller",
-                "file": "controller.js"
+                "file": "index.js"
             }
         },
         "route": {
@@ -40,7 +43,7 @@ module.exports = {
         "action": {
             "path": {
                 "folder": "action",
-                "file": "action.js"
+                "file": "index.js"
             }
         }
     }

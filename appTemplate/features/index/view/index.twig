@@ -1,15 +1,5 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <title>{{title}}</title>
-</head>
-<body>
-<h1>{{ title }}</h1>
-<ul>
-    {% for item in links %}
-    <li><a href="{{ item.link }}">{{ item.title }}</a></li>
-    {% endfor %}
-</ul>
-</body>
-</html>
+{% extends '_layout.' + getConfig('viewExtension') %}
+
+{% block content %}
+<h1>Hello ArrowJS</h1>
+{% endblock %}

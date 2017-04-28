@@ -43,10 +43,10 @@ module.exports = {
     },
     error : {
         "404" : {
-            render : "public/404.html"
+            render : "layouts/_404.html"
         },
         "500" : {
-            render : "public/500.html"
+            render : "layouts/_500.html"
         }
     }
 };

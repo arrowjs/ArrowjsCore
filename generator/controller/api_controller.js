@@ -1,7 +1,7 @@
 'use strict';
 
 module.exports = function (controller,component,application) {
-    controller.index = function (req,res) {
-        res.render('index')
-    };
+  controller.index = function (req,res) {
+    res.render('index')
+  };
 };
