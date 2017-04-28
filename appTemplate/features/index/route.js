@@ -3,11 +3,11 @@
 /**
  * Map final part of URL to equivalent functions in controller
  */
-module.exports = function (component,application) {
+module.exports = function (feature, application) {
     return {
         "/": {
             get : {
-                handler: component.controllers.index
+                handler: feature.controllers.index
             }
         },
     }

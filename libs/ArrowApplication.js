@@ -82,6 +82,7 @@ class ArrowApplication {
 
         installLog(this);
         this.logger = logger;
+        Arrow.logger = logger;
 
         this.middleware = Object.create(null);
         //Add passport and its authentication strategies
@@ -156,23 +157,6 @@ class ArrowApplication {
                 reject(new Error("Cant afterAuthenticate: not an function"));
             }
         })
-    }
-
-    /**
-     * Turn object to become property of ArrowApplication
-     * @param {object} obj - object parameter
-     */
-
-    addGlobal(obj) {
-        /* istanbul ignore next */
-        return new Promise(function (fulfill, reject) {
-            if (_.isObject(obj)) {
-                _.assign(Arrow, obj);
-                fulfill()
-            } else {
-                reject(new Error("Cant addGlobal: not an Object"));
-            }
-        });
     }
 
     /**
@@ -518,7 +502,49 @@ function configureExpressApp(app, config, setting) {
     });
 }
 
+function routerMapping(fatherPath, defaultRouteConfig, component, arrow, route, template, key) {
 
+    const componentName = component.name;
+    const viewInfo = component.views;
+
+    Object.keys(template).map(function (path_name) {
+        //Check path_name
+        /* istanbul ignore next */
+        let routePath = path_name[0] === "/" ? path_name : "/" + componentName + "/" + path_name;
+        routePath = fatherPath + routePath
+        //handle prefix
+        /* istanbul ignore if */
+        if (defaultRouteConfig.prefix && defaultRouteConfig.prefix[0] !== "/") {
+            defaultRouteConfig.prefix = "/" + defaultRouteConfig.prefix
+        }
+        let prefix = defaultRouteConfig.prefix || "/";
+        Object.keys(template[path_name]).map(function (method) {
+            const routeInfo = template[path_name][method]
+            if (routeInfo.name) {
+                arrow._arrRoutes[routeInfo.name] = path.normalize(prefix + routePath);
+            }
+            //handle function
+            let arrayHandler = [routeInfo.handler];
+
+            arrayHandler.splice(0, 0, overrideViewRender(arrow, viewInfo, componentName, component, key))
+
+            //Add to route
+            if (method === "param") {
+                if (_.isString(routeInfo.key) && !_.isArray(routeInfo.handler)) {
+                    return route.param(routeInfo.key, routeInfo.handler);
+                }
+            } else if (method === 'all') {
+                return route.route(routePath)[method](arrayHandler);
+            } else if (route[method] && ['route', 'use'].indexOf(method) === -1) {
+                return route.route(routePath)[method](arrayHandler);
+            } else {
+                return false
+            }
+        })
+        arrow.use(prefix, route)
+    })
+
+}
 /**
  *
  * @param arrow
@@ -540,7 +566,6 @@ function handleComponentRouteSetting(arrow, componentRouteSetting, defaultRouteC
         //Check path_name
         /* istanbul ignore next */
         let routePath = path_name[0] === "/" ? path_name : "/" + componentName + "/" + path_name;
-
         //handle prefix
         /* istanbul ignore if */
         if (defaultRouteConfig.prefix && defaultRouteConfig.prefix[0] !== "/") {
@@ -549,42 +574,50 @@ function handleComponentRouteSetting(arrow, componentRouteSetting, defaultRouteC
         let prefix = defaultRouteConfig.prefix || "/";
 
         let arrayMethod = Object.keys(componentRouteSetting[path_name]).filter(function (method) {
-            if (componentRouteSetting[path_name][method].name) {
-                arrow._arrRoutes[componentRouteSetting[path_name][method].name] = path.normalize(prefix + routePath);
+            //handle template route
+            if (method === 'template') {
+                const template = componentRouteSetting[path_name][method]
+                return routerMapping(routePath, defaultRouteConfig, component, arrow, route, template,key)
+            }
+
+            const routeInfo = componentRouteSetting[path_name][method]
+            if (routeInfo.name) {
+                arrow._arrRoutes[routeInfo.name] = path.normalize(prefix + routePath);
             }
             //handle function
             let routeHandler;
-            componentRouteSetting[path_name][method].handler = componentRouteSetting[path_name][method].handler || function (req, res, next) {
-                    next(new Error("Cant find controller"));
-                };
+            const defaultHandler = function (req, res, next) {
+                next(new Error("Invalid controller"));
+            };
 
+            routeHandler = routeInfo.handler;
 
-            routeHandler = componentRouteSetting[path_name][method].handler;
-            let authenticate = componentRouteSetting[path_name][method].authenticate !== undefined ? componentRouteSetting[path_name][method].authenticate : defaultRouteConfig.authenticate;
+            // let authenticate = routeInfo.authenticate !== undefined ?
+          //   routeInfo.authenticate : defaultRouteConfig.authenticate;
+          // if (!_.isString(authenticate) || !_.isBoolean(authenticate)) {
+          //   return false
+          // }
 
+            //Setting base Handler
             let arrayHandler = [];
-            if (arrayHandler && _.isArray(routeHandler)) {
-                arrayHandler = routeHandler.filter(function (func) {
-                    if (_.isFunction(func)) {
-                        return func
-                    }
-                });
+            if (_.isArray(routeHandler)) {
+                arrayHandler = routeHandler.filter(_.isFunction);
             } else if (_.isFunction(routeHandler)) {
                 arrayHandler.push(routeHandler)
-            } else if (!_.isString(authenticate)) {
-                return
+            } else {
+                arrayHandler.push(defaultHandler)
             }
 
             //Add viewRender
-            if (!_.isEmpty(viewInfo) && !_.isString(authenticate)) {
+            if (!_.isEmpty(viewInfo)) {
                 arrayHandler.splice(0, 0, overrideViewRender(arrow, viewInfo, componentName, component, key))
             }
 
-
             //handle role
+            //TODO: need new RBAC
             if (setting && setting.role) {
-                let permissions = componentRouteSetting[path_name][method].permissions;
-                if (permissions && !_.isString(authenticate)) {
+                let permissions = routeInfo.permissions;
+                if (permissions) {
                     arrayHandler.splice(0, 0, arrow.passportSetting.handlePermission);
                     arrayHandler.splice(0, 0, handleRole(arrow, permissions, componentName, key))
                 }
@@ -613,23 +646,23 @@ function handleComponentRouteSetting(arrow, componentRouteSetting, defaultRouteC
 
             //Add to route
             if (method === "param") {
-                if (_.isString(componentRouteSetting[path_name][method].key) && !_.isArray(componentRouteSetting[path_name][method].handler)) {
-                    return route.param(componentRouteSetting[path_name][method].key, componentRouteSetting[path_name][method].handler);
+                if (_.isString(routeInfo.key) && !_.isArray(routeInfo.handler)) {
+                    return route.param(routeInfo.key, routeInfo.handler);
                 }
             } else if (method === 'all') {
                 return route.route(routePath)
                     [method](arrayHandler);
             } else if (route[method] && ['route', 'use'].indexOf(method) === -1) {
-                if (componentRouteSetting[path_name][method].order) {
+                if (routeInfo.order) {
                     let newRoute = express.Router();
                     newRoute.componentName = componentName;
-                    newRoute.order = componentRouteSetting[path_name][method].order;
-                    newRoute.route(routePath)
-                        [method](arrayHandler);
-                    arrow.use(prefix, newRoute)
+                    newRoute.order = routeInfo.order;
+                    newRoute.route(routePath)[method](arrayHandler);
+                    return arrow.use(prefix, newRoute)
                 }
-                return route.route(routePath)
-                    [method](arrayHandler)
+                return route.route(routePath)[method](arrayHandler)
+            } else {
+                return false
             }
         });
         !_.isEmpty(arrayMethod) && arrow.use(prefix, route);
@@ -674,8 +707,8 @@ function overrideViewRender(application, componentView, componentName, component
  * @returns {Function}
  */
 function makeRender(req, res, application, componentView, componentName, component) {
+    const viewTemplateFolder = path.resolve(__dirname, '..', 'generator/view')
     return function (view, options, callback) {
-
         var done = callback;
         var opts = {};
 
@@ -704,10 +737,12 @@ function makeRender(req, res, application, componentView, componentName, compone
         }
         component.viewEngine.loaders[0].pathsToNames = {};
         component.viewEngine.loaders[0].cache = {};
-        component.viewEngine.loaders[0].searchPaths = componentView.map(function (obj) {
-            return handleView(obj, application, componentName);
+        const searchPaths = componentView.map(function (obj) {
+          return handleView(obj, application, componentName);
         });
+        searchPaths.push(viewTemplateFolder)
 
+        component.viewEngine.loaders[0].searchPaths = searchPaths
         component.viewEngine.render(view, opts, done);
     };
 }
@@ -794,15 +829,14 @@ function handleRole(application, permissions, componentName, key) {
  * @param self: ArrowApplication object
  */
 function loadingGlobalFunction(self) {
-    global.ArrowHelper = {};
     __.getGlobbedFiles(path.resolve(__dirname, "..", "helpers/*.js")).map(function (link) {
         let arrowObj = require(link);
         Object.keys(arrowObj).map(function (key) {
             /* istanbul ignore else */
             if (_.isFunction(arrowObj[key])) {
-                ArrowHelper[key] = arrowObj[key].bind(self)
+                Arrow[key] = arrowObj[key].bind(self)
             } else {
-                ArrowHelper[key] = arrowObj[key]
+                Arrow[key] = arrowObj[key]
             }
         })
     });
@@ -810,15 +844,15 @@ function loadingGlobalFunction(self) {
         let arrowObj = require(link);
         Object.keys(arrowObj).map(function (key) {
             if (_.isFunction(arrowObj[key])) {
-                ArrowHelper[key] = arrowObj[key].bind(self)
+                Arrow[key] = arrowObj[key].bind(self)
             } else {
-                ArrowHelper[key] = arrowObj[key]
+                Arrow[key] = arrowObj[key]
             }
         })
     });
 
     //Add some support function
-    global.__ = ArrowHelper.__;
+    global.__ = Arrow.__;
     return self
 }
 

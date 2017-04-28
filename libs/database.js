@@ -42,6 +42,10 @@ function mongoConnection(dbConfig) {
         mongoose.Promise = Promise;
         db = mongoose;
         db.__arrowDB = dbConfig;
+        mongoose.connection.on('error', function (err) {
+            console.log(err.message)
+            process.exit(1)
+        });
         resolve(db)
     })
 }
