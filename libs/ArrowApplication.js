@@ -409,7 +409,7 @@ class ArrowApplication {
 
 function associateModels(arrow) {
     let defaultDatabase = require('./database').db();
-    if (defaultDatabase.__arrowDB.dialect !== 'mongodb' && arrow.models && Object.keys(arrow.models).length > 0) {
+    if (defaultDatabase && defaultDatabase.__arrowDB.dialect !== 'mongodb' && arrow.models && Object.keys(arrow.models).length > 0) {
         /* istanbul ignore next */
         let defaultQueryResolve = function () {
             return new Promise(function (fulfill, reject) {

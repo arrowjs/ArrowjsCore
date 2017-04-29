@@ -20,7 +20,7 @@ module.exports = function (config) {
         /* istanbul ignore next */
 
         client.on('error', function (err) {
-            logger.error("Could not connect to redis server. ArrowJS used fakeredis");
+            logger.warn("Could not connect to redis server. ArrowJS used fakeredis");
             resolve(fakeredis.createClient);
             return client.quit()
 

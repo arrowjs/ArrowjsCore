@@ -11,14 +11,15 @@ function postgresConnection(dbConfig) {
         var conString = 'postgres://' + dbConfig.username + ':' + dbConfig.password + '@' + dbConfig.host + ":" + dbConfig.port;
         var client = new pg.Client({
             user: dbConfig.username,
-            password: dbConfig.password,
+            password: dbConfig.password || '1',
             database: "postgres",
             host: dbConfig.host,
             port: dbConfig.port,
         });
         client.connect(function (err) {
             if (err) {
-                return reject(new Error("Could not connect to " + conString))
+              logger.error("Can't connect your database");
+              return resolve(null)
             }
             client.query('CREATE DATABASE ' + dbConfig.database, function (err) {
                 //db should exist now, initialize Sequelize
