@@ -1,23 +1,19 @@
 'use strict';
-
-const exec = require('child_process').exec;
-const path = require('path');
-const fs = require('fs');
 const globalFunction = require('../libs/global_function');
-module.exports = function (params, options) {
-  exec('pwd', (error, stdout, stderr) => {
-    if (!params) {
-      return console.log('No feature name')
-    }
+const fs = require('fs');
 
-    const appPath = path.join(stdout.replace(/\n$/, ''))
-    const dbConfig = require(appPath + '/config/database')
-    const listFeatures = fs.readdirSync(appPath + '/features')
-    if (listFeatures.indexOf(params.toLowerCase()) > -1) {
-      return console.log(`You had a feature name "${params}"`)
-    }
-    globalFunction.createFeature(params.toLowerCase(),{
-      dbType: dbConfig.db.dialect,
-    }, appPath)
-  });
+module.exports = function (params, options) {
+  if (!params) {
+    return console.log('\x1b[31mNo feature name\x1b[0m')
+  }
+  const appPath = process.cwd()
+  const dbConfig = require(appPath + '/config/database')
+  const listFeatures = fs.readdirSync(appPath + '/features')
+  if (listFeatures.indexOf(params.toLowerCase()) > -1) {
+    return console.log(`\x1b[31mYou had a feature name "${params}"\x1b[0m`)
+  }
+  globalFunction.createFeature(params.toLowerCase(), {
+    dbType: dbConfig.db.dialect,
+  }, appPath)
+  console.log(`\x1b[32mCreate "${params}" feature successfully\x1b[0m`)
 }

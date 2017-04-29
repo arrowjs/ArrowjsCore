@@ -514,4 +514,22 @@ module.exports.createFeature = function createFeature(name, options, folder) {
     fs.writeFileSync(`${folder}/features/${name}/route.js`, routeInfo)
 }
 
+module.exports.useFeature = function useFeature(name, options, folder) {
+  const arrowFolder = path.resolve(__dirname, '..')
+  switch (name) {
+    case 'user':
+      fsEx.copySync(path.resolve(arrowFolder, 'packs', 'user'), `${folder}/features/user`);
+      return
+    case 'role':
+      fsEx.copySync(path.resolve(arrowFolder, 'packs', 'role'), `${folder}/features/role`);
+      fsEx.copySync(path.resolve(arrowFolder, 'packs', 'user'), `${folder}/features/user`);
+      return
+    case 'blog':
+      fsEx.copySync(path.resolve(arrowFolder, 'packs', 'blog'), `${folder}/features/blog`);
+      fsEx.copySync(path.resolve(arrowFolder, 'packs', 'role'), `${folder}/features/role`);
+      fsEx.copySync(path.resolve(arrowFolder, 'packs', 'user'), `${folder}/features/user`);
+      return
+  }
+}
+
 exports.createDirectory = createDirectory
