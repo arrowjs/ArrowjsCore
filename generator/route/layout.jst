@@ -1,0 +1,12 @@
+'use strict';
+
+/**
+ * Map final part of URL to equivalent functions in controller
+ */
+module.exports = function (feature,application) {
+  return {
+    "/{{name}}": {
+      template: Arrow.template('layout', '{{capName}}', feature)
+    },
+  }
+};

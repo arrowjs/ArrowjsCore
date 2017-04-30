@@ -561,7 +561,6 @@ function handleComponentRouteSetting(arrow, componentRouteSetting, defaultRouteC
     //Handle Route Path;
     let route = express.Router();
     route.componentName = componentName;
-
     Object.keys(componentRouteSetting).map(function (path_name) {
         //Check path_name
         /* istanbul ignore next */

@@ -44,9 +44,9 @@ function apiTemplate(model) {
   }
 }
 
-function layoutTemplate(model, component) {
-  mongoController(component.controllers, model)
-  const controller = component.controllers
+function layoutTemplate(model, feature) {
+  mongoController(feature, model)
+  const controller = feature.controllers
   return {
     "/": {
       get: {
@@ -81,11 +81,11 @@ function layoutTemplate(model, component) {
 }
 
 module.exports = {
-  "template": function (type, model, component) {
+  "template": function (type, model, feature) {
     if (type === 'api') {
-      return apiTemplate(model, component)
+      return apiTemplate(feature.models[model], feature)
     } else {
-      return layoutTemplate(model, component)
+      return layoutTemplate(feature.models[model], feature)
     }
   }
 };

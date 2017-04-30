@@ -1,22 +1,26 @@
 'use strict';
-
-module.exports = function (controller,model) {
-  controller.showAll = function (req, res, next) {
-    res.render('index')
+const mongoAction = require('../action/mongo_action')
+const modelToTemplate= require('../../libs/modelToTemplate')
+module.exports = function (feature, model) {
+  mongoAction(feature.actions, model);
+  const controllers = feature.controllers;
+  const actions = feature.actions
+  controllers.showAll = function (req, res, next) {
+    res.render('list')
   };
-  controller.create = function (req, res, next) {
+  controllers.create = function (req, res, next) {
     res.send('create')
   };
-  controller.detail = function (req, res, next) {
+  controllers.detail = function (req, res, next) {
     res.render('detail')
   };
-  controller.createPage = function (req, res, next) {
-    res.render('new')
+  controllers.createPage = function (req, res, next) {
+    res.render('new', { arrTemplate : modelToTemplate('mongodb', model) })
   };
-  controller.edit = function (req, res, next) {
+  controllers.edit = function (req, res, next) {
     res.redirect('demo')
   };
-  controller.editPage = function (req, res, next) {
+  controllers.editPage = function (req, res, next) {
     res.render('edit')
   };
 };

@@ -510,8 +510,19 @@ module.exports.createFeature = function createFeature(name, options, folder) {
         fs.writeFileSync(`${folder}/features/${name}/models/${capName}.js`, modelInfo)
     }
 
-    const routeInfo = nunjucks.render('route/no_template.js', {name : pluralName})
-    fs.writeFileSync(`${folder}/features/${name}/route.js`, routeInfo)
+    //TODO: Generate full template
+    if (options.full) {
+        if (options.api) {
+
+        } else {
+
+        }
+    } else {
+        const link = options.api ? 'route/api.jst' : 'route/layout.jst'
+        const routeInfo = nunjucks.render(link, {name : pluralName, capName: capName})
+        fs.writeFileSync(`${folder}/features/${name}/route.js`, routeInfo)
+    }
+
 }
 
 module.exports.useFeature = function useFeature(name, options, folder) {

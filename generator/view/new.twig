@@ -1,0 +1,63 @@
+{% extends '_layout.' + getConfig('viewExtension') %}
+
+{% macro field(key, value) %}
+    {% if value.arrInput == 'select' %}
+        <div class="form-group">
+            <label for="{{ key }}">{{ key }}:</label>
+            <textarea name="{{ key }}" id="{{ key }}" cols="30" rows="10" class="form-control"></textarea>
+        </div>
+    {% elseif value.arrInput == 'checkbox' %}
+        <div class="form-group">
+            <label for="{{ key }}">{{ key }}:</label>
+            <div class="switch">
+                <input type="checkbox" name="{{ key }}" id="{{ key }}">
+                <div class="slider round"></div>
+            </div>
+        </div>
+    {% elseif value.arrInput == 'textarea' %}
+        <div class="form-group">
+            <label for="{{ key }}">{{ key }}:</label>
+            <textarea name="{{ key }}" id="{{ key }}" cols="30" rows="10" class="form-control"></textarea>
+        </div>
+    {% elseif value.arrInput == 'file' %}
+        <div class="form-group">
+            <label for="{{ key }}">{{ key }}:</label>
+            <input type="file" class="form-control" id="{{ key }}">
+        </div>
+    {% else %}
+        <div class="form-group">
+            <label for="{{ key }}">{{ key }}:</label>
+            <input type="{{ value.arrInput }}" class="form-control" id="{{ key }}">
+        </div>
+    {% endif %}
+{% endmacro %}
+
+{% macro template(arrTemplate = {}) %}
+    {% for key, value in arrTemplate %}
+        {% if value.type == 'Nested' %}
+            <fieldset>
+                <legend>{{ key }}:</legend>
+                <div class="col-lg-offset-1">
+                    {{ template(value.template) }}
+                </div>
+            </fieldset>
+        {% elseif value.type == 'Array' %}
+            {#{{ template(value.element) }}#}
+        {% elseif  value.type not in ['ObjectId', 'Mixed', 'Buffer'] %}
+            {{ field(key, value) }}
+        {% endif %}
+    {% endfor %}
+{% endmacro %}
+
+{% block content %}
+    <div class="page-header">
+        <h1>Book create</h1>
+        {% include '_messages.' + getConfig('viewExtension') %}
+    </div>
+    <form action="">
+        {{ template(arrTemplate) }}
+        <div class="form-group">
+            <button type="submit">Create</button>
+        </div>
+    </form>
+{% endblock %}

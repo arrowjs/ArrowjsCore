@@ -69,9 +69,13 @@ program
 program
   .command('create <name>')
   .description('Create new feature')
-  .option("-t, --template", "Use arrow template")
+  .option("-f, --full", "Generate full template files")
+  .option("-a, --api", "Use api template")
   .action(function(params, options){
-    create(params, {template: options.template})
+    create(params, {
+      full: options.full,
+      api: options.api
+    })
   });
 
 program

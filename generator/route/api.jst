@@ -3,10 +3,10 @@
 /**
  * Map final part of URL to equivalent functions in controller
  */
-module.exports = function (component,application) {
+module.exports = function (feature,application) {
   return {
     "/{{name}}": {
-      layout_template: true
+      template: Arrow.template('api', feature.models.{{capName}}, feature)
     },
   }
 };
