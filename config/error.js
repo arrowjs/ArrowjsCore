@@ -2,7 +2,6 @@
 let winston = require('arrowjs').winston;
 
 module.exports = {
-    logFolder : 'log',
     winstonLog : {
         transports: [
             new winston.transports.Console({
@@ -36,17 +35,11 @@ module.exports = {
             })
         ]
     },
-    fault_tolerant : {
-        logdata : ["body","query"],//
-        render : '',
-        redirect : '500'
+    handlerError : function (err, req, res, next) {
+        console.error(err);
+        res.render('_500');
     },
-    error : {
-        "404" : {
-            render : "layouts/_404.html"
-        },
-        "500" : {
-            render : "layouts/_500.html"
-        }
+    handler404: function (req, res) {
+        res.render('_404');
     }
 };

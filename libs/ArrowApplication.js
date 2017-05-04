@@ -238,6 +238,7 @@ class ArrowApplication {
                 let viewEngineSetting = _.assign(self._config.nunjuckSettings || {}, {express: self._expressApplication});
                 let applicationView = ViewEngine(self.arrFolder, viewEngineSetting, self);
                 self.applicationENV = applicationView;
+                const viewTemplateFolder = path.resolve(__dirname, '..', 'generator/view')
 
                 self.render = function (view, options, callback) {
                     let application = self;
@@ -267,12 +268,13 @@ class ArrowApplication {
                     });
 
                     let newLink = arrayPart.join(path.sep);
-
-                    newLink = path.normalize(application.arrFolder + newLink);
-
+                    newLink = path.normalize(newLink);
                     application.applicationENV.loaders[0].pathsToNames = {};
-                    application.applicationENV.loaders[0].cache = {};
-                    application.applicationENV.loaders[0].searchPaths = [path.dirname(newLink) + path.sep];
+                    // application.applicationENV.loaders[0].cache= {};
+                    let searchPaths = []
+                    searchPaths.push(application.arrFolder + 'layouts')
+                    searchPaths.push(viewTemplateFolder)
+                    application.applicationENV.loaders[0].searchPaths = searchPaths;
                     return application.applicationENV.render(newLink, opts, done);
                 }.bind(self);
 
@@ -310,7 +312,7 @@ class ArrowApplication {
                 return associateModels(self);
             })
             .then(function () {
-                return circuit_breaker(self)
+                return overrideExpress(self)
             })
             .then(function () {
                 if (setting && setting.order) {
@@ -526,7 +528,7 @@ function routerMapping(fatherPath, defaultRouteConfig, component, arrow, route, 
             //handle function
             let arrayHandler = [routeInfo.handler];
 
-            arrayHandler.splice(0, 0, overrideViewRender(arrow, viewInfo, componentName, component, key))
+            arrayHandler.splice(0, 0, overrideViewRender(arrow, component, key))
 
             //Add to route
             if (method === "param") {
@@ -609,7 +611,7 @@ function handleComponentRouteSetting(arrow, componentRouteSetting, defaultRouteC
 
             //Add viewRender
             if (!_.isEmpty(viewInfo)) {
-                arrayHandler.splice(0, 0, overrideViewRender(arrow, viewInfo, componentName, component, key))
+                arrayHandler.splice(0, 0, overrideViewRender(arrow, component, key))
             }
 
             //handle role
@@ -618,7 +620,7 @@ function handleComponentRouteSetting(arrow, componentRouteSetting, defaultRouteC
                 let permissions = routeInfo.permissions;
                 if (permissions) {
                     arrayHandler.splice(0, 0, arrow.passportSetting.handlePermission);
-                    arrayHandler.splice(0, 0, handleRole(arrow, permissions, componentName, key))
+                    arrayHandler.splice(0, 0, handleRole(permissions, componentName, key))
                 }
             }
 
@@ -676,11 +678,12 @@ function handleComponentRouteSetting(arrow, componentRouteSetting, defaultRouteC
  * @param component
  * @returns {Function}
  */
-function overrideViewRender(application, componentView, componentName, component, key) {
+function overrideViewRender(application, component, key) {
+    const componentName = component.name;
+    const componentView = component.views;
     return function (req, res, next) {
         // Grab reference of render
         req.arrowUrl = key + "." + componentName;
-
         let _render = res.render;
         let self = this;
         if (_.isArray(componentView)) {
@@ -695,6 +698,17 @@ function overrideViewRender(application, componentView, componentName, component
         next();
     }
 }
+
+function overrideExpress(app) {
+    app.use(function overrideRender(req, res ,next) {
+        req.app = app
+        next()
+    })
+    app.use(function overrideRedirect(req, res, next) {
+        next()
+    })
+}
+
 /**
  *
  * @param req
@@ -794,7 +808,7 @@ function handleAuthenticate(application, name) {
  * @returns {handleRoles}
  */
 /* istanbul ignore next */
-function handleRole(application, permissions, componentName, key) {
+function handleRole(permissions, componentName, key) {
     let arrayPermissions = [];
     if (_.isArray(permissions)) {
         arrayPermissions = permissions
@@ -894,115 +908,8 @@ function handleError(app) {
     /** Assume 'not found' in the error msg is a 404.
      * This is somewhat silly, but valid, you can do whatever you like, set properties, use instanceof etc.
      */
-    app.use(function (err, req, res, next) {
-        // If the error object doesn't exists
-        let error = {};
-        if (!err) return next();
-        if (app.getConfig('fault_tolerant.enable')) {
-            app.arrowErrorLink[req.url] = true;
-            error[req.url] = {};
-            error[req.url].error = err.stack;
-            error[req.url].time = Date.now();
-            let arrayInfo = app.getConfig('fault_tolerant.logdata');
-            if (_.isArray(arrayInfo)) {
-                arrayInfo.map(function (key) {
-                    error[req.url][key] = req[key];
-                })
-            }
-
-        } else {
-            error.error = err.stack;
-            error.time = Date.now();
-            let arrayInfo = app.getConfig('fault_tolerant.logdata');
-            if (_.isArray(arrayInfo)) {
-                arrayInfo.map(function (key) {
-                    error[key] = req[key];
-                })
-            }
-        }
-        if (app.getConfig('fault_tolerant.log')) {
-            logger.error(error);
-        }
-
-        let renderSetting = app.getConfig('fault_tolerant.render');
-        if (_.isString(renderSetting)) {
-            let arrayPart = renderSetting.split(path.sep);
-            arrayPart = arrayPart.map(function (key) {
-                if (key[0] === ":") {
-                    key = key.replace(":", "");
-                    return app.getConfig(key);
-                } else {
-                    return key
-                }
-            });
-            let link = arrayPart.join(path.sep);
-            app.render(path.normalize(app.arrFolder + link), {error: error}, function (err, html) {
-                if (err) {
-                    res.send(err)
-                } else {
-                    res.send(html)
-                }
-            });
-        } else {
-            res.send(error)
-        }
-    });
-    if (app.getConfig("error")) {
-        Object.keys(app.getConfig("error")).map(function (link) {
-            let errorConfig = app.getConfig("error");
-            if (errorConfig[link].render) {
-                if (_.isString(errorConfig[link].render)) {
-                    app.get(path.normalize(path.sep + link + `(.html)?`), function (req, res) {
-                        app.render(errorConfig[link].render, function (err, html) {
-                            if (err) {
-                                res.send(err.toString())
-                            } else {
-                                res.send(html)
-                            }
-                        });
-                    })
-                } else if (_.isObject(errorConfig[link].render)) {
-                    app.get(link, function (req, res) {
-                        res.send(errorConfig[link].render)
-                    })
-                } else if (_.isNumber(errorConfig[link].render)) {
-                    app.get(link, function (req, res) {
-                        res.sendStatus(errorConfig[link].render)
-                    })
-                } else {
-                    app.get(link, function (req, res) {
-                        res.send(link)
-                    })
-                }
-            }
-
-        })
-    }
-
-    if (app.getConfig("error")) {
-        Object.keys(app.getConfig("error")).map(function (link) {
-            let errorConfig = app.getConfig("error");
-            if (errorConfig[link] && errorConfig[link].prefix) {
-                app.use(errorConfig[link].prefix, function (req, res) {
-                    res.redirect(path.normalize(path.sep + link))
-                })
-            }
-        })
-    }
-
-    app.use("*", function (req, res) {
-        let h = req.header("Accept");
-        try {
-            if (h.indexOf('text/html') > -1) {
-                res.redirect('/404');
-            } else {
-                res.sendStatus(404);
-            }
-        } catch (err) {
-            res.sendStatus(404);
-        }
-    });
-
+    app.use(app._config.handlerError)
+    app.use("*", app._config.handler404)
     return app
 }
 
