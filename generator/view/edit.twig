@@ -1,7 +1,67 @@
 {% extends '_layout.' + getConfig('viewExtension') %}
 
+{% macro field(key, value) %}
+    {% if value.arrInput == 'select' %}
+        <div class="form-group">
+            <label for="{{ key }}">{{ key | capitalize }}:</label>
+            <textarea name="{{ key }}" id="{{ key }}" cols="30" rows="10" class="form-control"></textarea>
+        </div>
+    {% elseif value.arrInput == 'checkbox' %}
+        <div class="form-group">
+            <label for="{{ key }}">{{ key | capitalize}}:</label>
+            <div class="switch">
+                <input type="checkbox" name="{{ key }}" id="{{ key }}" >
+                <div class="slider round"></div>
+            </div>
+        </div>
+    {% elseif value.arrInput == 'textarea' %}
+        <div class="form-group">
+            <label for="{{ key }}">{{ key | capitalize}}:</label>
+            <textarea name="{{ key }}" id="{{ key }}" cols="30" rows="10" class="form-control">{{ detail[key] }}</textarea>
+        </div>
+    {% elseif value.arrInput == 'file' %}
+        <div class="form-group">
+            <label for="{{ key }}">{{ key | capitalize}}:</label>
+            <input type="file" class="form-control" id="{{ key }}" name="{{ key }}" value="{{ detail[key] }}">
+        </div>
+    {% else %}
+        <div class="form-group">
+            <label for="{{ key }}">{{ key | capitalize}}:</label>
+            <input type="{{ value.arrInput }}" class="form-control" id="{{ key }}" name="{{ key }}" value="{{ detail[key] }}">
+        </div>
+    {% endif %}
+{% endmacro %}
+
+{% macro template(arrTemplate = {}) %}
+    {% for key, value in arrTemplate %}
+        {% if value.type == 'Nested' %}
+            <fieldset>
+                <legend>{{ key }}:</legend>
+                <div class="col-lg-offset-1">
+                    {{ template(value.template) }}
+                </div>
+            </fieldset>
+        {% elseif value.type == 'Array' %}
+            {#{{ template(value.element) }}#}
+        {% elseif  value.type not in ['ObjectId', 'Mixed', 'Buffer'] %}
+            {{ field(key, value) }}
+        {% endif %}
+    {% endfor %}
+{% endmacro %}
+
 {% block content %}
-    {% include '_messages.' + getConfig('viewExtension') %}
-    <h1>Books edit</h1>
-    <a href=""></a>
+    <div class="page-header">
+        <h1>{{ name | capitalize  }} edit</h1>
+        {% include '_messages.' + getConfig('viewExtension') %}
+    </div>
+    <div class="form-inline">
+        <a class="btn btn-default" href="/{{ name | pluralize }}">Back</a>
+    </div>
+    <form action="/{{ name | pluralize }}/{{ detail._id }}" method="post">
+        <input type="hidden" name="_method" value="PUT">
+        {{ template(arrTemplate) }}
+        <div class="form-group">
+            <button class="btn btn-primary" type="submit">Save changes</button>
+        </div>
+    </form>
 {% endblock %}

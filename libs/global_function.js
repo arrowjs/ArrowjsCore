@@ -39,7 +39,7 @@ exports.getAllVariable = function (env, viewSetting, app) {
         userVariable = require(path.normalize(__base + viewSetting.variableFile));
     } catch (err) {
         /* istanbul ignore next */
-        logger.warn('Cant find file :' + path.normalize(__base + viewSetting.variableFile))
+        // logger.warn('Cant find file :' + path.normalize(__base + viewSetting.variableFile))
     }
     let baseVariable = require(path.resolve(__dirname, '..', 'templateExtends/variable.js'));
 

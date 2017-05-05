@@ -70,6 +70,9 @@ function layoutTemplate(model, feature) {
       },
       patch: {
         handler: controller.edit
+      },
+      delete: {
+        handler: controller.destroy
       }
     },
     "/:id/edit": {

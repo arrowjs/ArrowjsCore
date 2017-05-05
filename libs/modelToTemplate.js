@@ -35,6 +35,10 @@ function mongoTemplate(schema) {
     schema[key].min && (template[key].min = schema[key].min)
     schema[key].default && (template[key].default = schema[key].default)
 
+    if (schema[key].arrTable) {
+      template[key].arrTable = schema[key].arrTable
+    }
+
     if (schema[key].arrInput) {
       template[key].arrInput = schema[key].arrInput
     } else {

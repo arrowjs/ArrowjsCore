@@ -3,12 +3,12 @@
 {% macro field(key, value) %}
     {% if value.arrInput == 'select' %}
         <div class="form-group">
-            <label for="{{ key }}">{{ key }}:</label>
+            <label for="{{ key }}">{{ key | capitalize }}:</label>
             <textarea name="{{ key }}" id="{{ key }}" cols="30" rows="10" class="form-control"></textarea>
         </div>
     {% elseif value.arrInput == 'checkbox' %}
         <div class="form-group">
-            <label for="{{ key }}">{{ key }}:</label>
+            <label for="{{ key }}">{{ key | capitalize}}:</label>
             <div class="switch">
                 <input type="checkbox" name="{{ key }}" id="{{ key }}">
                 <div class="slider round"></div>
@@ -16,18 +16,18 @@
         </div>
     {% elseif value.arrInput == 'textarea' %}
         <div class="form-group">
-            <label for="{{ key }}">{{ key }}:</label>
+            <label for="{{ key }}">{{ key | capitalize}}:</label>
             <textarea name="{{ key }}" id="{{ key }}" cols="30" rows="10" class="form-control"></textarea>
         </div>
     {% elseif value.arrInput == 'file' %}
         <div class="form-group">
-            <label for="{{ key }}">{{ key }}:</label>
-            <input type="file" class="form-control" id="{{ key }}">
+            <label for="{{ key }}">{{ key | capitalize}}:</label>
+            <input type="file" class="form-control" id="{{ key }}" name="{{ key }}" >
         </div>
     {% else %}
         <div class="form-group">
-            <label for="{{ key }}">{{ key }}:</label>
-            <input type="{{ value.arrInput }}" class="form-control" id="{{ key }}">
+            <label for="{{ key }}">{{ key | capitalize}}:</label>
+            <input type="{{ value.arrInput }}" class="form-control" id="{{ key }}" name="{{ key }}">
         </div>
     {% endif %}
 {% endmacro %}
@@ -51,13 +51,16 @@
 
 {% block content %}
     <div class="page-header">
-        <h1>Book create</h1>
+        <h1>{{ name | capitalize }} create</h1>
         {% include '_messages.' + getConfig('viewExtension') %}
     </div>
-    <form action="">
+
+    <div class="form-inline">
+        <a class="btn btn-default" href="/{{ name | pluralize }}">Back</a>
+    </div>
+
+    <form action="/{{ name | pluralize }}" method="post">
         {{ template(arrTemplate) }}
-        <div class="form-group">
-            <button type="submit">Create</button>
-        </div>
+        <button class="btn btn-primary" type="submit">Create</button>
     </form>
 {% endblock %}

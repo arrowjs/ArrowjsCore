@@ -1,8 +1,117 @@
 {% extends '_layout.' + getConfig('viewExtension') %}
 
 {% block content %}
+    {% for message in messages %}
+    {% endfor %}
+
     <div class="page-header">
-        <h1>Book List</h1>
-        {% include '_messages.' + getConfig('viewExtension') %}
+        <div class="page-header">
+            <h1>{{ name | capitalize }} list </h1>
+            {% include '_messages.' + getConfig('viewExtension') %}
+        </div>
+        <div class="form-inline">
+            <div class="input-group">
+                <input type="text" class="form-control" placeholder="Search for...">
+                <span class="input-group-btn">
+                    <button class="btn btn-default" type="button">Search</button>
+                  </span>
+            </div>
+            <select class="form-control">
+                <option value="">Bulk Actions</option>
+                <option value="delete">Delete</option>
+            </select>
+            <button class="btn btn-default" href="/{{ name | pluralize }}/search">Apply</button>
+            <a class="btn btn-primary pull-right" href="/{{ name | pluralize }}/new">New </a>
+        </div>
+        <div class="table-responsive">
+            <table class="table table-bordred table-striped" id="mytable">
+                <thead>
+                <tr>
+                    <th class="text-center"><input type="checkbox" id="checkall"/></th>
+                    {% for key,value in arrTemplate %}
+                        <th>{{ key | capitalize }}</th>
+                    {% endfor %}
+                    <th class="text-center"><span class="glyphicon glyphicon-cog"></span></th>
+                </tr>
+                </thead>
+                <tbody>
+                {% for item in items %}
+                    <tr>
+                        <td class="col-md-1 text-center"><input type="checkbox" class="checkthis"/></td>
+                        {% for key,value in arrTemplate %}
+                            <td>{{ item[key] }}</td>
+                        {% endfor %}
+                        <td class="col-md-2 text-center">
+                            <a class="btn btn-primary btn-xs" href="/{{ name | pluralize }}/{{ item._id }}">
+                                <span class="glyphicon glyphicon-eye-open"></span>
+                            </a>
+                            <a class="btn btn-primary btn-xs" href="/{{ name | pluralize }}/{{ item._id }}/edit">
+                                <span class="glyphicon glyphicon-pencil"></span>
+                            </a>
+                            <button class="btn btn-danger btn-xs" data-title="Delete" data-toggle="modal"
+                                    data-target="#delete">
+                                <span class="glyphicon glyphicon-trash"></span>
+                            </button>
+                        </td>
+                    </tr>
+                {% endfor %}
+                </tbody>
+            </table>
+            <div class="clearfix"></div>
+            <ul class="pagination pull-right">
+                <li class="disabled"><a href="#"><span class="glyphicon glyphicon-chevron-left"></span></a></li>
+                <li class="active"><a href="#">1</a></li>
+                <li><a href="#">2</a></li>
+                <li><a href="#">3</a></li>
+                <li><a href="#">4</a></li>
+                <li><a href="#">5</a></li>
+                <li><a href="#"><span class="glyphicon glyphicon-chevron-right"></span></a></li>
+            </ul>
+        </div>
     </div>
+    <div class="modal fade" id="delete" tabindex="-1" role="dialog" aria-labelledby="edit" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" aria-hidden="true"><span
+                                class="glyphicon glyphicon-remove" aria-hidden="true"></span></button>
+                    <h4 class="modal-title custom_align" id="Heading">Delete this entry</h4>
+                </div>
+                <div class="modal-body">
+                    <p>Do you sure you want to delete this Record?</p>
+                </div>
+                <div class="modal-footer ">
+                    <button type="submit" class="btn btn-success">
+                        <span class="glyphicon glyphicon-ok-sign"></span> Yes
+                    </button>
+                    <button type="button" class="btn btn-default" data-dismiss="modal">
+                        <span class="glyphicon glyphicon-remove"></span> No
+                    </button>
+                </div>
+            </div>
+            <!-- /.modal-content -->
+        </div>
+    </div>
+{% endblock %}
+
+
+{% block jsExtends %}
+    <script>
+        $(document).ready(function () {
+            $("#mytable #checkall").click(function () {
+                if ($("#mytable #checkall").is(':checked')) {
+                    $("#mytable input[type=checkbox]").each(function () {
+                        $(this).prop("checked", true);
+                    });
+
+                } else {
+                    $("#mytable input[type=checkbox]").each(function () {
+                        $(this).prop("checked", false);
+                    });
+                }
+            });
+
+            $("[data-toggle=tooltip]").tooltip();
+        });
+    </script>
 {% endblock %}
