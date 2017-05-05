@@ -2,7 +2,7 @@
 
 const Sequelize = require('sequelize'),
     mongoose =  require('mongoose'),
-    logger = require('./logger'),
+    logger = require('./../utils/handleLogger'),
     pg = require('pg');
 let db;
 
@@ -44,7 +44,7 @@ function mongoConnection(dbConfig) {
         db = mongoose;
         db.__arrowDB = dbConfig;
         mongoose.connection.on('error', function (err) {
-            console.log(err.message)
+            logger.error(err.message)
             process.exit(1)
         });
         resolve(db)

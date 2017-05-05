@@ -27,6 +27,6 @@ module.exports.init = function (app) {
     let log =  new ( winston.Logger )(config.winstonLog);
     _.assign(logger,log);
 
-    return null;
+    return logger;
 };
 

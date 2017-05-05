@@ -5,7 +5,7 @@ const _ = require('lodash'),
     fs = require('fs'),
     fsEx = require('fs-extra'),
     path = require('path'),
-    logger = require('./logger'),
+    logger = require('./../utils/handleLogger'),
     nunjucks = require('nunjucks'),
     pluralize = require('pluralize');
 
