@@ -10,17 +10,17 @@ module.exports = function (self) {
   const viewTemplateFolder = path.resolve(__dirname, '..', 'generator/view');
 
   self.render = function (view, options, callback) {
-    let application = self;
+    let application = this;
     let done = callback;
-
-    let opts = options || {};
-    /* istanbul ignore else */
-    if (typeof options === "function") {
-      done = options;
-      opts = {};
-    }
+    let opts = {};
 
     _.assign(opts, application.locals);
+
+    if (typeof options === "function") {
+      done = options;
+    } else {
+      _.assign(opts, options);
+    }
 
     if (application._config.viewExtension && !view.includes(application._config.viewExtension) && !view.includes(".")) {
       view += "." + application._config.viewExtension;

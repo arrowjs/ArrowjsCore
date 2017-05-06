@@ -33,8 +33,5 @@ module.exports = function loadingGlobalFunction(self) {
       }
     })
   });
-
-  //Add some support function
-  global.__ = Arrow.__;
   return self
 };

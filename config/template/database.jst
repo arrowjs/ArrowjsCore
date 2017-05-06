@@ -6,12 +6,15 @@
 module.exports = {
   db: {
     host: process.env.DB_HOST ||'localhost',
-    port: process.env.DB_PORT || '5432',
+    port: process.env.DB_PORT || '{{port}}',
     database: process.env.DB_NAME || 'arrow',
     username: process.env.DB_USERNAME || '',
     password: process.env.DB_PASSWORD || '',
-    dialect: 'postgres',
-    logging: false
+    dialect: '{{type}}',
+    logging: false,
+    {% if type === 'sqlite' %}
+    storage: './database.sqlite'
+    {% endif %}
   },
 
   /** Developer defines logic to associate models.<br>

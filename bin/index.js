@@ -23,13 +23,15 @@ program
   .command('init')
   .description('Init an arrowjs application')
   .option("-a, --api_mode", "Init an api application")
-  .option("-db, --database_type", "Give to specify a database type", 'mongodb')
-  .option("-n, --name", "select your app name", 'Arrow')
+  .option("-db, --database_type <type>", "Give to specify a database type", 'mongodb', /^(mysql|mariadb|sqlite|postgres|mssql|mongodb)$/i)
+  .option("-n, --name <name>", "select your app name", 'Arrow')
+  .option("-s, --websocket <name>", "Enable websocket")
   .action(function(options){
     init({
       api: options.api_mode,
       db: options.database_type,
-      name: options.name
+      name: options.name,
+      socket: options.websocket
     })
   });
 

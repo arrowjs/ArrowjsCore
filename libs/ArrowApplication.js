@@ -11,6 +11,7 @@ const fs = require('fs'),
   fsExtra = require('fs-extra'),
   Promise = require('bluebird'),
   http = require('http'),
+  dotenv = require('dotenv'),
 
   setupManager = require("../utils/setupManager"),
   setupPlugin = require("../utils/setupPlugin"),
@@ -35,7 +36,7 @@ const fs = require('fs'),
   __ = require("./global_function"),
   arrowStack = require('./ArrStack'),
   buildStructure = require("./buildStructure"),
-  loadLanguage = require("./i18n").loadLanguage;
+  setupMultiLanguage = require("./i18n").setupMultiLanguage;
 
 /**
  * ArrowApplication is a singleton object. It is heart of Arrowjs.io web app. it wraps Express and adds following functions:
@@ -80,6 +81,11 @@ class ArrowApplication {
     global.__base = this.arrFolder;
 
     //Read config/config.js into this._config
+    require('dotenv').config({path: this.arrFolder + '/config/env' });
+    const envConfig = dotenv.parse(fs.readFileSync(`config/env/.env.${process.env.NODE_ENV}`))
+    for (let k in envConfig) {
+      process.env[k] = envConfig[k]
+    }
     this._config = __.getRawConfig();
 
     //Read and parse config/structure.js
@@ -106,9 +112,10 @@ class ArrowApplication {
     this.middleware.cookieParser = require("cookie-parser");
     this.middleware.morgan = require("morgan");
     this.middleware.methodOverride = require('method-override');
+    this.middleware.i18n = require('i18n');
 
-    //Load available languages. See config/i18n.js and folder /lang
-    loadLanguage(this._config);
+    //Load available languages. See config/i18n.js and folder /langs
+    setupMultiLanguage(this._config);
 
     //Bind all global functions to ArrowApplication object
     loadGlobalFunction(this);

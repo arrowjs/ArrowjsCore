@@ -29,7 +29,7 @@ module.exports = function makeRender(req, res, application, componentView, compo
     _.assign(opts, res.locals);
 
     // support callback function as second arg
-    /* istanbul ignore if */
+
     if (typeof options === 'function') {
       done = options;
     } else {

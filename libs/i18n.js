@@ -1,6 +1,7 @@
 "use strict";
 
 const __ =  require('./global_function'),
+     i18n =  require('i18n'),
      path = require('path');
 
 let lang = {};
@@ -19,9 +20,7 @@ module.exports.languageKey = function () {
  * Loading language file.
  * @param config
  */
-module.exports.loadLanguage = function (config) {
-    let languagePath = __base + config.langPath + '/*.js';
-    __.getGlobbedFiles(languagePath).forEach(function (file) {
-        lang[path.basename(file, '.js')] = require(file);
-    })
+module.exports.setupMultiLanguage = function (config) {
+  config.language.directory = __base + config.language.directory
+  i18n.configure(config.language);
 };
