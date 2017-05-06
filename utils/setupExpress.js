@@ -6,8 +6,6 @@ const path = require('path');
 /**
  * Run /config/express.js to configure Express object
  * @param app - ArrowApplication object
- * @param config - this.configManager.getConfig
- * @param setting - parameters in application.start(setting);
  */
 module.exports = function setupExpress(app) {
   const config = app.getConfig();

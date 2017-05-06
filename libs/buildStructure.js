@@ -60,7 +60,7 @@ function parseConfig_Structure(obj, key, level) {
                 //    newObj.path[pathKey][key] = data[key];
                 //}
 
-                if (['controller', "view", "action", "model", "route"].indexOf(key) > -1) {
+                if (['controller', "view", "action", "model", "route"].includes(key)) {
                     //if (!_.isEmpty(data[key].path)) {
                     if (_.isArray(data[key])) {
                         data[key].map(function (data_key) {

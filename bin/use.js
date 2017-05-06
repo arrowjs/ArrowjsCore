@@ -13,10 +13,10 @@ module.exports = function (params, options) {
   const dbConfig = require(appPath + '/config/database')
   const listFeatures = fs.readdirSync(appPath + '/features')
   const listArrowFeatures = fs.readdirSync(arrowFolder + '/packs')
-  if (listFeatures.indexOf(params.toLowerCase()) > -1) {
+  if (listFeatures.includes(params.toLowerCase())) {
     return console.log(`\x1b[31mYou had a feature name "${params}"\x1b[0m`)
   }
-  if (listArrowFeatures.indexOf(params.toLowerCase()) === -1) {
+  if (!listArrowFeatures.includes(params.toLowerCase())) {
     return console.log(`\x1b[31mWe dont' had a feature name "${params}"\x1b[0m`)
   }
   if (options.force) {
@@ -30,17 +30,17 @@ module.exports = function (params, options) {
     case 'user':
       break;
     case 'role':
-      if (listFeatures.indexOf('user') > -1) {
+      if (listFeatures.includes('user')) {
         console.log(`\x1b[31mYou had a feature name "user". Maybe conflict with default "user" feature\x1b[0m`)
         return console.log(`\x1b[31mDelete your current "user" and retry this command\x1b[0m`)
       }
       break;
     case 'blog':
-      if (listFeatures.indexOf('user') > -1) {
+      if (listFeatures.includes('user')) {
         console.log(`\x1b[31mYou had a feature name "user". Maybe conflict with default "user" feature\x1b[0m`)
         return console.log(`\x1b[31mDelete your current "user" and retry this command\x1b[0m`)
       }
-      if (listFeatures.indexOf('role') > -1) {
+      if (listFeatures.includes('role')) {
         console.log(`\x1b[31mYou had a feature name "role". Maybe conflict with default "role" feature\x1b[0m`)
         return console.log(`\x1b[31mDelete your current "role" and retry this command\x1b[0m`)
       }

@@ -34,4 +34,4 @@ module.exports = function setupManager(arrowApp) {
     arrowApp[key] = arrowApp[managerName]["_" + key];
     arrowApp._componentList.push(key);
   }.bind(arrowApp));
-}
+};

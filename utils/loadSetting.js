@@ -21,4 +21,4 @@ module.exports = function loadSetting(des, source) {
 
   }
   return setting;
-}
+};

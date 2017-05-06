@@ -23,9 +23,13 @@ program
   .command('init')
   .description('Init an arrowjs application')
   .option("-a, --api_mode", "Init an api application")
+  .option("-db, --database_type", "Give to specify a database type", 'mongodb')
+  .option("-n, --name", "select your app name", 'Arrow')
   .action(function(options){
     init({
-      api: options.api_mode
+      api: options.api_mode,
+      db: options.database_type,
+      name: options.name
     })
   });
 

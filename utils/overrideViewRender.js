@@ -9,20 +9,21 @@ const makeRender = require('./makeRender');
  * @param key
  * @returns {Function}
  */
-module.exports = function overrideViewRender(application, component, key) {
-  const componentName = component.name;
-  const componentView = component.views;
+module.exports = function overrideViewRender(application, feature) {
+  const featureName = feature.name;
+  const featureView = feature.views;
+  const featureType = feature.type;
   return function (req, res, next) {
     // Grab reference of render
-    req.arrowUrl = key + "." + componentName;
-    if (_.isArray(componentView)) {
-      res.render = makeRender(req, res, application, componentView, componentName, component);
+    req.arrowUrl = featureType + "." + featureName;
+    if (_.isArray(featureView)) {
+      res.render = makeRender(req, res, application, featureView, featureName, feature);
     } else {
-      Object.keys(componentView).map(function (key) {
+      Object.keys(featureView).map(function (key) {
         res[key] = res[key] || {};
-        res[key].render = makeRender(req, res, application, componentView[key], componentName, component[key]);
+        res[key].render = makeRender(req, res, application, featureView[key], featureName, feature[key]);
       });
-      res.render = res[Object.keys(componentView)[0]].render
+      res.render = res[Object.keys(featureView)[0]].render
     }
     next();
   }

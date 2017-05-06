@@ -1,7 +1,7 @@
 'use strict';
 const orderRouteFunction = require('./orderRouteFunction');
 
-module.exports = function sortRouter(self,stackBegin) {
+module.exports = function sortRouter(self, stackBegin) {
   const setting = self.arrowSettings;
   if (setting && setting.order) {
     let coreRoute = self._router.stack.slice(0, stackBegin);
@@ -10,4 +10,4 @@ module.exports = function sortRouter(self,stackBegin) {
     coreRoute = coreRoute.concat(newRoute);
     self._router.stack = coreRoute
   }
-}
+};

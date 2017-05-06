@@ -18,7 +18,7 @@ module.exports = function handleRole(permissions, componentName, key) {
     req.permissions = req.session.permissions;
     if (req.permissions && req.permissions[key] && req.permissions[key][componentName]) {
       let checkedPermission = req.permissions[key][componentName].filter(function (key) {
-        if (arrayPermissions.indexOf(key.name) > -1) {
+        if (arrayPermissions.includes(key.name)) {
           return key
         }
       }).map(function (data) {

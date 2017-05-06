@@ -23,7 +23,7 @@ class ConfigManager extends SystemManager {
      */
     getConfig(key) {
         if (_.isString(key)) {
-            if (key.indexOf(".") > 0) {
+            if (key.includes(".")) {
                 let arrayKey = key.split(".");
                 let self = this._app._config;
                 let result;

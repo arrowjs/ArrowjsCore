@@ -4,10 +4,10 @@ const modelToTemplate= require('../../libs/modelToTemplate')
 const _ = require('lodash');
 const pluralize = require('pluralize');
 
-module.exports = function (feature, model) {
-  const template = modelToTemplate('mongodb', model)
+module.exports = function (feature, modelName) {
+  const template = modelToTemplate('mongodb', feature.models[modelName])
   const name =  feature.name
-  mongoAction(feature.actions, model, template);
+  mongoAction(feature.actions, feature.models[modelName], template);
   const controllers = feature.controllers;
   const actions = feature.actions;
   const tableTemplate = _.pickBy(template, function(value) {

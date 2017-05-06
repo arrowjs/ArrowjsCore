@@ -14,7 +14,6 @@ const path = require('path');
 module.exports = function handleView(obj, application, componentName) {
   let miniPath = obj.func(application._config, componentName);
   let normalizePath;
-  /* istanbul ignore if */
   if (miniPath[0] === path.sep) {
     normalizePath = path.normalize(obj.base + path.sep + miniPath);
   } else {

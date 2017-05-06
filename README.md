@@ -13,26 +13,32 @@ ArrowJS is framework based on Express.js. It helps you build your web applicatio
 To get started with arrowjs install the ```arrowjs``` package:
 
 ```sh
-mkdir arrowApp
-cd arrowApp
-npm init -y
-npm install arrowjs --save
+    mkdir arrowApp
+    cd arrowApp
+    npm init -y
+    npm install arrowjs --save
 ```
 
 ## First Arrowjs Application
 
 ```sh
-cd <app folder>
-arrow init
+    cd <app folder>
+    arrow init
 ```
 
 Start your app with command 
 
 ```sh
-arrow start
+    arrow start
 ```
 
-
+## Create your first feature
+- Stop your app with Ctrl-C or (Option-C) command
+- Run application in dev mode:
+```sh
+    arrow create <feature name>
+    //sample: arrow create blog
+```
 
 ## Useful links
 

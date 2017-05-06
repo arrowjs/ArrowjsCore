@@ -3,7 +3,7 @@ const _ = require('lodash');
 
 module.exports = function getDataByDotNotation(obj, key) {
   if (_.isString(key)) {
-    if (key.indexOf(".") > 0) {
+    if (key.includes(".")) {
       let arrayKey = key.split(".");
       let self = obj;
       let result = null;

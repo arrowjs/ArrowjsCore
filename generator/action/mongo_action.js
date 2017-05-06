@@ -1,5 +1,6 @@
 'use strict';
 module.exports = function (actions, model, template) {
+
   actions.findById = function (id) {
     return model.findById(id)
       .lean();

@@ -9,7 +9,7 @@ module.exports = function (params, options) {
   const appPath = process.cwd()
   const dbConfig = require(appPath + '/config/database')
   const listFeatures = fs.readdirSync(appPath + '/features')
-  if (listFeatures.indexOf(params.toLowerCase()) > -1) {
+  if (listFeatures.includes(params.toLowerCase())) {
     return console.log(`\x1b[31mYou had a feature name "${params}"\x1b[0m`)
   }
   globalFunction.createFeature(params.toLowerCase(), {

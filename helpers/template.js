@@ -44,9 +44,9 @@ function apiTemplate(model) {
   }
 }
 
-function layoutTemplate(model, feature) {
-  mongoController(feature, model)
-  const controller = feature.controllers
+function layoutTemplate(modelName, feature, options) {
+  mongoController(feature, modelName);
+  const controller = feature.controllers;
   return {
     "/": {
       get: {
@@ -84,11 +84,13 @@ function layoutTemplate(model, feature) {
 }
 
 module.exports = {
-  "template": function (type, model, feature) {
-    if (type === 'api') {
-      return apiTemplate(feature.models[model], feature)
-    } else {
-      return layoutTemplate(feature.models[model], feature)
+  "template": function (modelName, options = {}) {
+    return function (feature) {
+      if (options.type === 'api') {
+        return apiTemplate(modelName, feature, options)
+      } else {
+        return layoutTemplate(modelName, feature, options)
+      }
     }
   }
 };

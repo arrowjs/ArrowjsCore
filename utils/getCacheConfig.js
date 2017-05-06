@@ -13,4 +13,4 @@ module.exports = function getCacheConfig(self) {
   } else {
     return Promise.resolve();
   }
-}
+};

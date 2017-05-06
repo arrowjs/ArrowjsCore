@@ -22,7 +22,7 @@ module.exports = function (self) {
 
     _.assign(opts, application.locals);
 
-    if (application._config.viewExtension && view.indexOf(application._config.viewExtension) === -1 && view.indexOf(".") === -1) {
+    if (application._config.viewExtension && !view.includes(application._config.viewExtension) && !view.includes(".")) {
       view += "." + application._config.viewExtension;
     }
 
