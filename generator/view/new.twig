@@ -1,50 +1,55 @@
 {% extends '_layout.' + getConfig('viewExtension') %}
 
-{% macro field(key, value) %}
+{% macro field(key, value, parent) %}
+    {% set attributeKey = parent + '-' + key %}
     {% if value.arrInput == 'select' %}
         <div class="form-group">
-            <label for="{{ key }}">{{ key | capitalize }}:</label>
-            <textarea name="{{ key }}" id="{{ key }}" cols="30" rows="10" class="form-control"></textarea>
+            <label for="{{ attributeKey }}">{{ key | capitalize }}:</label>
+            <select name="{{ attributeKey }}" id="{{ attributeKey }}" class="form-control">
+                {% for v in value.enum %}
+                    <option value="{{ v }}">{{ v }}</option>
+                {% endfor %}
+            </select>
         </div>
     {% elseif value.arrInput == 'checkbox' %}
         <div class="form-group">
-            <label for="{{ key }}">{{ key | capitalize}}:</label>
-            <div class="switch">
-                <input type="checkbox" name="{{ key }}" id="{{ key }}">
-                <div class="slider round"></div>
-            </div>
+            <label for="{{ attributeKey }}">{{ key | capitalize}}:</label>
+            <input type="checkbox" name="{{ attributeKey }}" id="{{ attributeKey }}">
         </div>
     {% elseif value.arrInput == 'textarea' %}
         <div class="form-group">
-            <label for="{{ key }}">{{ key | capitalize}}:</label>
-            <textarea name="{{ key }}" id="{{ key }}" cols="30" rows="10" class="form-control"></textarea>
+            <label for="{{ attributeKey }}">{{ key | capitalize}}:</label>
+            <textarea name="{{ attributeKey }}" id="{{ attributeKey }}" cols="30" rows="10" class="form-control"></textarea>
         </div>
     {% elseif value.arrInput == 'file' %}
         <div class="form-group">
-            <label for="{{ key }}">{{ key | capitalize}}:</label>
-            <input type="file" class="form-control" id="{{ key }}" name="{{ key }}" >
+            <label for="{{ attributeKey }}">{{ key | capitalize}}:</label>
+            <input type="file" class="form-control" id="{{ attributeKey }}" name="{{ attributeKey }}" >
         </div>
     {% else %}
         <div class="form-group">
-            <label for="{{ key }}">{{ key | capitalize}}:</label>
-            <input type="{{ value.arrInput }}" class="form-control" id="{{ key }}" name="{{ key }}">
+            <label for="{{ attributeKey }}">{{ key | capitalize}}:</label>
+            <input type="{{ value.arrInput }}" class="form-control" id="{{ attributeKey }}" name="{{ attributeKey }}">
         </div>
     {% endif %}
 {% endmacro %}
 
-{% macro template(arrTemplate = {}) %}
+{% macro template(arrTemplate = {}, parent = '') %}
     {% for key, value in arrTemplate %}
         {% if value.type == 'Nested' %}
             <fieldset>
-                <legend>{{ key }}:</legend>
+                <legend>{{ key | capitalize }}:</legend>
                 <div class="col-lg-offset-1">
-                    {{ template(value.template) }}
+                    {% if parent != '' %}
+                        {% set key = parent + '-' + key %}
+                    {% endif %}
+                    {{ template(value.template, key) }}
                 </div>
             </fieldset>
         {% elseif value.type == 'Array' %}
             {#{{ template(value.element) }}#}
         {% elseif  value.type not in ['ObjectId', 'Mixed', 'Buffer'] %}
-            {{ field(key, value) }}
+            {{ field(key, value, parent) }}
         {% endif %}
     {% endfor %}
 {% endmacro %}

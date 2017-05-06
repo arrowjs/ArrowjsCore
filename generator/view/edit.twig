@@ -4,15 +4,15 @@
     {% if value.arrInput == 'select' %}
         <div class="form-group">
             <label for="{{ key }}">{{ key | capitalize }}:</label>
-            <textarea name="{{ key }}" id="{{ key }}" cols="30" rows="10" class="form-control"></textarea>
+            <select name="{{ key }}" id="{{ key }}" class="form-control">
+                {% for v in value.enum %}
+                    <option value="{{ v }}">{{ v }}</option>
+                {% endfor %}
+            </select>
         </div>
     {% elseif value.arrInput == 'checkbox' %}
-        <div class="form-group">
-            <label for="{{ key }}">{{ key | capitalize}}:</label>
-            <div class="switch">
-                <input type="checkbox" name="{{ key }}" id="{{ key }}" >
-                <div class="slider round"></div>
-            </div>
+        <div class="checkbox">
+            <label><input type="checkbox" name="{{ key }}" id="{{ key }}">{{ key | capitalize}}</label>
         </div>
     {% elseif value.arrInput == 'textarea' %}
         <div class="form-group">
