@@ -13,7 +13,6 @@ module.exports = function (feature, modelName) {
   const tableTemplate = _.pickBy(template, function(value) {
     return value.arrTable
   })
-
   controllers.showAll = function (req, res, next) {
     actions.find()
       .then(function (listItems) {

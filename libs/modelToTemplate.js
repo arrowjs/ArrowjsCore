@@ -8,6 +8,7 @@ module.exports = function modelToTemplate(type, model) {
 
 function parseMongoSchema(model) {
   const schema = model ? model.schema.obj : {}
+  console.log(model.schema.obj);
   return mongoTemplate(schema)
 }
 
@@ -24,7 +25,7 @@ function mongoTemplate(schema) {
     if (template[key].type === 'Array') {
       template[key].subType = !schema[key][0] ? 'none' :
         _.isFunction(schema[key][0]) ? schema[key][0].name :
-        _.isArray(schema[key][0]) ? 'Array' : 'Nested'
+          schema[key][0].type ? schema[key][0].type.name : 'Nested'
     }
     //mongoose build-in validator
     schema[key].enum && (template[key].enum = schema[key].enum)
@@ -56,28 +57,40 @@ function mongoTemplate(schema) {
           template[key].arrInput = 'date'
           break;
         case 'Array':
-          switch (template[key].subType) {
-            case 'String':
-              template[key].element = 'text'
-              break;
-            case 'Number':
-              template[key].element = 'number'
-              break;
-            case 'Boolean':
-              template[key].element = 'checkbox'
-              break;
-            case 'Date':
-              template[key].element = 'date'
-              break;
-            case 'Nested':
-              template[key].element = mongoTemplate(schema[key][0])
-              break;
-            case 'Array':
-              template[key].element = mongoTemplate({arrayElement: schema[key][0]})
-              break;
-            default:
-              template[key].element = 'none'
-              break;
+          schema[key][0].enum && (template[key].enum = schema[key][0].enum)
+          schema[key][0].match && (template[key].match = schema[key][0].match)
+          schema[key][0].maxlength && (template[key].maxlength = schema[key][0].maxlength)
+          schema[key][0].minlength && (template[key].minlength = schema[key][0].minlength)
+          schema[key][0].max && (template[key].max = schema[key][0].max)
+          schema[key][0].min && (template[key].min = schema[key][0].min)
+          schema[key][0].default && (template[key].default = schema[key][0].default)
+
+          if (schema[key][0].arrInput) {
+            template[key].element = schema[key][0].arrInput
+          } else {
+            switch (template[key].subType) {
+              case 'String':
+                template[key].element = 'text'
+                break;
+              case 'Number':
+                template[key].element = 'number'
+                break;
+              case 'Boolean':
+                template[key].element = 'checkbox'
+                break;
+              case 'Date':
+                template[key].element = 'date'
+                break;
+              case 'Nested':
+                template[key].element = mongoTemplate(schema[key][0])
+                break;
+              case 'Array':
+                template[key].element = mongoTemplate({arrayElement: schema[key][0]})
+                break;
+              default:
+                template[key].element = 'none'
+                break;
+            }
           }
           break;
         case 'Nested':

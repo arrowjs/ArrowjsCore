@@ -1,37 +1,59 @@
 {% extends '_layout.' + getConfig('viewExtension') %}
 
 {% macro field(key, value, parent) %}
-    {% set attributeKey = parent + '-' + key %}
-    {% if value.arrInput == 'select' %}
-        <div class="form-group">
-            <label for="{{ attributeKey }}">{{ key | capitalize }}:</label>
+    {% if parent != '' %}
+        {% set attributeKey = parent + '-' + key %}
+    {% else %}
+        {% set attributeKey = key %}
+    {% endif %}
+    <div class="form-group">
+        <label for="{{ attributeKey }}">{{ key | capitalize }}:</label>
+        {% if value.arrInput == 'select' %}
             <select name="{{ attributeKey }}" id="{{ attributeKey }}" class="form-control">
                 {% for v in value.enum %}
                     <option value="{{ v }}">{{ v }}</option>
                 {% endfor %}
             </select>
-        </div>
-    {% elseif value.arrInput == 'checkbox' %}
-        <div class="form-group">
-            <label for="{{ attributeKey }}">{{ key | capitalize}}:</label>
+        {% elseif value.arrInput == 'checkbox' %}
             <input type="checkbox" name="{{ attributeKey }}" id="{{ attributeKey }}">
-        </div>
-    {% elseif value.arrInput == 'textarea' %}
-        <div class="form-group">
-            <label for="{{ attributeKey }}">{{ key | capitalize}}:</label>
-            <textarea name="{{ attributeKey }}" id="{{ attributeKey }}" cols="30" rows="10" class="form-control"></textarea>
-        </div>
-    {% elseif value.arrInput == 'file' %}
-        <div class="form-group">
-            <label for="{{ attributeKey }}">{{ key | capitalize}}:</label>
-            <input type="file" class="form-control" id="{{ attributeKey }}" name="{{ attributeKey }}" >
-        </div>
-    {% else %}
-        <div class="form-group">
-            <label for="{{ attributeKey }}">{{ key | capitalize}}:</label>
+        {% elseif value.arrInput == 'textarea' %}
+            <textarea name="{{ attributeKey }}" id="{{ attributeKey }}" cols="30" rows="10"
+                      class="form-control"></textarea>
+        {% elseif value.arrInput == 'file' %}
+            <input type="file" class="form-control" id="{{ attributeKey }}" name="{{ attributeKey }}">
+        {% else %}
             <input type="{{ value.arrInput }}" class="form-control" id="{{ attributeKey }}" name="{{ attributeKey }}">
-        </div>
+        {% endif %}
+    </div>
+{% endmacro %}
+
+{% macro dynamicField(key, value, parent) %}
+    {% if parent != '' %}
+        {% set attributeKey = parent + '-' + key %}
+    {% else %}
+        {% set attributeKey = key %}
     {% endif %}
+    <div class="form-group" id="{{ attributeKey }}">
+        <label for="{{ attributeKey }}">{{ key | capitalize }}:</label>
+        <button class="btn btn-sm btn-default" onClick="addInput(event,'{{ attributeKey }}');" type="button">+</button>
+        <button class="btn btn-sm btn-default" onClick="removeLastInput(event);" type="button">-</button>
+        {% if value.element == 'select' %}
+            <select name="{{ attributeKey }}[]"  class="form-control">
+                {% for v in value.enum %}
+                    <option value="{{ v }}">{{ v }}</option>
+                {% endfor %}
+            </select>
+        {% elseif value.element == 'checkbox' %}
+            <input type="checkbox" name="{{ attributeKey }}[]">
+        {% elseif value.element == 'textarea' %}
+            <textarea name="{{ attributeKey }}[]" cols="30" rows="10"
+                      class="form-control"></textarea>
+        {% elseif value.element == 'file' %}
+            <input type="file" class="form-control" name="{{ attributeKey }}[]">
+        {% else %}
+            <input type="{{ value.element }}" class="form-control" name="{{ attributeKey }}[]">
+        {% endif %}
+    </div>
 {% endmacro %}
 
 {% macro template(arrTemplate = {}, parent = '') %}
@@ -47,7 +69,7 @@
                 </div>
             </fieldset>
         {% elseif value.type == 'Array' %}
-            {#{{ template(value.element) }}#}
+            {{ dynamicField(key, value, parent) }}
         {% elseif  value.type not in ['ObjectId', 'Mixed', 'Buffer'] %}
             {{ field(key, value, parent) }}
         {% endif %}
@@ -68,4 +90,28 @@
         {{ template(arrTemplate) }}
         <button class="btn btn-primary" type="submit">Create</button>
     </form>
+{% endblock %}
+
+{% block jsExtends %}
+    <script>
+      function addInput(event, divName) {
+        var parent = event.target.parentNode;
+        var lastChild = parent.lastElementChild;
+        if (lastChild.value) {
+          var newChild = lastChild.cloneNode(true);
+          newChild.value = "";
+          document.getElementById(divName).appendChild(newChild);
+        } else {
+          lastChild.focus()
+        }
+      }
+      function removeLastInput(event) {
+        var parent = event.target.parentNode;
+        var lastChild = parent.lastElementChild;
+        var previousChild = lastChild.previousElementSibling;
+        if (previousChild.nodeName !== 'BUTTON') {
+          parent.removeChild(lastChild)
+        }
+      }
+    </script>
 {% endblock %}
