@@ -123,7 +123,8 @@ node server.js
 
 ## ArrowjsCore structure
 
-- libs/ArrowApplication.js
+- ArrowjsCore/libs/ArrowApplication.js structure by 
+
     ![libs/ArrowApplication.js](arrowapp1000.png)
 
 ## License
