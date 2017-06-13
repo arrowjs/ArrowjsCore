@@ -123,7 +123,11 @@ node server.js
 
 ## ArrowjsCore Structure
 
-- This picture below shows overview of `ArrowjsCore/libs/ArrowApplication.js` structure .
+- `ArrowjsCore/libs/ArrowApplication.js`
+
+ArrowApplication is a singleton object. It is heart of Arrowjs.io web app. it wraps Express and adds following functions: support Redis, multi-languages, passport, check permission and socket.io / websocket
+
+This picture below shows overview of `ArrowApplication.js` structure .
 
 
     ![libs/ArrowApplication.js](arrowapp1000.png)
