@@ -121,9 +121,9 @@ node server.js
 * [Arrowjs.io Core examples](https://github.com/arrowjs/examples) 
 * [Documentation](https://github.com/arrowjs/Documents)
 
-## ArrowjsCore structure
+## ArrowjsCore Structure
 
-- This picture shows overview of ArrowjsCore/libs/ArrowApplication.js structure .
+- This picture below shows overview of `ArrowjsCore/libs/ArrowApplication.js` structure .
 
 
     ![libs/ArrowApplication.js](arrowapp1000.png)
