@@ -121,6 +121,11 @@ node server.js
 * [Arrowjs.io Core examples](https://github.com/arrowjs/examples) 
 * [Documentation](https://github.com/arrowjs/Documents)
 
+## ArrowjsCore structure
+
+- libs/ArrowApplication.js
+    ![libs/ArrowApplication.js](arrowapp1000.png)
+
 ## License
 
 The MIT License (MIT)
