@@ -123,7 +123,8 @@ node server.js
 
 ## ArrowjsCore structure
 
-- ArrowjsCore/libs/ArrowApplication.js structure by 
+- This picture shows overview of ArrowjsCore/libs/ArrowApplication.js structure .
+
 
     ![libs/ArrowApplication.js](arrowapp1000.png)
 
