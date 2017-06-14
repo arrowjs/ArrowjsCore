@@ -22,8 +22,53 @@ To get started with arrowjs install the ```arrowjs``` package:
 ```sh
 $ npm install arrowjs --save
 ```
+# SET UP ARROWJS CORE
+------------------
 
-## SETUP ARROWJS PROJECT 
+## 2 Ways To Use Arrowjs Core Module:
+1. Use the stable version in npm 
+```bash
+  $ cd my-project
+  $ npm i --save arrowjs
+```
+
+```js
+  // in your server.js 
+  // require the module from npm
+  const Arrow = require('arrowjs');
+  const application = new Arrow();
+  application.start(); 
+```
+
+2. Try the latest version in development in github
+* Clone ArrowjsCore to your local computer so that you can refer to it later in your project
+```bash
+  $ cd /home/user/modules/
+  $ git clone https://github.com/arrowjs/ArrowjsCore
+```
+* After cloning it, you have to install all dependencies of ArrowjsCore so it can work properly
+```bash
+  $ cd ArrowjsCore/
+  $ npm i
+```
+* Now ArrowjsCore is local at '/home/user/modules/ArrowjsCore'
+```js
+  // use it by referring to the ArrowjsCore folder
+  // in server.js
+  const Arrow = require('/home/user/modules/ArrowjsCore');
+  const application = new Arrow();
+  application.start(); 
+```
+
+## Start your project - Run the server and listen on port 8000
+
+```bash
+  // open terminal in your project to install dependencies and start server
+  $ npm i
+  $ node server.js
+```
+
+## SETUP ARROWJS PROJECT WITH GENERATOR
 ### Generate sample Arrowjs project with generator-arrowjs
 
 * Yeoman is a tool that helps you easily generate/ create a complete project structure or templates 
