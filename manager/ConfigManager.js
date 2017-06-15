@@ -17,7 +17,7 @@ class ConfigManager extends SystemManager {
     }
 
     /**
-     * Get system config by key
+     * Get system config by key - the key is in ArrowApplication.configManager._app._config
      * @param key
      * @returns {*}
      */

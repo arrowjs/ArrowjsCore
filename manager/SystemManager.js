@@ -9,7 +9,7 @@ const __ = require('../libs/global_function'),
     ViewEngine = require("../libs/ViewEngine");
 
 /**
- * Class is base class for FeatureManager, ThemeManager...
+ * Class is base class for ConfigManager, DefaultManager, FeatureManager, ThemeManager...
  */
 class SystemManager extends events.EventEmitter {
     constructor(app, name) {

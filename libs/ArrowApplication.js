@@ -73,6 +73,9 @@ class ArrowApplication {
         this._config = __.getRawConfig();
 
         //Read and parse config/structure.js
+        /* buildStructure() takes input as an object -> returns an array
+         * __.getStructure() reads file config/structure.js and returns the struc obj
+         */
         this.structure = buildStructure(__.getStructure());
 
         //display longer stack trace in console
@@ -104,7 +107,7 @@ class ArrowApplication {
         this.middleware.methodOverride = require('method-override');
 
 
-        //Load available languages. See config/i18n.js and folder /lang
+        //Load available languages. See libs/i18n.js and folder /lang
         loadingLanguage(this._config);
 
         //Bind all global functions to ArrowApplication object
@@ -115,9 +118,9 @@ class ArrowApplication {
         this._arrRoutes = Object.create(null);
 
         this.utils = Object.create(null);
-        this.utils.dotChain = getDataByDotNotation;
+        this.utils.dotChain = getDataByDotNotation; // not found
         this.utils.fs = fsExtra;
-        this.utils.loadAndCreate = loadSetting.bind(this);
+        this.utils.loadAndCreate = loadSetting.bind(this); // not found
         this.utils.markSafe = r.markSafe;
 
         this.arrowSettings = Object.create(null);

@@ -11,14 +11,14 @@ const pathAttribute = require('./path'),
 
 /**
  * Get config by attribute of feature
- * @param attName
- * @param component
- * @param fatherPath
- * @param application
+ * @param attName - attribute name e.g "action"
+ * @param component - component object e.g index {...}
+ * @param fatherPath - absolute folder path to features e.g /home/username/projectname/features/index
+ * @param application - ArrowApplication object
  * @returns {*}
  */
 module.exports = function actionByAttribute(attName, component, fatherPath, application) {
-    let setting = component._structure[attName];
+    let setting = component._structure[attName]; // { path: { '0': { path: [Object] } }, type: 'single' }
     switch (attName) {
         case "path" :
             return pathAttribute();

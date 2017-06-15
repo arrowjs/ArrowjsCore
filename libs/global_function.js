@@ -283,7 +283,9 @@ module.exports.getRawConfig = function getRawConfig() {
 
     //get config.js
     try {
+        // check file accessibility 
         fs.accessSync(__base + 'config/config.js');
+        // assign config object to conf
         _.assign(conf, require(__base + 'config/config'));
     } catch (err) {
 
@@ -457,10 +459,10 @@ module.exports.getRawConfig = function getRawConfig() {
  */
 module.exports.getStructure = function getStructure() {
     let structure = {};
-    try {
+    try {        
         fs.accessSync(__base + 'config/structure.js');
-
         /* istanbul ignore next */
+        // assign all content in config/structure.js to structure 
         _.assign(structure, require(__base + 'config/structure'));
     } catch (err) {
         /* istanbul ignore else */

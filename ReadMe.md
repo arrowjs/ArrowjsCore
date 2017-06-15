@@ -22,6 +22,17 @@ To get started with arrowjs install the ```arrowjs``` package:
 ```sh
 $ npm install arrowjs --save
 ```
+### Or check out the development version: clone the latest version in github
+```sh
+$ git clone https://github.com/arrowjs/ArrowjsCore.git
+```
+```js
+// use arrowjs in your project by require it with relative path
+// for example, Arrowjs is cloned to /Desktop/ArrowjsCore
+// your project is in /home/user/my-project/
+// in your server.js
+const Arrow = require('../Desktop/ArrowjsCore');
+```
 
 ## SETUP ARROWJS PROJECT 
 ### Generate sample Arrowjs project with generator-arrowjs
@@ -32,21 +43,21 @@ $ npm install arrowjs --save
 
 ```bash
 // enter the folder you want to store your project
-cd example
+$ cd example
 
 // install yo & generator-arrowjs
-npm install -g yo generator-arrowjs
+$ npm install -g yo generator-arrowjs
 
 // generate sample project structure
-yo arrowjs
+$ yo arrowjs
 
 // create feature menu for application my-project
 cd my-project && yo arrowjs:feature menu
 ```
 
 ### Generator-arrowjs steps by steps:
-```
- yo arrowjs
+```bash
+$ yo arrowjs
 ```
 ![img](Readme_images/yoarrowjs.png)
 
@@ -100,9 +111,9 @@ cd my-project && yo arrowjs:feature menu
 ```
 
 ### Easily add more features to the project
-```
-// create feature menu for application my-project
-cd my-project && yo arrowjs:feature menu
+```bash
+// create feature menu
+$ cd my-project && yo arrowjs:feature menu
 ```
 
 ![img](Readme_images/addfeature.png)
@@ -110,10 +121,10 @@ cd my-project && yo arrowjs:feature menu
 * As seen above, you can also set up database model that goes with this feature e.g. quickly create a user table in database with 4 columns (id, username, user_email, user_pass)
 * Notes: the table is not immediately created at this moment but when the server is started
 
-```
+```bash
 // now we can start the server 
 node server.js
-// go to port 8000 -> render default features/index/views/index.html
+// go to port 8000 - render default features/index/views/index.html
 ```
 
 ## Useful links
